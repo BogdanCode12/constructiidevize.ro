@@ -146,7 +146,7 @@ export async function matchLines(companyId: number, lines: ImportLine[]): Promis
     if (cached) {
       const res = (typeof cached.proposal === "string" ? JSON.parse(cached.proposal) : cached.proposal) as EstResource[];
       await execute("UPDATE ai_match_cache SET hits = hits + 1 WHERE id = ?", [cached.id]);
-      out.push({ item: { ...base, resources: await refreshPrices(companyId, res), reviewNote: "Propus de AI anterior (din cache) — verifică normele și prețurile" }, status: "cache" });
+      out.push({ item: { ...base, resources: await refreshPrices(companyId, res), reviewNote: "Propus anterior de asistent — verifică normele și prețurile" }, status: "cache" });
       continue;
     }
 
@@ -163,7 +163,7 @@ export async function matchLines(companyId: number, lines: ImportLine[]): Promis
         continue;
       }
     }
-    out.push({ item: { ...base, reviewNote: "Negăsit în bază — completează resursele sau folosește AI" }, status: "negasit" });
+    out.push({ item: { ...base, reviewNote: "Negăsit în bază — completează resursele sau folosește completarea automată" }, status: "negasit" });
   }
   return out;
 }

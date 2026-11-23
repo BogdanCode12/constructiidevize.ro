@@ -97,7 +97,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
     const res = await startEstimatorAction(doc.id, missing.map((i) => ({ ref: i.key, code: i.code, name: i.name, unit: i.unit })));
     if (!res.ok) return setError(res.error);
     setAiJob(res.jobId);
-    setNotice(`AI-ul caută în bază pentru ${missing.length} articole…`);
+    setNotice(`Asistentul caută în bază pentru ${missing.length} articole…`);
   };
 
   // Urmărește lucrarea AI și aplică propunerile pe articole când e gata.
@@ -119,12 +119,12 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
             }),
           })),
         }));
-        setNotice(`AI-ul a propus resurse pentru ${r.proposals.length} articole. Verifică notele galbene, apoi salvează.`);
+        setNotice(`Asistentul a propus resurse pentru ${r.proposals.length} articole. Verifică notele galbene, apoi salvează.`);
       } else if (r.status === "error") {
         clearInterval(t);
         setAiJob(null);
         setNotice(null);
-        setError(r.error ?? "Completarea cu AI a eșuat.");
+        setError(r.error ?? "Completarea automată a eșuat.");
       }
     }, 3000);
     return () => clearInterval(t);
@@ -182,7 +182,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
           {missing.length > 0 && (
             <button onClick={startAi} disabled={!!aiJob}
               className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-800 hover:border-brand-500 disabled:opacity-60">
-              {aiJob ? "AI lucrează…" : `✦ Completează cu AI (${missing.length})`}
+              {aiJob ? "Se completează…" : `✦ Completează automat (${missing.length})`}
             </button>
           )}
           <a
@@ -230,7 +230,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
               ],
             }));
             const s = res.stats;
-            setNotice(`Import: ${s.exact} potrivite sigur, ${s.propus + s.cache} propuse (de verificat), ${s.negasit} negăsite${s.negasit ? " — le poți completa cu AI" : ""}. Nu uita să salvezi.`);
+            setNotice(`Import: ${s.exact} potrivite sigur, ${s.propus + s.cache} propuse (de verificat), ${s.negasit} negăsite${s.negasit ? " — le poți completa automat" : ""}. Nu uita să salvezi.`);
           }}
         />
       )}
@@ -356,7 +356,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
               <button onClick={() => setTab("grafic")} className="mt-3 text-sm font-semibold text-brand-700 hover:underline">Vezi durata și graficul de execuție →</button>
               <div className="mt-6 border-t border-line pt-4">
                 <h3 className="font-semibold">Rețete</h3>
-                <p className="mt-1 text-sm text-muted">Articolele salvate ca rețete se găsesc automat la următorul import F3, fără AI și fără cost.</p>
+                <p className="mt-1 text-sm text-muted">Articolele salvate ca rețete se găsesc automat la următorul import F3, instant și fără cost.</p>
                 <button onClick={saveAllRecipes} className="mt-2 text-sm font-semibold text-brand-700 hover:underline">★ Salvează articolele verificate ca rețete</button>
               </div>
               <form action={deleteEstimateAction} className="mt-6 border-t border-line pt-4"

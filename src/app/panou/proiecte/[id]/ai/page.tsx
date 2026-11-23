@@ -12,7 +12,7 @@ import { PROJECT_FILE_LABELS, type ProjectFileLabel } from "@/lib/ai/labels";
 import { ChatForm, Poller, ProjectFilesUpload } from "./client";
 import { clearChatAction, deleteProjectFileAction, startAiJobAction } from "./actions";
 
-export const metadata = { title: "Asistent AI" };
+export const metadata = { title: "Asistent tehnic" };
 
 const dt = new Intl.DateTimeFormat("ro-RO", { dateStyle: "short", timeStyle: "short" });
 const size = (b: number) => (b > 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.ceil(b / 1024)} KB`);
@@ -51,14 +51,14 @@ export default async function ProjectAiPage({ params, searchParams }: { params: 
       <Poller active={running} />
       <Link href={`/panou/proiecte/${projectId}`} className="text-sm text-muted hover:text-ink">← {project.name}</Link>
       <div className="mt-1 mb-4 flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-2xl font-bold sm:text-3xl">Asistent AI</h1>
-        <span className="text-sm text-muted">Cereri AI luna aceasta: <b className="text-ink">{usage.used}</b> din {usage.limit}</span>
+        <h1 className="text-2xl font-bold sm:text-3xl">Asistent tehnic</h1>
+        <span className="text-sm text-muted">Cereri către asistent luna aceasta: <b className="text-ink">{usage.used}</b> din {usage.limit}</span>
       </div>
       {!configured && (
-        <p className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm">Asistentul AI nu este activat încă pe platformă. Poți încărca documentele; analizele vor fi disponibile după activare.</p>
+        <p className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm">Asistentul tehnic nu este activat încă pe platformă. Poți încărca documentele; analizele vor fi disponibile după activare.</p>
       )}
       <nav className="mb-6 flex gap-1 border-b border-line">
-        {[["analize", "Documente & analize"], ["chat", "Întreabă AI-ul"]].map(([id, label]) => (
+        {[["analize", "Documente & analize"], ["chat", "Întreabă asistentul"]].map(([id, label]) => (
           <Link key={id} href={`/panou/proiecte/${projectId}/ai?tab=${id}`}
             className={`border-b-2 px-3 py-2.5 text-sm font-medium ${tab === id ? "border-brand-700 text-brand-800" : "border-transparent text-muted hover:text-ink"}`}>{label}</Link>
         ))}
@@ -69,7 +69,7 @@ export default async function ProjectAiPage({ params, searchParams }: { params: 
           <div className="space-y-6">
             <Card>
               <h2 className="mb-1 font-bold">Rulează o analiză</h2>
-              <p className="mb-4 text-sm text-muted">AI-ul citește documentele bifate împreună cu datele din platformă (firma, dosarul, devizele, termenele).</p>
+              <p className="mb-4 text-sm text-muted">Asistentul citește documentele bifate împreună cu datele din platformă (firma, dosarul, devizele, termenele).</p>
               <ActionForm action={startAiJobAction} submitLabel="Pornește analiza">
                 <input type="hidden" name="project_id" value={projectId} />
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -147,7 +147,7 @@ export default async function ProjectAiPage({ params, searchParams }: { params: 
       ) : (
         <Card className="flex flex-col p-0">
           <div className="flex items-center justify-between border-b border-line px-5 py-3">
-            <span className="text-sm text-muted">AI-ul vede documentele proiectului ({files.length}), devizele, termenele și dosarul firmei.</span>
+            <span className="text-sm text-muted">Asistentul vede documentele proiectului ({files.length}), devizele, termenele și dosarul firmei.</span>
             {chat.length > 0 && (
               <form action={clearChatAction}>
                 <input type="hidden" name="project_id" value={projectId} />
@@ -172,7 +172,7 @@ export default async function ProjectAiPage({ params, searchParams }: { params: 
           </div>
         </Card>
       )}
-      <p className="mt-4 text-xs text-muted">Răspunsurile AI pot conține erori. Verifică întotdeauna cu documentele originale înainte de a le folosi în ofertă.</p>
+      <p className="mt-4 text-xs text-muted">Răspunsurile asistentului pot conține erori. Verifică întotdeauna cu documentele originale înainte de a le folosi în ofertă.</p>
     </>
   );
 }

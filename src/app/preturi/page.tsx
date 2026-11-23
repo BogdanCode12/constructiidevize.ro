@@ -20,7 +20,7 @@ export default async function PricingPage() {
             <p className="mt-5 text-lg text-muted">{trial_days} zile gratuit, fără card. Plata anuală te costă cât 10 luni.</p>
           </div>
           <div className="mt-14"><PlanCards plans={plans} cta={{ label: "Începe gratuit", href: "/inregistrare" }} /></div>
-          <p className="mt-6 text-sm text-muted">Prețurile nu includ TVA. Funcțiile AI au o limită lunară de cereri pe firmă, inclusă în abonament.</p>
+          <p className="mt-6 text-sm text-muted">Prețurile nu includ TVA. Asistentul tehnic are o limită lunară de cereri pe firmă, inclusă în abonament.</p>
         </div>
       </section>
       {faq && (

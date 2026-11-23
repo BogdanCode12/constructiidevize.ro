@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteShell } from "@/components/site/shell";
 
-export const metadata = { title: "Servicii", description: "Devize F1–F5 și C5–C9, import F3, asistent AI pentru licitații, dosar și declarații, management de șantier." };
+export const metadata = { title: "Servicii", description: "Devize F1–F5 și C5–C9, import F3, asistent tehnic pentru licitații, dosar și declarații, management de șantier." };
 
 const SECTIONS = [
   {
@@ -20,7 +20,7 @@ const SECTIONS = [
   },
   {
     id: "ai",
-    eyebrow: "Asistent AI",
+    eyebrow: "Asistent tehnic",
     title: "Un asistent care citește documentația pentru tine",
     text: "Încarci caietul de sarcini, fișa de date sau contractul, iar asistentul extrage cerințele, verifică ce lipsește din dosarul firmei și pregătește ciorne. Lucrează în limba română și indică sursa fiecărei informații.",
     points: [

@@ -28,7 +28,7 @@ export async function callClaude(opts: {
   maxTokens?: number;
 }): Promise<AiResult> {
   if (process.env.AI_MOCK === "1") return mockAnswer(opts.messages);
-  if (!process.env.ANTHROPIC_API_KEY) throw new AiError("Asistentul AI nu este configurat (lipsește ANTHROPIC_API_KEY).");
+  if (!process.env.ANTHROPIC_API_KEY) throw new AiError("Asistentul tehnic nu este configurat (lipsește ANTHROPIC_API_KEY).");
 
   try {
     // Streaming: răspunsurile lungi (propuneri tehnice, analize) pot dura câteva minute.
@@ -59,10 +59,10 @@ export async function callClaude(opts: {
     };
   } catch (err) {
     if (err instanceof AiError) throw err;
-    if (err instanceof Anthropic.AuthenticationError) throw new AiError("Cheia API pentru AI nu este validă.");
-    if (err instanceof Anthropic.RateLimitError) throw new AiError("Prea multe cereri către AI în acest moment. Reîncearcă peste câteva minute.");
+    if (err instanceof Anthropic.AuthenticationError) throw new AiError("Cheia API a asistentului nu este validă.");
+    if (err instanceof Anthropic.RateLimitError) throw new AiError("Prea multe cereri către asistent în acest moment. Reîncearcă peste câteva minute.");
     if (err instanceof Anthropic.BadRequestError) throw new AiError(`Cererea nu a fost acceptată: ${err.message.slice(0, 300)}`);
-    if (err instanceof Anthropic.APIError) throw new AiError(`Serviciul AI a răspuns cu eroare (${err.status ?? "rețea"}). Reîncearcă.`);
+    if (err instanceof Anthropic.APIError) throw new AiError(`Asistentul a răspuns cu eroare (${err.status ?? "rețea"}). Reîncearcă.`);
     throw err;
   }
 }

@@ -25,7 +25,7 @@ export default async function ResourcesPage({ searchParams }: { searchParams: Pr
     const rows = await listRecipes({ companyId: user.company?.id ?? null, includeGlobal: true, q: q?.trim() || undefined });
     return (
       <>
-        <PageHeader title="Resurse" subtitle="Rețetele sunt articole gata descompuse pe resurse. La importul F3 se potrivesc automat, fără AI și fără cost. Salvezi rețete din editorul de deviz cu ★." />
+        <PageHeader title="Resurse" subtitle="Rețetele sunt articole gata descompuse pe resurse. La importul F3 se potrivesc automat, instant și fără cost. Salvezi rețete din editorul de deviz cu ★." />
         {tabs}
         <Card className="overflow-x-auto p-0">
           {rows.length === 0 ? <p className="px-5 py-10 text-center text-muted">Nicio rețetă încă. În editorul de deviz, apasă ★ pe un articol completat ca să-l salvezi.</p> : (

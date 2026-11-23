@@ -204,7 +204,7 @@ export function ImportDialog({ onClose, onImport }: { onClose: () => void; onImp
       >
         <div>
           <h2 className="text-lg font-bold">Import listă de cantități (F3)</h2>
-          <p className="text-sm text-muted">Articolele se potrivesc automat cu rețetele din bază — fără AI, fără cost. Ce nu se găsește poate fi completat apoi cu AI.</p>
+          <p className="text-sm text-muted">Articolele se potrivesc automat cu rețetele din bază — instant, fără cost. Ce nu se găsește poate fi completat apoi automat, de asistent.</p>
         </div>
         {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
         <label className="block text-sm">

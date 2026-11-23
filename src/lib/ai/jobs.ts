@@ -68,7 +68,7 @@ export async function runJob(jobId: number): Promise<void> {
   await execute("UPDATE ai_jobs SET status = 'running' WHERE id = ?", [jobId]);
   try {
     const task = await queryOne<AiTask>("SELECT slug, name, description, prompt, effort, needs_files, send_originals, active, position FROM ai_tasks WHERE slug = ?", [job.task_slug]);
-    if (!task) throw new AiError("Sarcina AI nu mai există.");
+    if (!task) throw new AiError("Analiza nu mai există.");
     const ids = typeof job.file_ids === "string" ? (JSON.parse(job.file_ids) as number[]) : job.file_ids ?? [];
     const content = await sharedContent(job.company_id, job.project_id, { fileIds: ids, originals: task.send_originals === 1 });
     content.push({

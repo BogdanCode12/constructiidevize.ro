@@ -121,7 +121,7 @@ export async function importF3Action(data: FormData): Promise<ImportResult> {
 
 export async function startEstimatorAction(estimateId: number, items: EstimatorInput[]): Promise<{ ok: true; jobId: number } | { ok: false; error: string }> {
   const { user, companyId } = await companyOf();
-  if (!aiConfigured()) return { ok: false, error: "Asistentul AI nu este configurat încă pe platformă." };
+  if (!aiConfigured()) return { ok: false, error: "Asistentul tehnic nu este configurat încă pe platformă." };
   const est = await queryOne<{ project_id: number }>("SELECT project_id FROM estimates WHERE id = ? AND company_id = ?", [estimateId, companyId]);
   if (!est) return { ok: false, error: "Devizul nu există." };
   const clean = items
@@ -130,7 +130,7 @@ export async function startEstimatorAction(estimateId: number, items: EstimatorI
     .map((i) => ({ ref: String(i.ref).slice(0, 60), code: String(i.code ?? "").slice(0, 40), name: String(i.name).slice(0, 300), unit: String(i.unit ?? "").slice(0, 20) }));
   if (!clean.length) return { ok: false, error: "Nu există articole de completat." };
   const { used, limit } = await monthlyUsage(companyId);
-  if (used >= limit) return { ok: false, error: `Ai folosit toate cele ${limit} cereri AI incluse luna aceasta.` };
+  if (used >= limit) return { ok: false, error: `Ai folosit toate cele ${limit} cereri către asistent incluse luna aceasta.` };
 
   const res = await execute(
     "INSERT INTO ai_jobs (company_id, project_id, task_slug, task_name, instructions, created_by) VALUES (?, ?, 'deviz_ai', ?, ?, ?)",

@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 const STEPS = [
   { n: "01", title: "Încarci documentația", text: "Caietul de sarcini, fișa de date și lista de cantități (F3), din PDF, Word sau Excel." },
-  { n: "02", title: "Devizul se construiește din bază", text: "Articolele se potrivesc automat cu rețetele și resursele tale. AI-ul completează doar ce lipsește." },
+  { n: "02", title: "Devizul se construiește din bază", text: "Articolele se potrivesc automat cu rețetele și resursele tale. Asistentul completează doar ce lipsește." },
   { n: "03", title: "Verifici și ajustezi", text: "Vezi ce e sigur și ce e de verificat, simulezi prețul și profitul, stabilești graficul." },
   { n: "04", title: "Exporți dosarul complet", text: "Devize F1–F5 și C5–C9 în Excel, declarații în Word și documentele firmei, într-o arhivă." },
 ];
@@ -17,7 +17,7 @@ const STEPS = [
 const SERVICES = [
   { id: "devize", title: "Devize și formulare", text: "Capitole, articole și resurse cu norme și prețuri. Recapitulație, F1–F5, C5–C9, export Excel cu formule." },
   { id: "devize", title: "Import F3 automat", text: "Lista de cantități din Excel devine deviz în câteva secunde, potrivită cu baza ta de rețete." },
-  { id: "ai", title: "Asistent AI pentru licitații", text: "Extrage cerințele din caietul de sarcini, verifică eligibilitatea și ce lipsește, pregătește clarificări." },
+  { id: "ai", title: "Asistent tehnic pentru licitații", text: "Extrage cerințele din caietul de sarcini, verifică eligibilitatea și ce lipsește, pregătește clarificări." },
   { id: "documente", title: "Dosar și declarații", text: "Dosarul permanent al firmei cu alerte de expirare și declarații completate automat în Word." },
   { id: "devize", title: "Manoperă, grafic, profit", text: "Ore-om și durată pe capitole, grafic Gantt, simulator de preț și calculator de profit." },
   { id: "santier", title: "Șantier și situații de lucrări", text: "Situații lunare față de contract, încasări și cheltuieli, subcontractanți, jurnal cu poze." },
@@ -68,7 +68,7 @@ export default async function HomePage() {
           {[
             ["F1–F5 · C5–C9", "formularele cerute la licitațiile publice"],
             ["Import F3", "din Excel sau lipit, potrivit automat cu baza ta"],
-            ["AI în română", "citește caiete de sarcini și contracte"],
+            ["Asistent tehnic", "citește caiete de sarcini și contracte"],
             ["Export complet", "Excel, Word și arhivă ZIP a dosarului"],
           ].map(([a, b]) => (
             <div key={a} className="py-7 md:px-8 md:first:pl-0">
@@ -121,7 +121,7 @@ export default async function HomePage() {
         <div>
           <SectionTitle eyebrow="Diferența DevizBuild" title="Devizul vine din baza ta de date, nu din ghicit" />
           <p className="mt-6 text-lg leading-relaxed text-muted">
-            Fiecare articol importat se caută întâi în rețetele firmei și în catalogul platformei. Ce se găsește sigur intră direct în deviz, ce seamănă e marcat pentru verificare, iar asistentul AI completează doar restul, căutând tot în baza de date.
+            Fiecare articol importat se caută întâi în rețetele firmei și în catalogul platformei. Ce se găsește sigur intră direct în deviz, ce seamănă e marcat pentru verificare, iar asistentul tehnic completează doar restul, căutând tot în baza de date.
           </p>
           <ul className="mt-8 space-y-4">
             {[
@@ -147,7 +147,7 @@ export default async function HomePage() {
               ["✓", "text-ink", "Beton C25/30 în fundații", "mc", "Rețeta firmei"],
               ["!", "text-amber-600", "Beton clasa C25/30 turnat în fundații continue", "mc", "Propus · 70% asemănare"],
               ["✓", "text-ink", "Armături din oțel PC52", "kg", "Catalog platformă"],
-              ["✦", "text-brand-700", "Termoizolație cu vată bazaltică 15 cm", "mp", "Completat de AI din bază"],
+              ["✦", "text-brand-700", "Termoizolație cu vată bazaltică 15 cm", "mp", "Completat de asistent din bază"],
             ].map(([icon, color, name, um, src]) => (
               <li key={name} className="flex items-center gap-3 px-4 py-3">
                 <span className={`grid size-6 shrink-0 place-items-center rounded-full bg-canvas font-semibold ${color}`}>{icon}</span>
@@ -160,7 +160,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-3 gap-2 p-2 text-center text-sm">
             <div className="rounded-lg bg-canvas py-3"><div className="text-2xl font-semibold">158</div><div className="text-xs text-muted">potrivite sigur</div></div>
             <div className="rounded-lg bg-canvas py-3"><div className="text-2xl font-semibold text-amber-600">13</div><div className="text-xs text-muted">de verificat</div></div>
-            <div className="rounded-lg bg-canvas py-3"><div className="text-2xl font-semibold text-brand-700">13</div><div className="text-xs text-muted">completate de AI</div></div>
+            <div className="rounded-lg bg-canvas py-3"><div className="text-2xl font-semibold text-brand-700">13</div><div className="text-xs text-muted">completate de asistent</div></div>
           </div>
         </div>
       </section>
@@ -172,7 +172,7 @@ export default async function HomePage() {
           <div className="mt-14 grid gap-10 md:grid-cols-3">
             {[
               ["Ofertare", ["Deviz pe capitole și articole", "Simulator de preț și profit", "Verificări automate ale devizului"]],
-              ["Licitație", ["Analiza caietului de sarcini cu AI", "Declarații și formulare în Word", "Dosar complet într-o arhivă"]],
+              ["Licitație", ["Analiza automată a caietului de sarcini", "Declarații și formulare în Word", "Dosar complet într-o arhivă"]],
               ["Execuție", ["Situații de lucrări lunare", "Încasări, cheltuieli și profit real", "Jurnal de șantier cu poze"]],
             ].map(([t, items]) => (
               <div key={t as string} className="border-t border-white/15 pt-6">

@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/auth/session";
 import { aiConfigured } from "@/lib/ai/claude";
 import { listAiTasks, monthlyUsage } from "@/lib/ai/jobs";
 
-export const metadata = { title: "Asistent AI" };
+export const metadata = { title: "Asistent tehnic" };
 
 const dt = new Intl.DateTimeFormat("ro-RO", { dateStyle: "short", timeStyle: "short" });
 
@@ -31,8 +31,8 @@ export default async function AssistantPage() {
 
   return (
     <>
-      <PageHeader title="Asistent AI" subtitle={`Încarci documentele licitației, iar AI-ul analizează cerințele, verifică dosarul și redactează ciorne. Cereri luna aceasta: ${usage.used} din ${usage.limit}.`} />
-      {!aiConfigured() && <p className="mb-6 rounded-lg bg-amber-50 px-4 py-3 text-sm">Asistentul AI nu este activat încă pe platformă.</p>}
+      <PageHeader title="Asistent tehnic" subtitle={`Încarci documentele licitației, iar asistentul analizează cerințele, verifică dosarul și redactează ciorne. Cereri luna aceasta: ${usage.used} din ${usage.limit}.`} />
+      {!aiConfigured() && <p className="mb-6 rounded-lg bg-amber-50 px-4 py-3 text-sm">Asistentul tehnic nu este activat încă pe platformă.</p>}
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <Card className="p-0">
           <div className="border-b border-line px-5 py-3.5 font-semibold">Alege proiectul</div>

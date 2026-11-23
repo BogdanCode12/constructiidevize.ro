@@ -45,7 +45,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href={`/panou/proiecte/${id}/santier`} className="rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200">Șantier</Link>
-          <Link href={`/panou/proiecte/${id}/ai`} className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-800 hover:border-brand-500">✦ Asistent AI</Link>
+          <Link href={`/panou/proiecte/${id}/ai`} className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-800 hover:border-brand-500">✦ Asistent tehnic</Link>
           <a href={`/panou/proiecte/${id}/export`} className="rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200">F1 Excel</a>
           <Link href={`/panou/documente?tab=declaratii&proiect=${id}`} className="rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200">Declarații</Link>
           <a href={`/panou/proiecte/${id}/dosar`} className="rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-800">Dosar complet (ZIP)</a>

@@ -148,14 +148,14 @@ async function runBatch(companyId: number, items: EstimatorInput[], prompt: stri
     outputTokens += u.output_tokens ?? 0;
     last = msg;
   }
-  if (!last) throw new AiError("AI-ul nu a răspuns.");
-  if (last.stop_reason === "refusal") throw new AiError("AI-ul nu a putut procesa articolele.");
+  if (!last) throw new AiError("Asistentul nu a răspuns.");
+  if (last.stop_reason === "refusal") throw new AiError("Asistentul nu a putut procesa articolele.");
   const text = last.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("");
   let parsed: Output;
   try {
     parsed = JSON.parse(text) as Output;
   } catch {
-    throw new AiError("Răspunsul AI nu a putut fi citit. Reîncearcă.");
+    throw new AiError("Răspunsul asistentului nu a putut fi citit. Reîncearcă.");
   }
   return { parsed, inputTokens, outputTokens };
 }
@@ -194,7 +194,7 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
       let out: Output;
       if (process.env.AI_MOCK === "1") out = await mockBatch(job.company_id, batch);
       else {
-        if (!process.env.ANTHROPIC_API_KEY) throw new AiError("Asistentul AI nu este configurat.");
+        if (!process.env.ANTHROPIC_API_KEY) throw new AiError("Asistentul tehnic nu este configurat.");
         const r = await runBatch(job.company_id, batch, task?.prompt ?? "", task?.effort ?? "low");
         out = r.parsed;
         tin += r.inputTokens;
@@ -204,7 +204,7 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
         const src = batch.find((b) => b.ref === a.ref);
         if (!src) continue;
         const resources = await materialize(job.company_id, a);
-        proposals.push({ ref: a.ref, resources, note: `Propus de AI — verifică. ${a.nota}`.slice(0, 255) });
+        proposals.push({ ref: a.ref, resources, note: `Propus de asistent — verifică. ${a.nota}`.slice(0, 255) });
         await cacheProposal(job.company_id, src, resources);
       }
     }
@@ -215,7 +215,7 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
   } catch (err) {
     console.error("[ai] estimator", jobId, err);
     let msg = err instanceof Error ? err.message : "Eroare necunoscută.";
-    if (err instanceof Anthropic.APIError && !(err instanceof AiError)) msg = `Serviciul AI a răspuns cu eroare (${err.status ?? "rețea"}).`;
+    if (err instanceof Anthropic.APIError && !(err instanceof AiError)) msg = `Asistentul a răspuns cu eroare (${err.status ?? "rețea"}).`;
     await execute("UPDATE ai_jobs SET status = 'error', error = ?, finished_at = NOW() WHERE id = ?", [msg.slice(0, 500), jobId]);
   }
 }

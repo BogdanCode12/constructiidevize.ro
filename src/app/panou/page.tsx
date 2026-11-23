@@ -12,7 +12,7 @@ const dt = new Intl.DateTimeFormat("ro-RO", { weekday: "short", day: "2-digit", 
 export const metadata = { title: "Dashboard" };
 
 const START_OPTIONS: { icon: string; title: string; text: string; tag?: string; href?: string }[] = [
-  { icon: "spark", title: "Din documente, cu AI", text: "Încarcă caietul de sarcini, planșe, PDF sau Excel.", tag: "Recomandat", href: "/panou/asistent" },
+  { icon: "spark", title: "Din documente, cu asistentul", text: "Încarcă caietul de sarcini, planșe, PDF sau Excel.", tag: "Recomandat", href: "/panou/asistent" },
   { icon: "doc", title: "Din lista F3", text: "Importă lista de cantități; articolele se potrivesc automat cu baza ta.", href: "/panou/devize" },
   { icon: "calc", title: "Deviz de la zero", text: "Capitole și articole, cu bazele tale de resurse.", href: "/panou/devize" },
 ];

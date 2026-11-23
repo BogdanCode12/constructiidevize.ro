@@ -20,9 +20,9 @@ async function context(projectId: number) {
 }
 
 async function checkQuota(companyId: number): Promise<string | null> {
-  if (!aiConfigured()) return "Asistentul AI nu este configurat încă pe platformă.";
+  if (!aiConfigured()) return "Asistentul tehnic nu este configurat încă pe platformă.";
   const { used, limit } = await monthlyUsage(companyId);
-  if (used >= limit) return `Ai folosit toate cele ${limit} cereri AI incluse luna aceasta.`;
+  if (used >= limit) return `Ai folosit toate cele ${limit} cereri către asistent incluse luna aceasta.`;
   return null;
 }
 
@@ -41,7 +41,7 @@ export async function startAiJobAction(_: FormState, data: FormData): Promise<Fo
   const files = requested.length
     ? await query<{ id: number }>("SELECT id FROM project_files WHERE project_id = ? AND company_id = ? AND id IN (?)", [projectId, companyId, requested])
     : [];
-  if (task.needs_files && !files.length) return { error: "Bifează documentele pe care să le analizeze AI-ul." };
+  if (task.needs_files && !files.length) return { error: "Bifează documentele pe care să le analizeze asistentul." };
   const instructions = String(data.get("instructions") ?? "").trim().slice(0, 4000) || null;
 
   const res = await execute(

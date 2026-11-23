@@ -9,7 +9,7 @@ import { failStaleJobs } from "@/lib/ai/jobs";
 import { Poller } from "../client";
 import { deleteJobAction } from "../actions";
 
-export const metadata = { title: "Analiză AI" };
+export const metadata = { title: "Analiză" };
 
 export default async function AiJobPage({ params }: { params: Promise<{ id: string; jobId: string }> }) {
   const user = await requireUser();
@@ -28,7 +28,7 @@ export default async function AiJobPage({ params }: { params: Promise<{ id: stri
   return (
     <>
       <Poller active={working} />
-      <Link href={`/panou/proiecte/${id}/ai`} className="text-sm text-muted hover:text-ink">← Asistent AI · {job.project_name}</Link>
+      <Link href={`/panou/proiecte/${id}/ai`} className="text-sm text-muted hover:text-ink">← Asistent tehnic · {job.project_name}</Link>
       <div className="mt-1 mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">{job.task_name}</h1>
@@ -52,7 +52,7 @@ export default async function AiJobPage({ params }: { params: Promise<{ id: stri
         {working ? (
           <div className="py-16 text-center">
             <div className="mx-auto size-8 animate-spin rounded-full border-4 border-brand-100 border-t-brand-700" />
-            <p className="mt-4 font-semibold">AI-ul citește documentele și lucrează la analiză…</p>
+            <p className="mt-4 font-semibold">Asistentul citește documentele și lucrează la analiză…</p>
             <p className="mt-1 text-sm text-muted">Poate dura câteva minute pentru documentații mari. Poți părăsi pagina — rezultatul rămâne salvat.</p>
           </div>
         ) : job.status === "error" ? (
@@ -61,7 +61,7 @@ export default async function AiJobPage({ params }: { params: Promise<{ id: stri
           <Markdown text={job.output ?? ""} />
         )}
       </Card>
-      <p className="mt-4 text-xs text-muted">Text generat de AI — verifică-l cu documentele originale și asumă-l înainte de folosire.</p>
+      <p className="mt-4 text-xs text-muted">Text generat automat — verifică-l cu documentele originale și asumă-l înainte de folosire.</p>
     </>
   );
 }
