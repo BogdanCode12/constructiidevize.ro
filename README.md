@@ -65,10 +65,29 @@ Fluxul: **push pe `main` → GitHub Actions face build-ul → ramura `release` �
    ```
 6. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true}`.
 
+## Ce poate face clientul
+
+- **Proiecte:** fiecare lucrare sau licitație.
+- **Devize:** pe proiect, cu capitole și articole. Fiecare articol se desface pe resurse (normă × preț) de tip material, manoperă, utilaj sau transport. Recapitulația cuprinde cheltuielile indirecte, profitul și TVA-ul, cu procente editabile, plus orele de manoperă. Exportul Excel conține un deviz pe articole (F3) și listele C5 (materiale), C6 (manoperă), C7 (utilaje) și C8 (transport).
+- **Resurse:** fiecare firmă își ține materialele, manopera, utilajele și transportul cu prețurile proprii. Le poate adăuga, edita, șterge sau importa prin copy-paste din Excel. Pe lângă ele, vede și catalogul global al platformei.
+
+## Panoul de admin (`/admin`)
+
+Tot ce ține de platformă se modifică de aici, fără cod:
+
+- **Utilizatori:** căutare, editare (nume, email, rol, email confirmat), deconectare de pe toate dispozitivele și ștergere de cont.
+- **Abonamentul fiecărei firme:** plan, status, data de sfârșit a probei și data până la care e plătit.
+- **Datele firmei:** CUI, Nr. Reg. Com., adresă.
+- **Planuri și prețuri:** nume, preț lunar și anual, număr de utilizatori, funcționalități, plan evidențiat. Modificările apar imediat pe pagina de prețuri.
+- **Catalog global de resurse:** adăugare, editare, ștergere și import din Excel. Resursele de aici sunt vizibile tuturor clienților.
+- **Setări:** zilele perioadei de probă, procentele implicite pentru cheltuieli indirecte, profit și TVA.
+
+Fiecare modificare se scrie în jurnalul de activitate.
+
 ## Ce urmează
 
-1. Editorul de deviz: capitole, articole, resurse (materiale, manoperă, utilaje), recapitulație, export Excel/PDF (F1–F3, C5–C9).
-2. Plăți Stripe (lunar/anual) și facturi Oblio.
-3. Datele firmei după CUI din ANAF, invitarea colegilor, roluri.
-4. Calcul manoperă și ore de regie, apoi Asistentul AI (import PDF, Excel, planuri).
+1. Plăți Stripe (lunar/anual) și facturi Oblio; blocarea funcțiilor după expirarea probei.
+2. Datele firmei după CUI din ANAF, invitarea colegilor, roluri.
+3. Modulul Manoperă: echipe, durată, ore de regie, grafic de execuție.
+4. Import F3/Excel direct în deviz, apoi Asistentul AI (PDF, planuri).
 5. Limitarea încercărilor de autentificare și monitorizarea erorilor.

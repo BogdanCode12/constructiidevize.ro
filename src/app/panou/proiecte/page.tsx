@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ActionForm } from "@/components/action-form";
 import { Card, Field, PageHeader } from "@/components/ui";
 import { query } from "@/lib/db";
@@ -35,6 +36,7 @@ export default async function ProjectsPage() {
                   <th className="px-5 py-3 font-medium">Locație</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Creat</th>
+                  <th className="px-5 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -45,6 +47,7 @@ export default async function ProjectsPage() {
                     <td className="px-5 py-3">{p.location ?? "—"}</td>
                     <td className="px-5 py-3"><span className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium">{STATUS_LABEL[p.status]}</span></td>
                     <td className="px-5 py-3 whitespace-nowrap text-muted">{fmt.format(new Date(p.created_at))}</td>
+                    <td className="px-5 py-3 whitespace-nowrap text-right"><Link href={`/panou/devize?proiect=${p.id}`} className="font-semibold text-brand-700 hover:underline">+ Deviz</Link></td>
                   </tr>
                 ))}
               </tbody>
@@ -53,7 +56,7 @@ export default async function ProjectsPage() {
         </Card>
         <Card className="h-fit">
           <h2 className="mb-4 font-bold">Proiect nou</h2>
-          <ActionForm action={createProjectAction} submitLabel="Creează proiect">
+          <ActionForm action={createProjectAction} submitLabel="Creează proiect" resetOnSuccess>
             <Field label="Denumire" name="name" placeholder="ex: Reabilitare școala nr. 3" />
             <Field label="Beneficiar" name="client" required={false} placeholder="ex: Primăria Cluj-Napoca" />
             <Field label="Locație" name="location" required={false} placeholder="ex: Cluj-Napoca, jud. Cluj" />

@@ -2,7 +2,9 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { ButtonLink } from "@/components/ui";
 import { Icon } from "@/components/icon";
-import { TRIAL_DAYS } from "@/lib/plans";
+import { getSettings } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
 
 const FEATURES = [
   { icon: "spark", title: "Citire planuri cu AI", text: "Încarci DTAC, PTh, PDF sau Excel și primești antemăsurătoarea și lista de lucrări." },
@@ -13,7 +15,8 @@ const FEATURES = [
   { icon: "helmet", title: "Management de șantier", text: "Jurnal, pontaj și situații de lucrări lunare, comparate cu devizul." },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { trial_days } = await getSettings();
   return (
     <div className="bg-white">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
@@ -34,7 +37,7 @@ export default function HomePage() {
           Devize, calcul de manoperă, caiet de sarcini, declarații și management de șantier — într-o singură platformă, cu asistent AI.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <ButtonLink href="/inregistrare">Începe gratuit {TRIAL_DAYS} zile</ButtonLink>
+          <ButtonLink href="/inregistrare">Începe gratuit {trial_days} zile</ButtonLink>
           <ButtonLink href="/preturi" variant="ghost">Vezi prețurile</ButtonLink>
         </div>
       </section>

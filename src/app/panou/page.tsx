@@ -7,10 +7,10 @@ import { STATUS_LABEL } from "./proiecte/status";
 
 export const metadata = { title: "Dashboard" };
 
-const START_OPTIONS = [
+const START_OPTIONS: { icon: string; title: string; text: string; tag?: string; href?: string }[] = [
   { icon: "spark", title: "Din documente, cu AI", text: "Încarcă planuri DTAC / PTh, PDF sau Excel.", tag: "Recomandat" },
   { icon: "doc", title: "Din lista F3", text: "Pornește de la listele de cantități ale licitației." },
-  { icon: "calc", title: "Deviz de la zero", text: "Capitole și articole, cu bazele tale de resurse." },
+  { icon: "calc", title: "Deviz de la zero", text: "Capitole și articole, cu bazele tale de resurse.", href: "/panou/devize" },
 ];
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ email?: string }> }) {
@@ -60,7 +60,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <span className="grid size-10 place-items-center rounded-lg bg-brand-50 text-brand-700"><Icon name={o.icon} /></span>
             <div className="mt-3 font-semibold">{o.title}</div>
             <p className="mt-1 text-sm text-muted">{o.text}</p>
-            <p className="mt-3 text-xs font-medium text-muted">În curând</p>
+            {o.href ? (
+              <Link href={o.href} className="mt-3 inline-block text-sm font-semibold text-brand-700 hover:underline">Începe →</Link>
+            ) : (
+              <p className="mt-3 text-xs font-medium text-muted">În curând</p>
+            )}
           </Card>
         ))}
       </div>

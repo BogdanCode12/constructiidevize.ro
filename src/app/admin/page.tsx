@@ -1,6 +1,7 @@
 import { Card, PageHeader } from "@/components/ui";
 import { query, queryOne } from "@/lib/db";
-import { PLAN_LABEL, type PlanId } from "@/lib/plans";
+import Link from "next/link";
+import { getPlans, STATUS_LABEL, type PlanId } from "@/lib/plans";
 
 export const metadata = { title: "Admin" };
 
@@ -27,6 +28,9 @@ export default async function AdminPage() {
       ORDER BY u.created_at DESC LIMIT 100`,
   );
 
+  const plans = await getPlans();
+  const planName = (id: PlanId) => (id === "trial" ? "Probă" : plans.find((p) => p.id === id)?.name ?? id);
+
   const stats = [
     ["Utilizatori", totals?.users], ["Firme", totals?.companies], ["Abonați plătitori", totals?.paying],
     ["În probă", totals?.trial], ["Proiecte", totals?.projects],
@@ -49,10 +53,10 @@ export default async function AdminPage() {
           <tbody className="divide-y divide-line">
             {users.map((u) => (
               <tr key={u.id}>
-                <td className="px-4 py-3 font-medium whitespace-nowrap">{u.name}{u.role === "admin" && <span className="ml-2 rounded bg-ink px-1.5 text-[10px] text-white">ADMIN</span>}</td>
+                <td className="px-4 py-3 font-medium whitespace-nowrap"><Link href={`/admin/utilizatori/${u.id}`} className="text-brand-700 hover:underline">{u.name}</Link>{u.role === "admin" && <span className="ml-2 rounded bg-ink px-1.5 text-[10px] text-white">ADMIN</span>}</td>
                 <td className="px-4 py-3">{u.email}{!u.email_verified_at && <span className="ml-2 text-xs text-amber-700">neconfirmat</span>}</td>
                 <td className="px-4 py-3">{u.company ?? "—"}</td>
-                <td className="px-4 py-3 whitespace-nowrap">{u.plan ? `${PLAN_LABEL[u.plan]} · ${u.status}` : "—"}</td>
+                <td className="px-4 py-3 whitespace-nowrap">{u.plan ? `${planName(u.plan)} · ${STATUS_LABEL[u.status ?? ""] ?? u.status}` : "—"}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-muted">{fmt.format(new Date(u.created_at))}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-muted">{u.last_login_at ? fmt.format(new Date(u.last_login_at)) : "—"}</td>
               </tr>

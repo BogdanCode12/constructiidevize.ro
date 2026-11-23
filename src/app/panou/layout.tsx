@@ -4,7 +4,7 @@ import { Icon } from "@/components/icon";
 import { Sidebar } from "@/components/sidebar";
 import { requireUser } from "@/lib/auth/session";
 import { ACCOUNT_LINKS, MODULES } from "@/lib/modules";
-import { PLAN_LABEL } from "@/lib/plans";
+import { planLabel } from "@/lib/plans";
 import { logoutAction, } from "./actions";
 import { resendVerificationAction } from "../(auth)/actions";
 
@@ -37,7 +37,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Link href="/panou/abonament" className="block rounded-lg bg-canvas px-3 py-2.5 text-sm hover:bg-brand-50">
           <div className="flex items-center justify-between">
             <span className="text-muted">Plan</span>
-            <span className="font-semibold text-brand-800">{PLAN_LABEL[sub.plan]}</span>
+            <span className="font-semibold text-brand-800">{await planLabel(sub.plan)}</span>
           </div>
           {trialDays !== null && (
             <div className="mt-1 text-xs text-muted">{trialDays > 0 ? `${trialDays} zile rămase` : "Perioada de probă a expirat"}</div>

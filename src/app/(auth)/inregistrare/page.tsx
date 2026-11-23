@@ -3,17 +3,18 @@ import { redirect } from "next/navigation";
 import { ActionForm } from "@/components/action-form";
 import { Field } from "@/components/ui";
 import { getCurrentUser } from "@/lib/auth/session";
-import { TRIAL_DAYS } from "@/lib/plans";
+import { getSettings } from "@/lib/settings";
 import { registerAction } from "../actions";
 
 export const metadata = { title: "Creează cont" };
 
 export default async function RegisterPage() {
   if (await getCurrentUser()) redirect("/panou");
+  const { trial_days } = await getSettings();
   return (
     <>
       <h1 className="text-2xl font-bold">Creează cont</h1>
-      <p className="mt-1 mb-6 text-muted">{TRIAL_DAYS} zile gratuit, fără card.</p>
+      <p className="mt-1 mb-6 text-muted">{trial_days} zile gratuit, fără card.</p>
       <ActionForm action={registerAction} submitLabel="Creează cont">
         <Field label="Nume și prenume" name="name" autoComplete="name" />
         <Field label="Numele firmei" name="company" autoComplete="organization" placeholder="ex: SC Construct SRL" />

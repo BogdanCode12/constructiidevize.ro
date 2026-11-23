@@ -7,7 +7,7 @@ import { clientIp, createSession, requireUser } from "@/lib/auth/session";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/auth/emails";
 import { hashToken } from "@/lib/auth/tokens";
 import { logActivity } from "@/lib/activity";
-import { TRIAL_DAYS } from "@/lib/plans";
+import { getSettings } from "@/lib/settings";
 import type { FormState } from "@/components/action-form";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,6 +33,7 @@ export async function registerAction(_: FormState, data: FormData): Promise<Form
   if (data.get("terms") !== "on") return { error: "Trebuie să accepți termenii și politica de confidențialitate." };
 
   const passwordHash = await hashPassword(password);
+  const { trial_days } = await getSettings();
   let userId: number;
   let companyId: number;
   try {
@@ -42,7 +43,7 @@ export async function registerAction(_: FormState, data: FormData): Promise<Form
       await execute("INSERT INTO company_members (company_id, user_id, role) VALUES (?, ?, 'owner')", [c.insertId, u.insertId], conn);
       await execute(
         "INSERT INTO subscriptions (company_id, plan, status, trial_ends_at) VALUES (?, 'trial', 'trialing', DATE_ADD(NOW(), INTERVAL ? DAY))",
-        [c.insertId, TRIAL_DAYS],
+        [c.insertId, trial_days],
         conn,
       );
       return { userId: u.insertId, companyId: c.insertId };

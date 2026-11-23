@@ -1,46 +1,50 @@
-export type PlanId = "trial" | "start" | "pro" | "firma";
+import "server-only";
+import { cache } from "react";
+import { query } from "./db";
 
-export const TRIAL_DAYS = 14;
+export type PaidPlanId = "start" | "pro" | "firma";
+export type PlanId = "trial" | PaidPlanId;
 
-export const PLANS: {
-  id: Exclude<PlanId, "trial">;
+export const PAID_PLAN_IDS: PaidPlanId[] = ["start", "pro", "firma"];
+
+export type Plan = {
+  id: PaidPlanId;
   name: string;
   monthly: number;
   yearly: number;
-  users: string;
+  maxUsers: number;
   features: string[];
-  highlighted?: boolean;
-}[] = [
-  {
-    id: "start",
-    name: "Start",
-    monthly: 99,
-    yearly: 990,
-    users: "1 utilizator",
-    features: ["Devize nelimitate", "Export Excel și PDF (F1–F3, C5–C9)", "Declarații precompletate", "Baze proprii de resurse"],
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    monthly: 249,
-    yearly: 2490,
-    users: "3 utilizatori",
-    highlighted: true,
-    features: ["Tot din Start", "Asistent AI: citire planuri DTAC / PTh, PDF, Excel", "Calcul manoperă și ore de regie", "Caiet de sarcini generat", "Management de șantier"],
-  },
-  {
-    id: "firma",
-    name: "Firmă",
-    monthly: 499,
-    yearly: 4990,
-    users: "10 utilizatori",
-    features: ["Tot din Pro", "Roluri și permisiuni", "Situații de lucrări lunare", "Suport prioritar"],
-  },
-];
+  highlighted: boolean;
+};
 
-export const PLAN_LABEL: Record<PlanId, string> = {
-  trial: "Perioadă de probă",
-  start: "Start",
-  pro: "Pro",
-  firma: "Firmă",
+/** Planurile de abonament (editabile din /admin/planuri). */
+export const getPlans = cache(async (): Promise<Plan[]> => {
+  const rows = await query<{
+    id: PaidPlanId; name: string; monthly_price: string; yearly_price: string;
+    max_users: number; features: string; highlighted: number;
+  }>("SELECT id, name, monthly_price, yearly_price, max_users, features, highlighted FROM plans ORDER BY position, id");
+  return rows.map((r) => ({
+    id: r.id,
+    name: r.name,
+    monthly: Number(r.monthly_price),
+    yearly: Number(r.yearly_price),
+    maxUsers: r.max_users,
+    features: r.features.split("\n").map((f) => f.trim()).filter(Boolean),
+    highlighted: r.highlighted === 1,
+  }));
+});
+
+export async function planLabel(id: PlanId): Promise<string> {
+  if (id === "trial") return "Perioadă de probă";
+  return (await getPlans()).find((p) => p.id === id)?.name ?? id;
+}
+
+export const usersLabel = (n: number) => (n === 1 ? "1 utilizator" : `${n} utilizatori`);
+
+export const STATUS_LABEL: Record<string, string> = {
+  trialing: "în probă",
+  active: "activ",
+  past_due: "plată restantă",
+  canceled: "anulat",
+  expired: "expirat",
 };
