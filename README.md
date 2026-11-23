@@ -1,4 +1,6 @@
-# ConstructiiDevize.ro
+# DevizBuild.ro
+
+(repo: constructiidevize.ro)
 
 Platformă SaaS pentru firme de construcții: devize, calcul manoperă și ore de regie, caiet de sarcini, declarații pentru licitații, management de șantier și asistent AI. Acces pe bază de cont și abonament lunar sau anual.
 

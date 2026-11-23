@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/admin/sabloane", label: "Șabloane documente" },
   { href: "/admin/ai", label: "Asistent AI" },
   { href: "/admin/pagini", label: "Pagini" },
+  { href: "/admin/mesaje", label: "Mesaje" },
   { href: "/admin/setari", label: "Setări" },
 ];
 

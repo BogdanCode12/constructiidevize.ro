@@ -13,5 +13,5 @@ export const MODULES = [
 export const ACCOUNT_LINKS = [
   { slug: "firma", label: "Firmă & utilizatori", icon: "building" },
   { slug: "abonament", label: "Abonament", icon: "card" },
-  { slug: "cont", label: "Contul meu", icon: "shield" },
+  { slug: "cont", label: "Contul meu", icon: "user" },
 ] as const;

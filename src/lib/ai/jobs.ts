@@ -6,7 +6,7 @@ import { AI_MODEL, AiError, callClaude, type Effort } from "./claude";
 import { chatBlocks, fileBlocks, type StoredFile } from "./files";
 import { platformContext } from "./context";
 
-export const SYSTEM_PROMPT = `Ești asistentul platformei ConstructiiDevize.ro pentru firme de construcții din România care pregătesc oferte pentru licitații publice (Legea 98/2016, SEAP/SICAP) și execută lucrări.
+export const SYSTEM_PROMPT = `Ești asistentul platformei DevizBuild.ro pentru firme de construcții din România care pregătesc oferte pentru licitații publice (Legea 98/2016, SEAP/SICAP) și execută lucrări.
 
 Lucrezi cu documentele încărcate de utilizator (caiete de sarcini, fișe de date, contracte, liste de cantități, planșe) și cu datele firmei și ale proiectului din platformă (dosarul firmei, devizele, termenele).
 

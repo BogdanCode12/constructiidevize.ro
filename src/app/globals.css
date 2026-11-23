@@ -2,26 +2,44 @@
 
 @theme {
   --font-sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  --font-display: var(--font-outfit), "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  --color-brand-50: #eef7f7;
-  --color-brand-100: #d5ecec;
-  --color-brand-200: #a9d6d7;
-  --color-brand-500: #1d8a92;
-  --color-brand-600: #13737b;
-  --color-brand-700: #0f5c63;
-  --color-brand-800: #0c474d;
-  --color-brand-900: #0a3539;
+  /* Roșul din siglă DevizBuild (#C71319) */
+  --color-brand-50: #fdf2f2;
+  --color-brand-100: #fbe1e2;
+  --color-brand-200: #f4b9bb;
+  --color-brand-500: #e1373d;
+  --color-brand-600: #d21c23;
+  --color-brand-700: #c71319;
+  --color-brand-800: #a20f14;
+  --color-brand-900: #7c0b0f;
 
   --color-accent-500: #e8a33d;
 
-  --color-ink: #1c2526;
-  --color-muted: #5b6b6d;
-  --color-line: #dde5e5;
-  --color-canvas: #f5f7f7;
+  --color-ink: #0c0c0d;
+  --color-muted: #5d6166;
+  --color-line: #e5e5e3;
+  --color-canvas: #f6f6f4;
 }
 
 html,
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hook {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(46px); }
+}
+.animate-rise { animation: rise 0.8s cubic-bezier(.2,.7,.2,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

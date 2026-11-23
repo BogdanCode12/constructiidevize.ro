@@ -233,3 +233,9 @@ export async function savePageAction(_: FormState, data: FormData): Promise<Form
   revalidatePath(`/${slug}`);
   return { ok: "Pagina a fost salvată." };
 }
+
+export async function toggleContactHandledAction(data: FormData): Promise<void> {
+  await requireAdmin();
+  await execute("UPDATE contact_messages SET handled = 1 - handled WHERE id = ?", [Number(data.get("id"))]);
+  revalidatePath("/admin/mesaje");
+}

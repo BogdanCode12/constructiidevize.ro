@@ -118,7 +118,7 @@ export async function toDocx(text: string): Promise<Buffer> {
     paragraphs.push(new Paragraph({ alignment: lines.length > 1 ? AlignmentType.LEFT : AlignmentType.JUSTIFIED, spacing: { after: 160, line: 300 }, children: runs }));
   }
   const doc = new Document({
-    creator: "ConstructiiDevize.ro",
+    creator: "DevizBuild.ro",
     styles: { default: { document: { run: { font: "Arial" } } } },
     sections: [{ properties: { page: { margin: { top: 1134, bottom: 1134, left: 1247, right: 1134 } } }, children: paragraphs }],
   });

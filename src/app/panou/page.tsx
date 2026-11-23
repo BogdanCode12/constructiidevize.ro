@@ -13,7 +13,7 @@ export const metadata = { title: "Dashboard" };
 
 const START_OPTIONS: { icon: string; title: string; text: string; tag?: string; href?: string }[] = [
   { icon: "spark", title: "Din documente, cu AI", text: "Încarcă caietul de sarcini, planșe, PDF sau Excel.", tag: "Recomandat", href: "/panou/asistent" },
-  { icon: "doc", title: "Din lista F3", text: "Pornește de la listele de cantități ale licitației." },
+  { icon: "doc", title: "Din lista F3", text: "Importă lista de cantități; articolele se potrivesc automat cu baza ta.", href: "/panou/devize" },
   { icon: "calc", title: "Deviz de la zero", text: "Capitole și articole, cu bazele tale de resurse.", href: "/panou/devize" },
 ];
 

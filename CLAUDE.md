@@ -1,4 +1,6 @@
-# ConstructiiDevize.ro — note pentru dezvoltare
+# DevizBuild.ro — note pentru dezvoltare
+
+(Repo-ul se numește constructiidevize.ro; numele comercial al platformei este **DevizBuild.ro**.)
 
 Platformă SaaS pentru firme de construcții din România: devize (F1–F5, C5–C9), dosar de licitație, asistent AI.
 Stack: Next.js 16 + React 19 + TypeScript, Tailwind v4, MySQL/MariaDB (`mysql2`, migrări în `sql/NNN_*.sql`),
@@ -6,7 +8,13 @@ găzduire cPanel (Setup Node.js App, build standalone, publicare prin ramura `re
 
 ## Reguli stabilite cu proprietarul
 
+- **Brand:** DevizBuild.ro. Culori: alb curat, negru (`ink` #0c0c0d) și roșul din siglă (`brand-700` #C71319).
+  Sigla e în `public/brand/` (variantă albă pentru fundal închis); titluri cu fontul Outfit, text Helvetica.
+  Design elegant, simplu, serios, fără cifre sau testimoniale inventate.
+
 - Interfața și textele sunt în limba română.
+- Site public: Acasă, Servicii, Prețuri, Contact + Autentificare / Contul meu. Textele principale (titlul de pe
+  prima pagină, întrebările frecvente, datele de contact, paginile legale) se editează din admin → Pagini.
 - Tot ce ține de conținutul platformei trebuie să poată fi modificat din panoul de admin (planuri, prețuri,
   catalog de resurse, șabloane de documente, instrucțiunile AI, setări, limite).
 - Fără copiere 1:1 după ofertant.ro (alt design, alte fluxuri).
