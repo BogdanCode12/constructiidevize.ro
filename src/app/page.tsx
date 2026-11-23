@@ -63,17 +63,24 @@ export default async function HomePage() {
       </section>
 
       {/* FAPTE */}
-      <section className="border-b border-line bg-white">
-        <div className="mx-auto grid max-w-7xl divide-line px-4 sm:px-6 md:grid-cols-4 md:divide-x">
+      <section className="border-y-2 border-ink/15 bg-white">
+        <div className="mx-auto grid max-w-7xl divide-y-2 divide-ink/10 px-4 sm:px-6 md:grid-cols-4 md:divide-x-2 md:divide-y-0">
           {[
-            ["F1–F5 · C5–C9", "formularele cerute la licitațiile publice"],
-            ["Import F3", "din Excel sau lipit, potrivit automat cu baza ta"],
-            ["Asistent tehnic", "citește caiete de sarcini și contracte"],
-            ["Export complet", "Excel, Word și arhivă ZIP a dosarului"],
-          ].map(([a, b]) => (
-            <div key={a} className="py-7 md:px-8 md:first:pl-0">
-              <div className="text-xl font-semibold text-ink">{a}</div>
-              <div className="mt-1 text-sm text-muted">{b}</div>
+            ["crane", "F1–F5 · C5–C9", "formularele cerute la licitațiile publice"],
+            ["", "Import F3", "din Excel sau lipit, potrivit automat cu baza ta"],
+            ["", "Asistent tehnic", "citește caiete de sarcini și contracte"],
+            ["building", "Export complet", "Excel, Word și arhivă ZIP a dosarului"],
+          ].map(([icon, a, b]) => (
+            <div key={a} className="flex items-start gap-4 py-7 md:px-8 md:first:pl-0">
+              {icon && (
+                <span className="grid size-14 shrink-0 place-items-center rounded-2xl border-2 border-ink/15 text-ink">
+                  {icon === "crane" ? <CraneIcon /> : <BuildingIcon />}
+                </span>
+              )}
+              <div>
+                <div className="text-xl font-semibold text-ink">{a}</div>
+                <div className="mt-1 text-sm text-muted">{b}</div>
+              </div>
             </div>
           ))}
         </div>
@@ -231,6 +238,32 @@ function Check({ light }: { light?: boolean }) {
   return (
     <svg viewBox="0 0 16 16" className={`size-4 shrink-0 ${light ? "text-white" : "text-brand-700"}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <path d="M3 8.5l3 3 7-7" />
+    </svg>
+  );
+}
+
+/** Macara turn (simbol de șantier). */
+function CraneIcon() {
+  return (
+    <svg viewBox="0 0 32 32" className="size-9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M9 29V7M13 29V7M9 11l4 4M13 11l-4 4M9 17l4 4M13 17l-4 4M9 23l4 4M13 23l-4 4" />
+      <path d="M3 7h27M9 7l2-4 2 4M11 3l15 4M11 3L5 7" />
+      <path d="M24 7v9" />
+      <path d="M21.5 16h5v3.5h-5z" fill="#c71319" stroke="#c71319" />
+      <path d="M3 7v3h4V7M6 29h10" />
+    </svg>
+  );
+}
+
+/** Clădire în construcție, cu schelă. */
+function BuildingIcon() {
+  return (
+    <svg viewBox="0 0 32 32" className="size-9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M5 29V11l9-6 9 6v18" />
+      <path d="M3 29h26" />
+      <path d="M9 15h3v3H9zM16 15h3v3h-3zM9 21h3v3H9z" />
+      <path d="M16 21h3v8h-3z" fill="#c71319" stroke="#c71319" />
+      <path d="M26 29V13M29 29V13M26 17h3M26 22h3M24 13h6" />
     </svg>
   );
 }
