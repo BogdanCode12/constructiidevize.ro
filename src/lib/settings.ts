@@ -7,6 +7,7 @@ export type Settings = {
   default_overhead_pct: number;
   default_profit_pct: number;
   default_vat_pct: number;
+  ai_monthly_requests: number;
 };
 
 export const SETTING_DEFAULTS: Settings = {
@@ -14,6 +15,7 @@ export const SETTING_DEFAULTS: Settings = {
   default_overhead_pct: 10,
   default_profit_pct: 5,
   default_vat_pct: 21,
+  ai_monthly_requests: 200,
 };
 
 export const SETTING_LABELS: Record<keyof Settings, string> = {
@@ -21,6 +23,7 @@ export const SETTING_LABELS: Record<keyof Settings, string> = {
   default_overhead_pct: "Cheltuieli indirecte implicite (%)",
   default_profit_pct: "Profit implicit (%)",
   default_vat_pct: "TVA implicit (%)",
+  ai_monthly_requests: "Cereri AI pe lună, per firmă",
 };
 
 /** Setările platformei (editabile din /admin/setari). */

@@ -68,7 +68,8 @@ Fluxul: **push pe `main` → GitHub Actions face build-ul → ramura `release` �
    curl -s "https://domeniul.ro/api/cron/alerte?key=CRON_SECRET" > /dev/null
    ```
 7. **Fișiere încărcate.** Documentele clienților se salvează în `~/constructiidevize-uploads`, în afara aplicației, ca să nu fie șterse la publicare. Folderul se poate schimba cu `UPLOAD_DIR`. Include-l în backup.
-8. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true}`.
+8. **Asistentul AI.** Adaugă `ANTHROPIC_API_KEY` (cheia din console.anthropic.com) în variabilele aplicației. Fără cheie, platforma merge normal, iar AI-ul apare ca neactivat. Pentru teste fără cost, `AI_MOCK=1` întoarce răspunsuri simulate. Modelul implicit e `claude-opus-5-5` și se schimbă cu `AI_MODEL`.
+9. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true}`.
 
 ## Ce poate face clientul
 
@@ -89,6 +90,17 @@ Fluxul: **push pe `main` → GitHub Actions face build-ul → ramura `release` �
   - colegi invitați pe email, cu rol de administrator sau membru;
   - comutare între firme, dacă utilizatorul face parte din mai multe.
 - **Dashboard:** termene în următoarele 14 zile și documente care expiră.
+- **Asistent AI (Claude), pe fiecare proiect:** se încarcă documentele licitației (PDF, Word, Excel, ZIP, planșe scanate). Analizele disponibile:
+  - analiza caietului de sarcini;
+  - verificarea documentației față de dosarul firmei;
+  - analiza eligibilității;
+  - compararea versiunilor după clarificări;
+  - întrebări de clarificare SEAP;
+  - propunere tehnică și plan SSM/calitate (ciorne);
+  - analiza contractului;
+  - propunere de materiale.
+
+  Pe lângă analize există un chat pe proiect, care vede documentele, devizele, termenele și dosarul firmei. Rezultatele se descarcă în Word.
 
 ## Panoul de admin (`/admin`)
 
@@ -101,11 +113,13 @@ Tot ce ține de platformă se modifică de aici, fără cod:
 - **Catalog global de resurse:** adăugare, editare, ștergere și import din Excel. Resursele de aici sunt vizibile tuturor clienților.
 - **Setări:** zilele perioadei de probă, procentele implicite pentru cheltuieli indirecte, profit și TVA.
 - **Șabloane de documente:** textul declarațiilor și formularelor, cu câmpuri automate. Se pot adăuga, modifica sau dezactiva.
+- **Asistent AI:** instrucțiunile fiecărei analize, efortul (cost/calitate), activare/dezactivare, consumul lunii. Limita de cereri AI pe firmă se setează din Setări.
 
 Fiecare modificare se scrie în jurnalul de activitate.
 
 ## Ce urmează
 
-1. Funcțiile AI: analiza caietului de sarcini, verificarea documentației, compararea versiunilor, clarificări SEAP, propunere tehnică, analiza contractului, asistent conversațional.
-2. Plăți Stripe și facturi Oblio.
-3. Licitații din TED, prețuri de la furnizori, situații de lucrări, aplicația de șantier.
+1. Plăți Stripe și facturi Oblio; blocarea funcțiilor după expirarea probei.
+2. Licitații: căutare în TED, recomandări AI, analiza concurenței.
+3. Prețuri de la furnizori, comparare oferte, cereri de ofertă pe email.
+4. Șantier: situații de lucrări, financiar proiect, aplicație mobilă; import BIM/IFC.

@@ -126,13 +126,14 @@ export async function updateSettingsAction(_: FormState, data: FormData): Promis
   const admin = await requireAdmin();
   const limits: Record<keyof Settings, [number, number]> = {
     trial_days: [0, 365], default_overhead_pct: [0, 100], default_profit_pct: [0, 100], default_vat_pct: [0, 100],
+    ai_monthly_requests: [0, 100000],
   };
   const values: Partial<Settings> = {};
   for (const key of Object.keys(SETTING_DEFAULTS) as (keyof Settings)[]) {
     const n = parseNum(data.get(key));
     const [min, max] = limits[key];
     if (n === null || n < min || n > max) return { error: `Valoare invalidă la „${key}” (între ${min} și ${max}).` };
-    values[key] = key === "trial_days" ? Math.round(n) : n;
+    values[key] = key === "trial_days" || key === "ai_monthly_requests" ? Math.round(n) : n;
   }
   for (const [k, v] of Object.entries(values)) await saveSetting(k as keyof Settings, v as number);
   await logActivity({ userId: admin.id, action: "admin.setari.modificate", details: values });
@@ -169,4 +170,22 @@ export async function deleteTemplateAction(data: FormData): Promise<void> {
   await logActivity({ userId: admin.id, action: "admin.sablon.sters", details: { id } });
   revalidatePath("/admin/sabloane");
   redirect("/admin/sabloane");
+}
+
+export async function updateAiTaskAction(_: FormState, data: FormData): Promise<FormState> {
+  const admin = await requireAdmin();
+  const slug = s(data, "slug");
+  const name = s(data, "name").slice(0, 120);
+  const description = s(data, "description").slice(0, 255);
+  const prompt = String(data.get("prompt") ?? "").replace(/\r/g, "").trim();
+  const effort = s(data, "effort");
+  if (!name || !prompt) return { error: "Numele și instrucțiunile sunt obligatorii." };
+  if (!["low", "medium", "high", "xhigh", "max"].includes(effort)) return { error: "Nivel de efort invalid." };
+  await execute(
+    "UPDATE ai_tasks SET name = ?, description = ?, prompt = ?, effort = ?, needs_files = ?, active = ?, position = ? WHERE slug = ?",
+    [name, description, prompt, effort, data.get("needs_files") === "on" ? 1 : 0, data.get("active") === "on" ? 1 : 0, Math.round(parseNum(data.get("position")) ?? 0), slug],
+  );
+  await logActivity({ userId: admin.id, action: "admin.ai.modificat", details: { slug } });
+  revalidatePath("/admin/ai");
+  return { ok: `„${name}” salvat.` };
 }
