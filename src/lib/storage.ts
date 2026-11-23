@@ -14,7 +14,7 @@ export function uploadRoot(): string {
 
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
-const ALLOWED = new Set([".pdf", ".jpg", ".jpeg", ".png", ".webp", ".doc", ".docx", ".xls", ".xlsx", ".zip", ".txt", ".odt", ".ods"]);
+const ALLOWED = new Set([".pdf", ".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".doc", ".docx", ".xls", ".xlsx", ".zip", ".txt", ".odt", ".ods"]);
 
 export function isAllowedFile(name: string) {
   return ALLOWED.has(extname(name).toLowerCase());
