@@ -4,6 +4,10 @@ import { Icon } from "@/components/icon";
 import { query, queryOne } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { STATUS_LABEL } from "./proiecte/status";
+import { DEADLINE_TYPES } from "@/lib/deadlines";
+import { expiryStatus } from "@/lib/documents";
+
+const dt = new Intl.DateTimeFormat("ro-RO", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
 export const metadata = { title: "Dashboard" };
 
@@ -30,6 +34,20 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     [companyId],
   );
 
+  const deadlines = await query<{ id: number; type: keyof typeof DEADLINE_TYPES; title: string; due_at: Date; project_id: number; project: string }>(
+    `SELECT d.id, d.type, d.title, d.due_at, p.id AS project_id, p.name AS project
+       FROM project_deadlines d JOIN projects p ON p.id = d.project_id
+      WHERE p.company_id = ? AND d.done = 0 AND d.due_at < DATE_ADD(NOW(), INTERVAL 14 DAY)
+      ORDER BY d.due_at LIMIT 8`,
+    [companyId],
+  );
+  const expiring = await query<{ id: number; title: string; expires_at: Date }>(
+    `SELECT id, title, expires_at FROM company_documents
+      WHERE company_id = ? AND expires_at IS NOT NULL AND expires_at < DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+      ORDER BY expires_at LIMIT 8`,
+    [companyId],
+  );
+
   const stats = [
     { label: "Proiecte", value: Number(counts?.total ?? 0) },
     { label: "În ofertare / licitație", value: Number(counts?.bidding ?? 0) },
@@ -51,6 +69,45 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </Card>
         ))}
       </div>
+
+      {(deadlines.length > 0 || expiring.length > 0) && (
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <Card className="p-0">
+            <div className="border-b border-line px-5 py-3 font-semibold">Termene în următoarele 14 zile</div>
+            {deadlines.length === 0 ? <p className="px-5 py-4 text-sm text-muted">Niciun termen apropiat.</p> : (
+              <ul className="divide-y divide-line text-sm">
+                {deadlines.map((d) => {
+                  const late = new Date(d.due_at).getTime() < Date.now();
+                  return (
+                    <li key={d.id} className="flex items-center gap-3 px-5 py-2.5">
+                      <span className={`w-32 shrink-0 whitespace-nowrap ${late ? "font-semibold text-red-700" : "text-muted"}`}>{dt.format(new Date(d.due_at))}</span>
+                      <Link href={`/panou/proiecte/${d.project_id}`} className="min-w-0 flex-1 truncate hover:underline">
+                        <b>{DEADLINE_TYPES[d.type]}</b> · {d.project}{d.title ? ` — ${d.title}` : ""}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </Card>
+          <Card className="p-0">
+            <div className="border-b border-line px-5 py-3 font-semibold">Documente care expiră</div>
+            {expiring.length === 0 ? <p className="px-5 py-4 text-sm text-muted">Toate documentele sunt valabile.</p> : (
+              <ul className="divide-y divide-line text-sm">
+                {expiring.map((d) => {
+                  const st = expiryStatus(d.expires_at);
+                  return (
+                    <li key={d.id} className="flex items-center justify-between gap-3 px-5 py-2.5">
+                      <Link href="/panou/documente" className="truncate hover:underline">{d.title}</Link>
+                      <span className={`shrink-0 text-xs font-semibold ${st.tone === "expired" ? "text-red-700" : "text-amber-700"}`}>{st.label}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </Card>
+        </div>
+      )}
 
       <h2 className="mt-10 mb-4 text-lg font-bold">Începe o ofertă nouă</h2>
       <div className="grid gap-4 md:grid-cols-3">

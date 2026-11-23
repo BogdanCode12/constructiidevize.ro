@@ -139,3 +139,34 @@ export async function updateSettingsAction(_: FormState, data: FormData): Promis
   revalidatePath("/", "layout");
   return { ok: "Setări salvate." };
 }
+
+export async function saveTemplateAction(_: FormState, data: FormData): Promise<FormState> {
+  const admin = await requireAdmin();
+  const id = Number(data.get("id") || 0);
+  const name = s(data, "name").slice(0, 190);
+  const category = s(data, "category").slice(0, 60) || "Declarații";
+  const body = String(data.get("body") ?? "").replace(/\r/g, "").trim();
+  const position = Math.round(parseNum(data.get("position")) ?? 0);
+  const active = data.get("active") === "on" ? 1 : 0;
+  if (!name) return { error: "Numele este obligatoriu." };
+  if (!body) return { error: "Textul șablonului este gol." };
+  if (id) {
+    await execute("UPDATE document_templates SET name = ?, category = ?, body = ?, position = ?, active = ? WHERE id = ?", [name, category, body, position, active, id]);
+  } else {
+    const res = await execute("INSERT INTO document_templates (name, category, body, position, active) VALUES (?, ?, ?, ?, ?)", [name, category, body, position, active]);
+    await logActivity({ userId: admin.id, action: "admin.sablon.creat", details: { id: res.insertId, name } });
+    redirect(`/admin/sabloane/${res.insertId}?salvat=1`);
+  }
+  await logActivity({ userId: admin.id, action: "admin.sablon.modificat", details: { id, name } });
+  revalidatePath("/admin/sabloane");
+  return { ok: "Șablon salvat." };
+}
+
+export async function deleteTemplateAction(data: FormData): Promise<void> {
+  const admin = await requireAdmin();
+  const id = Number(data.get("id"));
+  await execute("DELETE FROM document_templates WHERE id = ?", [id]);
+  await logActivity({ userId: admin.id, action: "admin.sablon.sters", details: { id } });
+  revalidatePath("/admin/sabloane");
+  redirect("/admin/sabloane");
+}

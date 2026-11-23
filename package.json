@@ -14,7 +14,9 @@
     "node": ">=20.9"
   },
   "dependencies": {
+    "docx": "^9.16.0",
     "exceljs": "^4.4.0",
+    "jszip": "^3.10.1",
     "mysql2": "^3.24.6",
     "next": "^16.4.6",
     "nodemailer": "^10.6.1",

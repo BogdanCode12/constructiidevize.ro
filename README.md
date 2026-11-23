@@ -63,13 +63,32 @@ Fluxul: **push pe `main` → GitHub Actions face build-ul → ramura `release` �
    ```
    /bin/bash $HOME/constructiidevize-release/scripts/cpanel-deploy.sh >> $HOME/logs/deploy.log 2>&1
    ```
-6. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true}`.
+6. **Alerte zilnice pe email.** Adaugă `CRON_SECRET` (un text lung, aleator) în variabilele aplicației, apoi un cron zilnic:
+   ```
+   curl -s "https://domeniul.ro/api/cron/alerte?key=CRON_SECRET" > /dev/null
+   ```
+7. **Fișiere încărcate.** Documentele clienților se salvează în `~/constructiidevize-uploads`, în afara aplicației, ca să nu fie șterse la publicare. Folderul se poate schimba cu `UPLOAD_DIR`. Include-l în backup.
+8. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true}`.
 
 ## Ce poate face clientul
 
-- **Proiecte:** fiecare lucrare sau licitație.
-- **Devize:** pe proiect, cu capitole și articole. Fiecare articol se desface pe resurse (normă × preț) de tip material, manoperă, utilaj sau transport. Recapitulația cuprinde cheltuielile indirecte, profitul și TVA-ul, cu procente editabile, plus orele de manoperă. Exportul Excel conține un deviz pe articole (F3) și listele C5 (materiale), C6 (manoperă), C7 (utilaje) și C8 (transport).
-- **Resurse:** fiecare firmă își ține materialele, manopera, utilajele și transportul cu prețurile proprii. Le poate adăuga, edita, șterge sau importa prin copy-paste din Excel. Pe lângă ele, vede și catalogul global al platformei.
+- **Proiecte:** fiecare lucrare sau licitație are o pagină proprie, cu autoritatea contractantă, nr. anunț SEAP, termene (depunere, clarificări etc.), devize și export.
+- **Devize:** capitole și articole, desfăcute pe material, manoperă, utilaj, transport și echipament, prin normă × preț. Editorul are patru taburi:
+  - **Verificări:** cantități, prețuri și norme 0, dubluri, prețuri sau U.M. diferite pentru aceeași resursă.
+  - **Simulator preț & profit:** ajustări pe categorii, cantități și discount; calculează costul real, marja și pragul fără pierdere.
+  - **Grafic execuție (Gantt):** echipă pe capitol, zile lucrătoare, date de început și de final.
+- **Export Excel cu formule verificabile:** Analize → F3 → F2 → Recapitulație, cu procente editabile, plus C5–C9, F4 și F5. Pe proiect se exportă F1.
+- **Manoperă & utilaje:** ore-om, ore de utilaj, costuri și durată, pentru toate devizele.
+- **Resurse:** prețurile proprii ale firmei, cu import din Excel, plus catalogul global.
+- **Documente:**
+  - **Dosarul firmei:** certificate, autorizații, experiență similară, personal, utilaje, cu dată de expirare.
+  - **Declarații și formulare:** generate în Word din șabloane, completate automat cu datele firmei, ale proiectului și valoarea din deviz.
+- **Dosar complet (ZIP) pe proiect:** devizele în Excel, declarațiile în Word și documentele valabile ale firmei.
+- **Firmă & utilizatori:**
+  - datele firmei completate automat din ANAF după CUI;
+  - colegi invitați pe email, cu rol de administrator sau membru;
+  - comutare între firme, dacă utilizatorul face parte din mai multe.
+- **Dashboard:** termene în următoarele 14 zile și documente care expiră.
 
 ## Panoul de admin (`/admin`)
 
@@ -81,13 +100,12 @@ Tot ce ține de platformă se modifică de aici, fără cod:
 - **Planuri și prețuri:** nume, preț lunar și anual, număr de utilizatori, funcționalități, plan evidențiat. Modificările apar imediat pe pagina de prețuri.
 - **Catalog global de resurse:** adăugare, editare, ștergere și import din Excel. Resursele de aici sunt vizibile tuturor clienților.
 - **Setări:** zilele perioadei de probă, procentele implicite pentru cheltuieli indirecte, profit și TVA.
+- **Șabloane de documente:** textul declarațiilor și formularelor, cu câmpuri automate. Se pot adăuga, modifica sau dezactiva.
 
 Fiecare modificare se scrie în jurnalul de activitate.
 
 ## Ce urmează
 
-1. Plăți Stripe (lunar/anual) și facturi Oblio; blocarea funcțiilor după expirarea probei.
-2. Datele firmei după CUI din ANAF, invitarea colegilor, roluri.
-3. Modulul Manoperă: echipe, durată, ore de regie, grafic de execuție.
-4. Import F3/Excel direct în deviz, apoi Asistentul AI (PDF, planuri).
-5. Limitarea încercărilor de autentificare și monitorizarea erorilor.
+1. Funcțiile AI: analiza caietului de sarcini, verificarea documentației, compararea versiunilor, clarificări SEAP, propunere tehnică, analiza contractului, asistent conversațional.
+2. Plăți Stripe și facturi Oblio.
+3. Licitații din TED, prețuri de la furnizori, situații de lucrări, aplicația de șantier.

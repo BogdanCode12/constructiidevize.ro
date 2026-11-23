@@ -7,6 +7,8 @@ import { hashToken, newToken } from "./tokens";
 import type { PlanId } from "../plans";
 
 export const SESSION_COOKIE = "cd_session";
+/** Firma activă, când utilizatorul face parte din mai multe firme. */
+export const COMPANY_COOKIE = "cd_company";
 const SESSION_DAYS = 30;
 
 export type CurrentUser = {
@@ -63,8 +65,10 @@ type Row = {
 
 /** Utilizatorul logat (o singură interogare per request), sau null. */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const jar = await cookies();
+  const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
+  const preferred = Number(jar.get(COMPANY_COOKIE)?.value) || 0;
   const row = await queryOne<Row>(
     `SELECT u.id, u.email, u.name, u.role, u.email_verified_at,
             c.id AS company_id, c.name AS company_name, cm.role AS member_role,
@@ -75,9 +79,9 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
        LEFT JOIN companies c ON c.id = cm.company_id
        LEFT JOIN subscriptions s ON s.company_id = c.id
       WHERE se.id = ? AND se.expires_at > NOW()
-      ORDER BY cm.created_at ASC
+      ORDER BY (cm.company_id = ?) DESC, cm.created_at ASC
       LIMIT 1`,
-    [hashToken(token)],
+    [hashToken(token), preferred],
   );
   if (!row) return null;
   return {
@@ -103,6 +107,13 @@ export async function requireUser(): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) redirect("/autentificare");
   return user;
+}
+
+/** Utilizator cu firmă, cu rol de proprietar sau administrator în firmă. */
+export async function requireCompanyManager(): Promise<CurrentUser & { company: NonNullable<CurrentUser["company"]> }> {
+  const user = await requireUser();
+  if (!user.company || user.company.memberRole === "member") redirect("/panou/firma?eroare=drepturi");
+  return user as CurrentUser & { company: NonNullable<CurrentUser["company"]> };
 }
 
 export async function requireAdmin(): Promise<CurrentUser> {

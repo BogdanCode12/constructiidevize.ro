@@ -42,7 +42,7 @@ export default async function ProjectsPage() {
               <tbody className="divide-y divide-line">
                 {projects.map((p) => (
                   <tr key={p.id}>
-                    <td className="px-5 py-3 font-medium">{p.name}</td>
+                    <td className="px-5 py-3 font-medium"><Link href={`/panou/proiecte/${p.id}`} className="text-brand-700 hover:underline">{p.name}</Link></td>
                     <td className="px-5 py-3">{p.client_name ?? "—"}</td>
                     <td className="px-5 py-3">{p.location ?? "—"}</td>
                     <td className="px-5 py-3"><span className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium">{STATUS_LABEL[p.status]}</span></td>

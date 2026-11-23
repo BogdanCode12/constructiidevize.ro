@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/admin/utilizatori", label: "Utilizatori" },
   { href: "/admin/planuri", label: "Planuri & prețuri" },
   { href: "/admin/resurse", label: "Catalog resurse" },
+  { href: "/admin/sabloane", label: "Șabloane documente" },
   { href: "/admin/setari", label: "Setări" },
 ];
 
