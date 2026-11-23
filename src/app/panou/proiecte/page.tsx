@@ -47,7 +47,8 @@ export default async function ProjectsPage() {
                     <td className="px-5 py-3">{p.location ?? "—"}</td>
                     <td className="px-5 py-3"><span className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium">{STATUS_LABEL[p.status]}</span></td>
                     <td className="px-5 py-3 whitespace-nowrap text-muted">{fmt.format(new Date(p.created_at))}</td>
-                    <td className="px-5 py-3 whitespace-nowrap text-right"><Link href={`/panou/devize?proiect=${p.id}`} className="font-semibold text-brand-700 hover:underline">+ Deviz</Link></td>
+                    <td className="px-5 py-3 whitespace-nowrap text-right"><Link href={`/panou/devize?proiect=${p.id}`} className="font-semibold text-brand-700 hover:underline">+ Deviz</Link>
+                      <a href={`/panou/proiecte/${p.id}/export`} className="ml-4 font-semibold text-brand-700 hover:underline" title="Centralizator F1 pe obiectiv">F1</a></td>
                   </tr>
                 ))}
               </tbody>

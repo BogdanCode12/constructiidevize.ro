@@ -1,12 +1,16 @@
-export type ResType = "material" | "manopera" | "utilaj" | "transport";
+export type ResType = "material" | "manopera" | "utilaj" | "transport" | "echipament";
 
-export const RES_TYPES: ResType[] = ["material", "manopera", "utilaj", "transport"];
+export const RES_TYPES: ResType[] = ["material", "manopera", "utilaj", "transport", "echipament"];
+
+/** Categoriile de construcții-montaj (C+M), pe care se aplică cheltuielile indirecte și profitul. */
+export const CM_TYPES: ResType[] = ["material", "manopera", "utilaj", "transport"];
 
 export const RES_TYPE_LABEL: Record<ResType, string> = {
   material: "Material",
   manopera: "Manoperă",
   utilaj: "Utilaj",
   transport: "Transport",
+  echipament: "Echipament",
 };
 
 export const RES_TYPE_PLURAL: Record<ResType, string> = {
@@ -14,6 +18,7 @@ export const RES_TYPE_PLURAL: Record<ResType, string> = {
   manopera: "Manoperă",
   utilaj: "Utilaje",
   transport: "Transport",
+  echipament: "Echipamente",
 };
 
 export type CatalogResource = {
@@ -48,7 +53,15 @@ export type EstItem = {
   resources: EstResource[];
 };
 
-export type EstChapter = { key: string; name: string; items: EstItem[] };
+export type EstChapter = {
+  key: string;
+  name: string;
+  /** Nr. de muncitori pe capitol (pentru durată / grafic). */
+  teamSize: number;
+  /** Ziua de început (de la începutul lucrării); null = imediat după capitolul anterior. */
+  startDay: number | null;
+  items: EstItem[];
+};
 
 export type EstimateDoc = {
   id: number;
@@ -58,5 +71,7 @@ export type EstimateDoc = {
   overheadPct: number;
   profitPct: number;
   vatPct: number;
+  startDate: string | null;
+  hoursPerDay: number;
   chapters: EstChapter[];
 };
