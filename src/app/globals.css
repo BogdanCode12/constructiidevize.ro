@@ -43,19 +43,16 @@ body {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
-/* Ilustrația din panou (bloc în construcție): rulează o dată, apoi rămâne fixă. */
-@keyframes bRise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-@keyframes bFade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes bGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes bDrop { from { opacity: 0; transform: translateY(-26px); } 70% { opacity: 1; transform: translateY(2px); } to { opacity: 1; transform: none; } }
-@keyframes bPanel { from { opacity: 0; } to { opacity: 1; } }
-@keyframes bHook { 0% { transform: translateY(-14px); } 45% { transform: translateY(30px); } 100% { transform: translateY(0); } }
-.building-anim .b-rise { animation: bRise .8s cubic-bezier(.2,.7,.2,1) both; }
-.building-anim .b-fade { animation: bFade .9s ease-out both; }
-.building-anim .b-grow { animation: bGrow .9s cubic-bezier(.2,.7,.2,1) both; transform-box: fill-box; transform-origin: bottom; }
-.building-anim .b-drop { animation: bDrop .7s cubic-bezier(.2,.7,.2,1) both; }
-.building-anim .b-panel { animation: bPanel 1s ease-out both; }
-.building-anim .b-hook { animation: bHook 5.5s ease-in-out .4s both; }
+/* Ilustrația din panou (bloc în construcție): rulează o dată (~5 s) și din nou la trecerea mouse-ului. */
+@keyframes bGhost { from { opacity: 0; } to { opacity: .22; } }
+@keyframes bBuild { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes bFinish { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
+@keyframes bScan { 0% { top: 100%; opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { top: 0; opacity: 0; } }
+.building-anim .b-ghost { filter: grayscale(1); animation: bGhost .6s ease-out both; }
+.building-anim .b-structure { filter: grayscale(1) brightness(1.04); animation: bBuild 2.8s cubic-bezier(.45,.05,.35,1) .4s both; }
+.building-anim .b-finish { animation: bFinish 1.6s cubic-bezier(.4,0,.2,1) 3.2s both; }
+.building-anim .b-scan { animation: bScan 2.8s cubic-bezier(.45,.05,.35,1) .4s both; }
 @media (prefers-reduced-motion: reduce) {
-  .building-anim * { animation: none !important; }
+  .building-anim .b-ghost, .building-anim .b-structure, .building-anim .b-scan { display: none; }
+  .building-anim .b-finish { animation: none !important; }
 }

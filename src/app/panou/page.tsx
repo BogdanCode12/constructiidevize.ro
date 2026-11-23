@@ -60,7 +60,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       {email === "retrimis" && (
         <p className="mb-6 rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-800">Ți-am retrimis emailul de confirmare.</p>
       )}
-      <section className="grid items-center gap-6 rounded-2xl border-2 border-ink/10 bg-white p-5 sm:p-7 lg:grid-cols-[1fr_minmax(280px,380px)]">
+      <section className="grid items-center gap-6 rounded-2xl border-2 border-ink/10 bg-white p-5 sm:p-7 lg:grid-cols-[1fr_minmax(300px,460px)]">
         <div className="min-w-0">
           <PageHeader title={`Salut, ${user.name.split(" ")[0]}!`} subtitle={user.company?.name} />
           <div className="grid gap-3 sm:grid-cols-3">
@@ -73,7 +73,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
         </div>
         <div className="hidden border-ink/10 sm:block lg:border-l-2 lg:pl-6">
-          <BuildingAnim className="mx-auto h-auto w-full max-w-[380px]" />
+          <BuildingAnim className="mx-auto w-full max-w-[460px]" />
         </div>
       </section>
 
