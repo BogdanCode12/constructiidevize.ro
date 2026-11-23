@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SiteShell } from "@/components/site/shell";
-import { BlueprintHero } from "@/components/site/blueprint-hero";
+import { HeroCard } from "@/components/site/hero-card";
 import { Faq } from "@/components/site/faq";
 import { getSettings } from "@/lib/settings";
 import { getPlans } from "@/lib/plans";
@@ -30,15 +30,22 @@ export default async function HomePage() {
 
   return (
     <SiteShell>
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b border-line">
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#0c0c0d08_1px,transparent_1px),linear-gradient(to_bottom,#0c0c0d08_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_at_70%_40%,black,transparent_75%)]" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pt-12 pb-16 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:pt-20 lg:pb-24">
+      {/* HERO — fundal: clădirea din schiță în clădire finisată (public/brand/hero-building.webp) */}
+      <section className="relative isolate overflow-hidden bg-white">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/hero-building.webp" srcSet="/brand/hero-building-960.webp 960w, /brand/hero-building.webp 1672w"
+          sizes="(min-width: 1024px) 75vw, 100vw" alt="" aria-hidden fetchPriority="high"
+          className="hero-zoom pointer-events-none absolute top-0 right-0 -z-10 h-full w-full object-cover object-[70%_center] lg:w-[76%] lg:object-center" />
+        {/* textul stă pe alb, iar clădirea se pierde treptat în fundal */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,#fff_0%,#fff_30%,rgba(255,255,255,.86)_46%,rgba(255,255,255,0)_70%)] max-lg:bg-[linear-gradient(180deg,#fff_0%,rgba(255,255,255,.92)_55%,rgba(255,255,255,.55)_100%)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-white to-transparent" />
+
+        <div className="relative mx-auto grid min-h-[640px] max-w-7xl items-center gap-10 px-4 pt-14 pb-20 sm:px-6 lg:min-h-[720px] lg:grid-cols-[1.05fr_1fr] lg:pt-16">
           <div className="animate-rise">
-            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-sm font-medium text-muted">
+            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white/80 px-3 py-1 text-sm font-medium text-muted backdrop-blur">
               <span className="size-1.5 rounded-full bg-brand-700" /> Pentru firme de construcții din România
             </p>
-            <h1 className="mt-6 font-display text-4xl leading-[1.05] font-semibold tracking-tight text-ink sm:text-5xl lg:text-[3.6rem]">
+            <h1 className="mt-6 text-4xl leading-[1.06] font-semibold tracking-[-0.03em] text-ink sm:text-5xl lg:text-[3.7rem]">
               {hero?.title ?? "Devize corecte. Dosare complete. Lucrări sub control."}
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{hero?.body}</p>
@@ -50,13 +57,15 @@ export default async function HomePage() {
                 Vezi serviciile
               </Link>
             </div>
-            <ul className="mt-8 grid gap-2 text-sm text-muted sm:grid-cols-2">
+            <ul className="mt-8 grid max-w-xl gap-2 text-sm text-muted sm:grid-cols-2">
               {["Fără card la înscriere", "Excel cu formule verificabile", "Formulare F1–F5 și C5–C9", "Datele firmei din ANAF, automat"].map((t) => (
                 <li key={t} className="flex items-center gap-2"><Check /> {t}</li>
               ))}
             </ul>
           </div>
-          <BlueprintHero />
+          <div className="relative hidden h-full lg:block">
+            <HeroCard />
+          </div>
         </div>
       </section>
 
@@ -70,7 +79,7 @@ export default async function HomePage() {
             ["Export complet", "Excel, Word și arhivă ZIP a dosarului"],
           ].map(([a, b]) => (
             <div key={a} className="py-7 md:px-8 md:first:pl-0">
-              <div className="font-display text-xl font-semibold text-ink">{a}</div>
+              <div className="text-xl font-semibold text-ink">{a}</div>
               <div className="mt-1 text-sm text-muted">{b}</div>
             </div>
           ))}
@@ -84,8 +93,8 @@ export default async function HomePage() {
           {STEPS.map((s) => (
             <li key={s.n} className="relative border-t-2 border-ink pt-6">
               <span className="absolute -top-[2px] left-0 h-[2px] w-10 bg-brand-700" />
-              <div className="font-display text-sm font-semibold text-brand-700">{s.n}</div>
-              <h3 className="mt-2 font-display text-xl font-semibold">{s.title}</h3>
+              <div className="text-sm font-semibold text-brand-700">{s.n}</div>
+              <h3 className="mt-2 text-xl font-semibold">{s.title}</h3>
               <p className="mt-2 leading-relaxed text-muted">{s.text}</p>
             </li>
           ))}
@@ -103,10 +112,10 @@ export default async function HomePage() {
             {SERVICES.map((s, i) => (
               <Link key={s.title} href={`/servicii#${s.id}`} className="group bg-white p-7 transition hover:bg-white/60">
                 <div className="flex items-center justify-between">
-                  <span className="font-display text-sm font-semibold text-muted">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="text-sm font-semibold text-muted">{String(i + 1).padStart(2, "0")}</span>
                   <span className="text-muted transition group-hover:translate-x-1 group-hover:text-brand-700">→</span>
                 </div>
-                <h3 className="mt-6 font-display text-xl font-semibold">{s.title}</h3>
+                <h3 className="mt-6 text-xl font-semibold">{s.title}</h3>
                 <p className="mt-2 leading-relaxed text-muted">{s.text}</p>
               </Link>
             ))}
@@ -156,9 +165,9 @@ export default async function HomePage() {
             ))}
           </ul>
           <div className="grid grid-cols-3 gap-2 p-2 text-center text-sm">
-            <div className="rounded-lg bg-canvas py-3"><div className="font-display text-2xl font-semibold">158</div><div className="text-xs text-muted">potrivite sigur</div></div>
-            <div className="rounded-lg bg-canvas py-3"><div className="font-display text-2xl font-semibold text-amber-600">13</div><div className="text-xs text-muted">de verificat</div></div>
-            <div className="rounded-lg bg-canvas py-3"><div className="font-display text-2xl font-semibold text-brand-700">13</div><div className="text-xs text-muted">completate de AI</div></div>
+            <div className="rounded-lg bg-canvas py-3"><div className="text-2xl font-semibold">158</div><div className="text-xs text-muted">potrivite sigur</div></div>
+            <div className="rounded-lg bg-canvas py-3"><div className="text-2xl font-semibold text-amber-600">13</div><div className="text-xs text-muted">de verificat</div></div>
+            <div className="rounded-lg bg-canvas py-3"><div className="text-2xl font-semibold text-brand-700">13</div><div className="text-xs text-muted">completate de AI</div></div>
           </div>
         </div>
       </section>
@@ -174,7 +183,7 @@ export default async function HomePage() {
               ["Execuție", ["Situații de lucrări lunare", "Încasări, cheltuieli și profit real", "Jurnal de șantier cu poze"]],
             ].map(([t, items]) => (
               <div key={t as string} className="border-t border-white/15 pt-6">
-                <h3 className="font-display text-2xl font-semibold">{t}</h3>
+                <h3 className="text-2xl font-semibold">{t}</h3>
                 <ul className="mt-4 space-y-2.5 text-white/70">
                   {(items as string[]).map((i) => <li key={i} className="flex gap-3"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-600" />{i}</li>)}
                 </ul>
@@ -202,7 +211,7 @@ export default async function HomePage() {
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff14_1px,transparent_1px),linear-gradient(to_bottom,#ffffff14_1px,transparent_1px)] bg-[size:40px_40px]" />
           <div className="relative flex flex-wrap items-center justify-between gap-8">
             <div>
-              <h2 className="font-display text-3xl font-semibold sm:text-4xl">Pregătește următoarea ofertă în DevizBuild.</h2>
+              <h2 className="text-3xl font-semibold sm:text-4xl">Pregătește următoarea ofertă în DevizBuild.</h2>
               <p className="mt-3 text-white/80">Cont gratuit în mai puțin de un minut.</p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -220,7 +229,7 @@ function SectionTitle({ eyebrow, title, dark }: { eyebrow: string; title: string
   return (
     <div className="max-w-2xl">
       <p className={`text-sm font-semibold tracking-wider uppercase ${dark ? "text-brand-500" : "text-brand-700"}`}>{eyebrow}</p>
-      <h2 className={`mt-3 font-display text-3xl leading-tight font-semibold tracking-tight sm:text-4xl ${dark ? "text-white" : "text-ink"}`}>{title}</h2>
+      <h2 className={`mt-3 text-3xl leading-tight font-semibold tracking-tight sm:text-4xl ${dark ? "text-white" : "text-ink"}`}>{title}</h2>
     </div>
   );
 }

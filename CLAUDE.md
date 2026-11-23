@@ -9,7 +9,8 @@ găzduire cPanel (Setup Node.js App, build standalone, publicare prin ramura `re
 ## Reguli stabilite cu proprietarul
 
 - **Brand:** DevizBuild.ro. Culori: alb curat, negru (`ink` #0c0c0d) și roșul din siglă (`brand-700` #C71319).
-  Sigla e în `public/brand/` (variantă albă pentru fundal închis); titluri cu fontul Outfit, text Helvetica.
+  Sigla e în `public/brand/` (variantă albă pentru fundal închis). Font: Inter peste tot (Helvetica ca rezervă).
+  Prima secțiune are ca fundal imaginea `public/brand/hero-building.webp` (clădire: schiță → finisat), aleasă de proprietar.
   Design elegant, simplu, serios, fără cifre sau testimoniale inventate.
 
 - Interfața și textele sunt în limba română.

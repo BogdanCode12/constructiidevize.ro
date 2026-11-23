@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
-  --font-display: var(--font-outfit), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* Inter peste tot (curat, foarte lizibil); Helvetica ca rezervă */
+  --font-sans: var(--font-inter), "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  --font-display: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* Roșul din siglă DevizBuild (#C71319) */
   --color-brand-50: #fdf2f2;
@@ -28,17 +29,15 @@ body {
   color: var(--color-ink);
 }
 
-@keyframes draw {
-  to { stroke-dashoffset: 0; }
-}
 @keyframes rise {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
 }
-@keyframes hook {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(46px); }
+@keyframes heroZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
 }
+.hero-zoom { transform-origin: 65% 55%; animation: heroZoom 28s ease-in-out infinite alternate; }
 .animate-rise { animation: rise 0.8s cubic-bezier(.2,.7,.2,1) both; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }

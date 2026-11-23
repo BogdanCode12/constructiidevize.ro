@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookieNotice } from "@/components/cookie-notice";
 
-// Font geometric pentru titluri, apropiat de cel din siglă; textul curent rămâne Helvetica.
-const outfit = Outfit({ subsets: ["latin", "latin-ext"], weight: ["500", "600", "700"], variable: "--font-outfit", display: "swap" });
+const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "DevizBuild.ro — devize și dosare de licitație pentru construcții", template: "%s · DevizBuild.ro" },
@@ -16,7 +15,7 @@ export const viewport: Viewport = { themeColor: "#ffffff" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ro" className={outfit.variable}>
+    <html lang="ro" className={inter.variable}>
       <body className="min-h-dvh font-sans antialiased">
         {children}
         <CookieNotice />
