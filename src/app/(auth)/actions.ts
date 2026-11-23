@@ -9,6 +9,7 @@ import { hashToken } from "@/lib/auth/tokens";
 import { logActivity } from "@/lib/activity";
 import { getSettings } from "@/lib/settings";
 import type { FormState } from "@/components/action-form";
+import { clearAttempts, LIMITS, recordAttempt, TOO_MANY, tooMany } from "@/lib/ratelimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const str = (d: FormData, k: string) => String(d.get(k) ?? "").trim();
@@ -20,6 +21,11 @@ function passwordProblem(pw: string): string | null {
 }
 
 export async function registerAction(_: FormState, data: FormData): Promise<FormState> {
+  // Câmp-capcană invizibil: oamenii nu-l completează, roboții de spam da.
+  if (str(data, "website")) return { error: "Înregistrarea nu a putut fi finalizată." };
+  const ip = (await clientIp()) ?? "necunoscut";
+  if (await tooMany(`register:ip:${ip}`, LIMITS.registerPerIp.max, LIMITS.registerPerIp.minutes)) return { error: TOO_MANY };
+  await recordAttempt(`register:ip:${ip}`);
   const name = str(data, "name");
   const companyName = str(data, "company");
   const email = str(data, "email").toLowerCase();
@@ -63,13 +69,23 @@ export async function registerAction(_: FormState, data: FormData): Promise<Form
 export async function loginAction(_: FormState, data: FormData): Promise<FormState> {
   const email = str(data, "email").toLowerCase();
   const password = String(data.get("password") ?? "");
+  const ip = (await clientIp()) ?? "necunoscut";
+  const emailKey = `login:email:${email}`;
+  const ipKey = `login:ip:${ip}`;
+  if (
+    (await tooMany(emailKey, LIMITS.loginPerEmail.max, LIMITS.loginPerEmail.minutes)) ||
+    (await tooMany(ipKey, LIMITS.loginPerIp.max, LIMITS.loginPerIp.minutes))
+  ) return { error: "Prea multe încercări greșite. Încearcă din nou peste 15 minute sau resetează parola." };
   const user = await queryOne<{ id: number; password_hash: string }>(
     "SELECT id, password_hash FROM users WHERE email = ?",
     [email],
   );
   if (!user || !(await verifyPassword(password, user.password_hash))) {
+    await recordAttempt(emailKey);
+    await recordAttempt(ipKey);
     return { error: "Email sau parolă greșită." };
   }
+  await clearAttempts(emailKey);
   await createSession(user.id);
   await logActivity({ userId: user.id, action: "autentificare", ip: await clientIp() });
   const next = str(data, "next");
@@ -78,6 +94,13 @@ export async function loginAction(_: FormState, data: FormData): Promise<FormSta
 
 export async function forgotPasswordAction(_: FormState, data: FormData): Promise<FormState> {
   const email = str(data, "email").toLowerCase();
+  const ip = (await clientIp()) ?? "necunoscut";
+  if (
+    (await tooMany(`reset:email:${email}`, LIMITS.resetPerEmail.max, LIMITS.resetPerEmail.minutes)) ||
+    (await tooMany(`reset:ip:${ip}`, LIMITS.resetPerIp.max, LIMITS.resetPerIp.minutes))
+  ) return { error: TOO_MANY };
+  await recordAttempt(`reset:email:${email}`);
+  await recordAttempt(`reset:ip:${ip}`);
   const user = await queryOne<{ id: number }>("SELECT id FROM users WHERE email = ?", [email]);
   if (user) await sendPasswordResetEmail(user.id, email).catch((e) => console.error("[forgot]", e));
   // Același mesaj indiferent dacă există contul (nu dezvăluim emailurile înregistrate).
@@ -101,6 +124,8 @@ export async function resetPasswordAction(_: FormState, data: FormData): Promise
     await execute("UPDATE email_tokens SET used_at = NOW() WHERE id = ?", [row.id], conn);
     await execute("DELETE FROM sessions WHERE user_id = ?", [row.user_id], conn);
   });
+  const owner = await queryOne<{ email: string }>("SELECT email FROM users WHERE id = ?", [row.user_id]);
+  if (owner) await clearAttempts(`login:email:${owner.email}`); // parola nouă deblochează logarea
   await logActivity({ userId: row.user_id, action: "parola.resetata", ip: await clientIp() });
   redirect("/autentificare?resetat=1");
 }

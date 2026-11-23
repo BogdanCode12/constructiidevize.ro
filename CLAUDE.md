@@ -11,7 +11,8 @@ găzduire cPanel (Setup Node.js App, build standalone, publicare prin ramura `re
   catalog de resurse, șabloane de documente, instrucțiunile AI, setări, limite).
 - Fără copiere 1:1 după ofertant.ro (alt design, alte fluxuri).
 - Fără preluare automată de date de pe site-uri care nu permit asta (SEAP intern, magazine): doar surse oficiale
-  (TED, ANAF, BNR) sau date furnizate de utilizator / parteneri.
+  (ANAF, BNR) sau date furnizate de utilizator / parteneri.
+- **Fără integrare TED** (decizia proprietarului): modulul de căutare licitații a fost scos din plan.
 
 ## Cerință importantă: AI care face devize din baza noastră de date
 

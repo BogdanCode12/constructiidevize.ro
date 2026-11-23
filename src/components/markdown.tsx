@@ -40,6 +40,12 @@ export function Markdown({ text }: { text: string }) {
       blocks.push(<pre key={key} className="overflow-x-auto rounded-lg bg-canvas p-3 text-sm">{code.join("\n")}</pre>);
       continue;
     }
+    if (line.startsWith(">")) {
+      const quote: string[] = [];
+      while (i < lines.length && lines[i].startsWith(">")) quote.push(lines[i++].replace(/^>\s?/, ""));
+      blocks.push(<blockquote key={key} className="my-3 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-4 py-2.5">{inline(quote.join(" "), key)}</blockquote>);
+      continue;
+    }
     const h = line.match(/^(#{1,4})\s+(.*)$/);
     if (h) {
       const cls = ["", "text-xl font-bold mt-6", "text-lg font-bold mt-6", "font-bold mt-4", "font-semibold mt-3"][h[1].length];
@@ -83,7 +89,7 @@ export function Markdown({ text }: { text: string }) {
       continue;
     }
     const para: string[] = [];
-    while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|```|\s*\||\s*([-*•]|\d+[.)])\s)/.test(lines[i])) para.push(lines[i++]);
+    while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|```|>|\s*\||\s*([-*•]|\d+[.)])\s)/.test(lines[i])) para.push(lines[i++]);
     blocks.push(
       <p key={key} className="my-2 leading-relaxed">
         {para.map((p, j) => <Fragment key={j}>{j > 0 && <br />}{inline(p, `${key}${j}`)}</Fragment>)}

@@ -220,3 +220,16 @@ export async function promoteRecipeAction(data: FormData): Promise<void> {
   await logActivity({ userId: admin.id, action: "admin.reteta.globala", details: { id } });
   revalidatePath("/admin/retete");
 }
+
+export async function savePageAction(_: FormState, data: FormData): Promise<FormState> {
+  const admin = await requireAdmin();
+  const slug = s(data, "slug");
+  const title = s(data, "title").slice(0, 190);
+  const body = String(data.get("body") ?? "").replace(/\r/g, "").trim();
+  if (!title || !body) return { error: "Titlul și textul sunt obligatorii." };
+  const res = await execute("UPDATE pages SET title = ?, body = ? WHERE slug = ?", [title, body, slug]);
+  if (!res.affectedRows) return { error: "Pagina nu există." };
+  await logActivity({ userId: admin.id, action: "admin.pagina.modificata", details: { slug } });
+  revalidatePath(`/${slug}`);
+  return { ok: "Pagina a fost salvată." };
+}

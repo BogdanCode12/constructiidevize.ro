@@ -90,6 +90,17 @@ Fluxul: **push pe `main` → GitHub Actions face build-ul → ramura `release` �
   - colegi invitați pe email, cu rol de administrator sau membru;
   - comutare între firme, dacă utilizatorul face parte din mai multe.
 - **Dashboard:** termene în următoarele 14 zile și documente care expiră.
+- **Deviz din baza de date:**
+  - import F3 din Excel sau text lipit, cu potrivire automată (fără AI) pe rețetele firmei și ale platformei;
+  - „Completează cu AI” pentru ce nu se găsește: AI-ul caută în bază prin unelte, cu consum mic de tokeni, iar potrivirile se salvează și se refolosesc;
+  - rețete de articole salvate din editor (★).
+- **Șantier:**
+  - contractul pe proiect;
+  - situații de lucrări (cantități curente, anterioare și cumulate, export Excel cu formule);
+  - încasări și cheltuieli, cu deviz față de realizat și profit;
+  - subcontractanți;
+  - jurnal zilnic cu poze de pe telefon.
+- **Contul meu:** profil, schimbare parolă, sesiuni active, export al datelor (JSON) și ștergerea contului (GDPR).
 - **Asistent AI (Claude), pe fiecare proiect:** se încarcă documentele licitației (PDF, Word, Excel, ZIP, planșe scanate). Analizele disponibile:
   - analiza caietului de sarcini;
   - verificarea documentației față de dosarul firmei;
@@ -113,13 +124,24 @@ Tot ce ține de platformă se modifică de aici, fără cod:
 - **Catalog global de resurse:** adăugare, editare, ștergere și import din Excel. Resursele de aici sunt vizibile tuturor clienților.
 - **Setări:** zilele perioadei de probă, procentele implicite pentru cheltuieli indirecte, profit și TVA.
 - **Șabloane de documente:** textul declarațiilor și formularelor, cu câmpuri automate. Se pot adăuga, modifica sau dezactiva.
-- **Asistent AI:** instrucțiunile fiecărei analize, efortul (cost/calitate), activare/dezactivare, consumul lunii. Limita de cereri AI pe firmă se setează din Setări.
+- **Asistent AI:** instrucțiunile fiecărei analize, efortul (cost/calitate), activare/dezactivare, trimiterea PDF-urilor originale, consumul și costul estimat al lunii. Limita de cereri AI pe firmă se setează din Setări.
+- **Rețete:** rețetele globale și ale firmelor; o rețetă de firmă poate fi promovată la globală.
+- **Pagini:** Termeni, Confidențialitate și alte texte, în Markdown, cu previzualizare.
 
 Fiecare modificare se scrie în jurnalul de activitate.
+
+## Securitate
+
+- Parolele sunt salvate cu scrypt; sesiunile stau în baza de date, în cookie httpOnly.
+- Încercările se limitează: 5 logări greșite pe email în 15 minute, 5 înregistrări pe IP pe oră, 3 resetări pe email pe oră.
+- Formularul de înregistrare are un câmp-capcană invizibil pentru roboți.
+- Anteturi HTTP de securitate: X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy și HSTS în producție.
+- Fișierele încărcate stau în afara aplicației și se servesc doar membrilor firmei.
 
 ## Ce urmează
 
 1. Plăți Stripe și facturi Oblio; blocarea funcțiilor după expirarea probei.
-2. Licitații: căutare în TED, recomandări AI, analiza concurenței.
-3. Prețuri de la furnizori, comparare oferte, cereri de ofertă pe email.
-4. Șantier: situații de lucrări, financiar proiect, aplicație mobilă; import BIM/IFC.
+2. Prețuri de la furnizori și cereri de ofertă (după acorduri cu furnizorii).
+3. Batch API pentru devize AI mari; reglarea AI pe date reale (necesită cheie API).
+4. Aplicație mobilă (PWA / Capacitor); import BIM/IFC.
+5. Textele legale finale (verificate de jurist), completate din admin → Pagini.

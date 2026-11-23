@@ -9,6 +9,8 @@ import { hashPassword } from "@/lib/auth/password";
 import { COMPANY_COOKIE, createSession, getCurrentUser } from "@/lib/auth/session";
 import { logActivity } from "@/lib/activity";
 import type { FormState } from "@/components/action-form";
+import { clientIp } from "@/lib/auth/session";
+import { LIMITS, recordAttempt, TOO_MANY, tooMany } from "@/lib/ratelimit";
 
 async function join(inv: Invitation, userId: number) {
   await transaction(async (conn) => {
@@ -28,6 +30,9 @@ export async function acceptInvitationAction(data: FormData): Promise<void> {
 }
 
 export async function registerFromInvitationAction(_: FormState, data: FormData): Promise<FormState> {
+  const ip = (await clientIp()) ?? "necunoscut";
+  if (await tooMany(`register:ip:${ip}`, LIMITS.registerPerIp.max, LIMITS.registerPerIp.minutes)) return { error: TOO_MANY };
+  await recordAttempt(`register:ip:${ip}`);
   const inv = await findInvitation(String(data.get("token") ?? ""));
   if (!inv) return { error: "Invitația a expirat sau a fost folosită." };
   const name = String(data.get("name") ?? "").trim().slice(0, 120);

@@ -11,8 +11,8 @@ const FEATURES = [
   { icon: "calc", title: "Devize complete", text: "Materiale, manoperă și utilaje, cu export în formularele F1–F3 și C5–C9." },
   { icon: "clock", title: "Manoperă și ore de regie", text: "Din norme afli câți oameni și câte zile îți trebuie, cu grafic de execuție." },
   { icon: "doc", title: "Caiet de sarcini și declarații", text: "Documentele pentru licitație, precompletate din datele firmei tale." },
-  { icon: "megaphone", title: "Licitații publice", text: "Găsești licitațiile potrivite și pornești devizul direct din dosar." },
-  { icon: "helmet", title: "Management de șantier", text: "Jurnal, pontaj și situații de lucrări lunare, comparate cu devizul." },
+  { icon: "megaphone", title: "Analiza caietului de sarcini", text: "AI-ul extrage cerințele licitației și verifică ce lipsește din dosarul tău." },
+  { icon: "helmet", title: "Management de șantier", text: "Situații de lucrări, încasări și cheltuieli, subcontractanți și jurnal zilnic cu poze." },
 ];
 
 export default async function HomePage() {

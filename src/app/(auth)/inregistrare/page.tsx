@@ -17,6 +17,7 @@ export default async function RegisterPage() {
       <p className="mt-1 mb-6 text-muted">{trial_days} zile gratuit, fără card.</p>
       <ActionForm action={registerAction} submitLabel="Creează cont">
         <Field label="Nume și prenume" name="name" autoComplete="name" />
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] h-0 w-0 opacity-0" />
         <Field label="Numele firmei" name="company" autoComplete="organization" placeholder="ex: SC Construct SRL" />
         <Field label="Email" name="email" type="email" autoComplete="email" />
         <Field label="Parolă" name="password" type="password" autoComplete="new-password" hint="Minim 8 caractere." />
