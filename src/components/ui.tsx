@@ -32,7 +32,7 @@ export function ButtonLink({ href, children, variant = "primary" }: { href: stri
 }
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-xl border border-line bg-white p-5 ${className}`}>{children}</div>;
+  return <div className={`rounded-xl border-2 border-ink/10 bg-white p-5 ${className}`}>{children}</div>;
 }
 
 export function PageHeader({ title, subtitle, children }: { title: string; subtitle?: string; children?: React.ReactNode }) {

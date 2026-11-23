@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, PageHeader } from "@/components/ui";
 import { Icon } from "@/components/icon";
+import { BuildingAnim } from "@/components/building-anim";
 import { query, queryOne } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { STATUS_LABEL } from "./proiecte/status";
@@ -59,16 +60,22 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       {email === "retrimis" && (
         <p className="mb-6 rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-800">Ți-am retrimis emailul de confirmare.</p>
       )}
-      <PageHeader title={`Salut, ${user.name.split(" ")[0]}!`} subtitle={user.company?.name} />
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        {stats.map((s) => (
-          <Card key={s.label}>
-            <div className="text-sm text-muted">{s.label}</div>
-            <div className="mt-1 text-3xl font-bold">{s.value}</div>
-          </Card>
-        ))}
-      </div>
+      <section className="grid items-center gap-6 rounded-2xl border-2 border-ink/10 bg-white p-5 sm:p-7 lg:grid-cols-[1fr_minmax(280px,380px)]">
+        <div className="min-w-0">
+          <PageHeader title={`Salut, ${user.name.split(" ")[0]}!`} subtitle={user.company?.name} />
+          <div className="grid gap-3 sm:grid-cols-3">
+            {stats.map((s) => (
+              <div key={s.label} className="rounded-xl border-2 border-ink/10 px-4 py-3.5">
+                <div className="text-sm text-muted">{s.label}</div>
+                <div className="mt-1 text-3xl font-bold">{s.value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hidden border-ink/10 sm:block lg:border-l-2 lg:pl-6">
+          <BuildingAnim className="mx-auto h-auto w-full max-w-[380px]" />
+        </div>
+      </section>
 
       {(deadlines.length > 0 || expiring.length > 0) && (
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
