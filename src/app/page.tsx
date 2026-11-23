@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { SiteShell } from "@/components/site/shell";
-import { HeroCard } from "@/components/site/hero-card";
 import { Faq } from "@/components/site/faq";
 import { getSettings } from "@/lib/settings";
 import { getPlans } from "@/lib/plans";
@@ -42,10 +41,7 @@ export default async function HomePage() {
 
         <div className="relative mx-auto grid min-h-[640px] max-w-7xl items-center gap-10 px-4 pt-14 pb-20 sm:px-6 lg:min-h-[720px] lg:grid-cols-[1.05fr_1fr] lg:pt-16">
           <div className="animate-rise">
-            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white/80 px-3 py-1 text-sm font-medium text-muted backdrop-blur">
-              <span className="size-1.5 rounded-full bg-brand-700" /> Pentru firme de construcții din România
-            </p>
-            <h1 className="mt-6 text-4xl leading-[1.06] font-semibold tracking-[-0.03em] text-ink sm:text-5xl lg:text-[3.7rem]">
+            <h1 className="text-4xl leading-[1.06] font-semibold tracking-[-0.03em] text-ink sm:text-5xl lg:text-[3.7rem]">
               {hero?.title ?? "Devize corecte. Dosare complete. Lucrări sub control."}
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{hero?.body}</p>
@@ -62,9 +58,6 @@ export default async function HomePage() {
                 <li key={t} className="flex items-center gap-2"><Check /> {t}</li>
               ))}
             </ul>
-          </div>
-          <div className="relative hidden h-full lg:block">
-            <HeroCard />
           </div>
         </div>
       </section>
