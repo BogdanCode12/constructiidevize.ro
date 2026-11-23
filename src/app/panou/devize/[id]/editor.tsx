@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
-import { saveEstimateAction, deleteEstimateAction } from "../actions";
-import { cellCls, newKey, NumInput, ResourcePicker } from "./parts";
+import { saveEstimateAction, deleteEstimateAction, estimatorJobAction, saveRecipeAction, startEstimatorAction } from "../actions";
+import { cellCls, ImportDialog, newKey, NumInput, RecipePicker, ResourcePicker } from "./parts";
 import { Simulator } from "./simulator";
 import { Gantt } from "./gantt";
 import { checkEstimate, type Issue } from "@/lib/estimate/checks";
@@ -14,7 +14,7 @@ import {
 
 type Tab = "deviz" | "verificari" | "simulator" | "grafic";
 
-const emptyItem = (): EstItem => ({ key: newKey(), code: "", name: "", unit: "", quantity: 0, resources: [] });
+const emptyItem = (): EstItem => ({ key: newKey(), code: "", name: "", unit: "", quantity: 0, reviewNote: null, resources: [] });
 
 const move = <T,>(arr: T[], from: number, to: number) => {
   if (to < 0 || to >= arr.length) return arr;
@@ -24,7 +24,7 @@ const move = <T,>(arr: T[], from: number, to: number) => {
   return copy;
 };
 
-export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
+export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isAdmin: boolean }) {
   const [doc, setDoc] = useState<EstimateDoc>(initial);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +33,9 @@ export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
   const [tab, setTab] = useState<Tab>("deviz");
   const [flash, setFlash] = useState<string | null>(null);
   const [saving, startSaving] = useTransition();
+  const [showImport, setShowImport] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [aiJob, setAiJob] = useState<number | null>(null);
 
   const update = useCallback((fn: (d: EstimateDoc) => EstimateDoc) => {
     setDoc((d) => fn(d));
@@ -83,6 +86,62 @@ export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
     };
   }, [save, dirty]);
 
+  // Articole fără resurse (de completat cu AI din bază)
+  const missing = useMemo(
+    () => doc.chapters.flatMap((c) => c.items).filter((i) => i.name.trim() && i.resources.length === 0),
+    [doc],
+  );
+
+  const startAi = async () => {
+    setError(null);
+    const res = await startEstimatorAction(doc.id, missing.map((i) => ({ ref: i.key, code: i.code, name: i.name, unit: i.unit })));
+    if (!res.ok) return setError(res.error);
+    setAiJob(res.jobId);
+    setNotice(`AI-ul caută în bază pentru ${missing.length} articole…`);
+  };
+
+  // Urmărește lucrarea AI și aplică propunerile pe articole când e gata.
+  useEffect(() => {
+    if (!aiJob) return;
+    const t = setInterval(async () => {
+      const r = await estimatorJobAction(aiJob);
+      if (r.status === "done" && r.proposals) {
+        clearInterval(t);
+        setAiJob(null);
+        const byRef = new Map(r.proposals.map((p) => [p.ref, p]));
+        update((d) => ({
+          ...d,
+          chapters: d.chapters.map((c) => ({
+            ...c,
+            items: c.items.map((it) => {
+              const p = byRef.get(it.key);
+              return p && it.resources.length === 0 ? { ...it, resources: p.resources.map((x) => ({ ...x, key: newKey() })), reviewNote: p.note } : it;
+            }),
+          })),
+        }));
+        setNotice(`AI-ul a propus resurse pentru ${r.proposals.length} articole. Verifică notele galbene, apoi salvează.`);
+      } else if (r.status === "error") {
+        clearInterval(t);
+        setAiJob(null);
+        setNotice(null);
+        setError(r.error ?? "Completarea cu AI a eșuat.");
+      }
+    }, 3000);
+    return () => clearInterval(t);
+  }, [aiJob, update]);
+
+  const saveAsRecipe = async (item: EstItem, global: boolean) => {
+    const res = await saveRecipeAction(item, global);
+    setNotice(res.ok ? `„${item.name.slice(0, 60)}” salvat ca rețetă${global ? " globală" : ""} — data viitoare se găsește automat.` : null);
+    if (!res.ok) setError(res.error);
+  };
+
+  const saveAllRecipes = async () => {
+    const ok = doc.chapters.flatMap((c) => c.items).filter((i) => i.name.trim() && i.unit.trim() && i.resources.length && !i.reviewNote);
+    for (const it of ok) await saveRecipeAction(it, false);
+    setNotice(`${ok.length} articole salvate ca rețete ale firmei.`);
+  };
+
   const issues = useMemo(() => checkEstimate(doc), [doc]);
   const errors = issues.filter((i) => i.level === "eroare").length;
 
@@ -119,6 +178,13 @@ export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
           <span className="text-sm text-muted">
             {saving ? "Se salvează…" : dirty ? "Modificări nesalvate" : savedAt ? `Salvat la ${savedAt.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}` : "Salvat"}
           </span>
+          <button onClick={() => setShowImport(true)} className="rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200">Import F3</button>
+          {missing.length > 0 && (
+            <button onClick={startAi} disabled={!!aiJob}
+              className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-800 hover:border-brand-500 disabled:opacity-60">
+              {aiJob ? "AI lucrează…" : `✦ Completează cu AI (${missing.length})`}
+            </button>
+          )}
           <a
             href={dirty ? undefined : `/panou/devize/${doc.id}/export`}
             onClick={(e) => { if (dirty) { e.preventDefault(); alert("Salvează devizul înainte de export."); } }}
@@ -132,6 +198,12 @@ export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
           </button>
         </div>
         {error && <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {notice && (
+          <p className="mt-2 flex items-center justify-between gap-3 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-800">
+            <span>{notice}</span>
+            <button onClick={() => setNotice(null)} className="text-brand-700">✕</button>
+          </p>
+        )}
         <nav className="mt-2 flex gap-1 overflow-x-auto">
           {tabs.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
@@ -145,6 +217,23 @@ export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
         </nav>
       </div>
 
+      {showImport && (
+        <ImportDialog
+          onClose={() => setShowImport(false)}
+          onImport={(res) => {
+            setShowImport(false);
+            update((d) => ({
+              ...d,
+              chapters: [
+                ...d.chapters.filter((c) => c.items.length > 0 || c.name.trim() !== "Capitolul 1"),
+                ...res.chapters.map((c) => ({ key: newKey(), name: c.name, teamSize: 4, startDay: null, items: c.items.map((it) => ({ ...it, key: newKey(), resources: it.resources.map((r) => ({ ...r, key: newKey() })) })) })),
+              ],
+            }));
+            const s = res.stats;
+            setNotice(`Import: ${s.exact} potrivite sigur, ${s.propus + s.cache} propuse (de verificat), ${s.negasit} negăsite${s.negasit ? " — le poți completa cu AI" : ""}. Nu uita să salvezi.`);
+          }}
+        />
+      )}
       {tab === "verificari" && <IssuesPanel issues={issues} onGo={goTo} />}
       {tab === "simulator" && <Simulator doc={doc} />}
       {tab === "grafic" && <Gantt doc={doc} onDoc={update} onChapter={setChapter} />}
@@ -207,12 +296,14 @@ export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
                               return { ...c, items };
                             })}
                             onDelete={() => setChapter(ci, (c) => ({ ...c, items: c.items.filter((_, i) => i !== ii) }))}
+                            onSaveRecipe={(global) => saveAsRecipe(it, global)}
+                            isAdmin={isAdmin}
                           />
                         ))}
                       </tbody>
                     </table>
                   </div>
-                  <div className="px-4 py-3">
+                  <div className="flex flex-wrap items-center gap-4 px-4 py-3">
                     <button
                       onClick={() => {
                         const it = emptyItem();
@@ -223,6 +314,7 @@ export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
                     >
                       + Adaugă articol
                     </button>
+                    <RecipePicker onPick={(it) => setChapter(ci, (c) => ({ ...c, items: [...c.items, { ...it, key: newKey(), resources: it.resources.map((r) => ({ ...r, key: newKey() })) }] }))} />
                   </div>
                 </section>
               );
@@ -262,6 +354,11 @@ export function EstimateEditor({ initial }: { initial: EstimateDoc }) {
                 <div className="flex justify-between"><dt className="text-muted">Zile-om ({doc.hoursPerDay} ore/zi)</dt><dd className="font-semibold tabular-nums">{fmtQty(Math.round(r.laborHours / (doc.hoursPerDay || 8) * 10) / 10)}</dd></div>
               </dl>
               <button onClick={() => setTab("grafic")} className="mt-3 text-sm font-semibold text-brand-700 hover:underline">Vezi durata și graficul de execuție →</button>
+              <div className="mt-6 border-t border-line pt-4">
+                <h3 className="font-semibold">Rețete</h3>
+                <p className="mt-1 text-sm text-muted">Articolele salvate ca rețete se găsesc automat la următorul import F3, fără AI și fără cost.</p>
+                <button onClick={saveAllRecipes} className="mt-2 text-sm font-semibold text-brand-700 hover:underline">★ Salvează articolele verificate ca rețete</button>
+              </div>
               <form action={deleteEstimateAction} className="mt-6 border-t border-line pt-4"
                 onSubmit={(e) => { if (!confirm("Ștergi definitiv acest deviz?")) e.preventDefault(); }}>
                 <input type="hidden" name="id" value={doc.id} />
@@ -328,7 +425,7 @@ function PctRow({ label, pct, value, onPct }: { label: string; pct: number; valu
 }
 
 function ItemRows({
-  nr, item, open, flash, onToggle, onItem, onRes, onMove, onDuplicate, onDelete,
+  nr, item, open, flash, onToggle, onItem, onRes, onMove, onDuplicate, onDelete, onSaveRecipe, isAdmin,
 }: {
   nr: string; item: EstItem; open: boolean; flash: boolean;
   onToggle: () => void;
@@ -337,6 +434,8 @@ function ItemRows({
   onMove: (dir: -1 | 1) => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onSaveRecipe: (global: boolean) => void;
+  isAdmin: boolean;
 }) {
   const ub = itemUnitBreakdown(item);
   const addRes = (r: Omit<EstResource, "key">) => onItem((it) => ({ ...it, resources: [...it.resources, { ...r, key: newKey() }] }));
@@ -358,9 +457,21 @@ function ItemRows({
           <button title="Mută sus" onClick={() => onMove(-1)} className="px-1 hover:text-ink">↑</button>
           <button title="Mută jos" onClick={() => onMove(1)} className="px-1 hover:text-ink">↓</button>
           <button title="Duplică articolul" onClick={onDuplicate} className="px-1 hover:text-ink">⧉</button>
+          <button title="Salvează ca rețetă a firmei" onClick={() => onSaveRecipe(false)} disabled={!item.resources.length} className="px-1 hover:text-amber-600 disabled:opacity-30">★</button>
+          {isAdmin && <button title="Salvează ca rețetă globală (pentru toți clienții)" onClick={() => onSaveRecipe(true)} disabled={!item.resources.length} className="px-1 text-xs hover:text-amber-600 disabled:opacity-30">★G</button>}
           <button title="Șterge articolul" onClick={() => { if (!item.resources.length || confirm("Ștergi articolul?")) onDelete(); }} className="px-1 text-red-700 hover:text-red-900">✕</button>
         </td>
       </tr>
+      {item.reviewNote && (
+        <tr className="border-b border-line bg-amber-50">
+          <td />
+          <td colSpan={7} className="px-2 py-1.5 text-xs text-amber-900">
+            <span className="mr-3">⚠ {item.reviewNote}</span>
+            <button onClick={() => onItem((it) => ({ ...it, reviewNote: null }))} className="font-semibold text-brand-700 hover:underline">✓ Am verificat</button>
+            {!open && item.resources.length > 0 && <button onClick={onToggle} className="ml-3 font-semibold text-brand-700 hover:underline">Vezi resursele</button>}
+          </td>
+        </tr>
+      )}
       {open && (
         <tr className="border-b border-line bg-brand-50/40">
           <td />

@@ -126,7 +126,7 @@ export async function updateSettingsAction(_: FormState, data: FormData): Promis
   const admin = await requireAdmin();
   const limits: Record<keyof Settings, [number, number]> = {
     trial_days: [0, 365], default_overhead_pct: [0, 100], default_profit_pct: [0, 100], default_vat_pct: [0, 100],
-    ai_monthly_requests: [0, 100000],
+    ai_monthly_requests: [0, 100000], ai_price_input_per_mtok: [0, 1000], ai_price_output_per_mtok: [0, 1000],
   };
   const values: Partial<Settings> = {};
   for (const key of Object.keys(SETTING_DEFAULTS) as (keyof Settings)[]) {
@@ -182,10 +182,41 @@ export async function updateAiTaskAction(_: FormState, data: FormData): Promise<
   if (!name || !prompt) return { error: "Numele și instrucțiunile sunt obligatorii." };
   if (!["low", "medium", "high", "xhigh", "max"].includes(effort)) return { error: "Nivel de efort invalid." };
   await execute(
-    "UPDATE ai_tasks SET name = ?, description = ?, prompt = ?, effort = ?, needs_files = ?, active = ?, position = ? WHERE slug = ?",
-    [name, description, prompt, effort, data.get("needs_files") === "on" ? 1 : 0, data.get("active") === "on" ? 1 : 0, Math.round(parseNum(data.get("position")) ?? 0), slug],
+    "UPDATE ai_tasks SET name = ?, description = ?, prompt = ?, effort = ?, needs_files = ?, send_originals = ?, active = ?, position = ? WHERE slug = ?",
+    [name, description, prompt, effort, data.get("needs_files") === "on" ? 1 : 0, data.get("send_originals") === "on" ? 1 : 0, data.get("active") === "on" ? 1 : 0, Math.round(parseNum(data.get("position")) ?? 0), slug],
   );
   await logActivity({ userId: admin.id, action: "admin.ai.modificat", details: { slug } });
   revalidatePath("/admin/ai");
   return { ok: `„${name}” salvat.` };
+}
+
+export async function deleteRecipeAdminAction(data: FormData): Promise<void> {
+  const admin = await requireAdmin();
+  const id = Number(data.get("id"));
+  await execute("DELETE FROM recipes WHERE id = ?", [id]);
+  await logActivity({ userId: admin.id, action: "admin.reteta.stearsa", details: { id } });
+  revalidatePath("/admin/retete");
+}
+
+export async function promoteRecipeAction(data: FormData): Promise<void> {
+  const admin = await requireAdmin();
+  const id = Number(data.get("id"));
+  const r = await query<{ norm_key: string }>("SELECT norm_key FROM recipes WHERE id = ? AND company_id IS NOT NULL", [id]);
+  if (!r.length) return;
+  // Copiază rețeta firmei în catalogul global (înlocuiește una globală cu aceeași cheie).
+  await transaction(async (conn) => {
+    await execute("DELETE FROM recipes WHERE company_id IS NULL AND norm_key = ?", [r[0].norm_key], conn);
+    const ins = await execute(
+      "INSERT INTO recipes (company_id, code, name, unit, norm_key, source, created_by) SELECT NULL, code, name, unit, norm_key, 'manual', ? FROM recipes WHERE id = ?",
+      [admin.id, id], conn,
+    );
+    await execute(
+      `INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, price)
+       SELECT ?, rr.position, CASE WHEN res.company_id IS NULL THEN rr.resource_id ELSE NULL END, rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.price
+         FROM recipe_resources rr LEFT JOIN resources res ON res.id = rr.resource_id WHERE rr.recipe_id = ?`,
+      [ins.insertId, id], conn,
+    );
+  });
+  await logActivity({ userId: admin.id, action: "admin.reteta.globala", details: { id } });
+  revalidatePath("/admin/retete");
 }

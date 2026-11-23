@@ -13,7 +13,7 @@ găzduire cPanel (Setup Node.js App, build standalone, publicare prin ramura `re
 - Fără preluare automată de date de pe site-uri care nu permit asta (SEAP intern, magazine): doar surse oficiale
   (TED, ANAF, BNR) sau date furnizate de utilizator / parteneri.
 
-## Cerință importantă: AI care face devize din baza noastră de date (de implementat)
+## Cerință importantă: AI care face devize din baza noastră de date
 
 Proprietarul vrea ca asistentul AI să **caute în baza de date a platformei** (catalogul global de resurse,
 resursele firmei, articolele și devizele aprobate anterior) ca să construiască un deviz bun, și să **consume cât mai
@@ -37,4 +37,21 @@ puțini tokeni**. Direcția agreată:
    limită lunară pe firmă (există deja: `ai_monthly_requests`).
 6. **Chat-ul** să nu mai trimită toate documentele la fiecare mesaj: rezumate salvate + doar fragmentele relevante.
 
-Codul AI existent: `src/lib/ai/` (claude.ts, jobs.ts, files.ts, context.ts); sarcinile AI sunt în tabelul `ai_tasks`.
+### Stare implementare
+
+Făcut:
+- **Pct. 1:** potrivire fără AI în `src/lib/recipes/repo.ts` (`matchLines`). Ordinea: cod → cheie normalizată → cache AI → căutare FULLTEXT + scor `similarity`.
+- **Import F3:** `src/lib/estimate/f3.ts`, din Excel sau din text lipit.
+- **Pct. 2:** `src/lib/ai/estimator.ts`. Tool runner din SDK cu unelte strict (`cauta_retete`, `reteta`, `cauta_resurse`), rezultate scurte, separate prin „|”. Răspunsul final e JSON prin `output_config.format`, cu efort `low`. Sarcina `deviz_ai` se poate edita din admin.
+- **Pct. 3:** rețetele sunt în tabelele `recipes` și `recipe_resources`. Se salvează din editor: ★ pentru firmă, ★G pentru global (doar admin). Adminul poate promova o rețetă de firmă la globală.
+- **Pct. 4:**
+  - textul extras se salvează în `project_files.extracted_text`, la încărcare;
+  - potrivirile AI sunt în tabelul `ai_match_cache` (globale dacă folosesc doar resurse globale);
+  - prompt caching pe system.
+- **Pct. 5:** efort configurabil, cost estimat în /admin/ai (prețuri în Setări), opțiunea `send_originals` pe sarcină.
+- **Pct. 6:** chat-ul trimite textul extras; la documente mari, doar fragmentele relevante pentru ultima întrebare.
+
+De făcut: Batch API pentru devize mari; reglarea instrucțiunilor și a pragurilor de asemănare pe date reale (necesită cheie API).
+Notă: tool runner-ul din SDK folosește automat message threads (beta `message-threads-2026-08-12`).
+
+Codul AI: `src/lib/ai/` (claude.ts, jobs.ts, files.ts, context.ts, estimator.ts); sarcinile AI sunt în tabelul `ai_tasks`.

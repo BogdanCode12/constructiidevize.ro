@@ -22,6 +22,10 @@ export default async function AdminAiPage() {
               + (SELECT COALESCE(SUM(output_tokens),0) FROM ai_chat_messages WHERE created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')) AS tout,
             (SELECT COUNT(*) FROM ai_jobs WHERE status = 'error' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')) AS errors`,
   );
+  const cost = (Number(month?.tin ?? 0) * settings.ai_price_input_per_mtok + Number(month?.tout ?? 0) * settings.ai_price_output_per_mtok) / 1_000_000;
+  const cacheStats = await queryOne<{ recipes: number; cached: number; hits: number }>(
+    "SELECT (SELECT COUNT(*) FROM recipes) AS recipes, (SELECT COUNT(*) FROM ai_match_cache) AS cached, (SELECT COALESCE(SUM(hits),0) FROM ai_match_cache) AS hits",
+  );
   const top = await query<{ name: string; n: number }>(
     `SELECT c.name, COUNT(*) AS n FROM ai_jobs j JOIN companies c ON c.id = j.company_id
       WHERE j.created_at >= DATE_FORMAT(NOW(), '%Y-%m-01') GROUP BY c.id ORDER BY n DESC LIMIT 5`,
@@ -35,10 +39,13 @@ export default async function AdminAiPage() {
           ? process.env.AI_MOCK === "1" ? "Mod de test (AI_MOCK=1): răspunsurile sunt simulate, fără cost." : "AI activ — cheia ANTHROPIC_API_KEY este configurată."
           : "AI inactiv — adaugă variabila ANTHROPIC_API_KEY în cPanel (Setup Node.js App → Environment variables) și repornește aplicația."}
       </div>
-      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-5">
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
         {[["Analize luna aceasta", month?.jobs], ["Mesaje chat", month?.chats], ["Tokeni intrare", month?.tin], ["Tokeni ieșire", month?.tout], ["Erori", month?.errors]].map(([l, v]) => (
           <Card key={String(l)}><div className="text-sm text-muted">{l}</div><div className="mt-1 text-2xl font-bold">{num.format(Number(v ?? 0))}</div></Card>
         ))}
+        <Card><div className="text-sm text-muted">Cost estimat luna aceasta</div><div className="mt-1 text-2xl font-bold">${cost.toFixed(2)}</div></Card>
+        <Card><div className="text-sm text-muted">Rețete în bază</div><div className="mt-1 text-2xl font-bold">{num.format(Number(cacheStats?.recipes ?? 0))}</div></Card>
+        <Card><div className="text-sm text-muted">Potriviri AI salvate / refolosite</div><div className="mt-1 text-2xl font-bold">{num.format(Number(cacheStats?.cached ?? 0))} / {num.format(Number(cacheStats?.hits ?? 0))}</div></Card>
       </div>
       {top.length > 0 && <p className="mb-6 text-sm text-muted">Cei mai activi clienți luna aceasta: {top.map((t) => `${t.name} (${t.n})`).join(", ")}.</p>}
 
@@ -67,6 +74,7 @@ export default async function AdminAiPage() {
               <div className="flex flex-wrap gap-6 text-sm">
                 <label className="flex items-center gap-2"><input type="checkbox" name="active" defaultChecked={t.active === 1} className="size-4 accent-brand-700" /> Activă</label>
                 <label className="flex items-center gap-2"><input type="checkbox" name="needs_files" defaultChecked={t.needs_files === 1} className="size-4 accent-brand-700" /> Necesită documente încărcate</label>
+                <label className="flex items-center gap-2" title="Implicit se trimite textul extras (de câteva ori mai ieftin). Bifează doar dacă sarcina trebuie să vadă desene, tabele scanate sau ștampile."><input type="checkbox" name="send_originals" defaultChecked={t.send_originals === 1} className="size-4 accent-brand-700" /> Trimite PDF-urile originale (mai scump)</label>
               </div>
             </ActionForm>
           </Card>

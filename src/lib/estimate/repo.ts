@@ -22,8 +22,8 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
     "SELECT id, name, team_size, start_day FROM estimate_chapters WHERE estimate_id = ? ORDER BY position, id",
     [id],
   );
-  const items = await query<{ id: number; chapter_id: number; code: string | null; name: string; unit: string; quantity: string }>(
-    `SELECT i.id, i.chapter_id, i.code, i.name, i.unit, i.quantity
+  const items = await query<{ id: number; chapter_id: number; code: string | null; name: string; unit: string; quantity: string; review_note: string | null }>(
+    `SELECT i.id, i.chapter_id, i.code, i.name, i.unit, i.quantity, i.review_note
        FROM estimate_items i JOIN estimate_chapters c ON c.id = i.chapter_id
       WHERE c.estimate_id = ? ORDER BY i.position, i.id`,
     [id],
@@ -69,7 +69,7 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
         .filter((i) => i.chapter_id === c.id)
         .map((i) => ({
           key: k(), code: i.code ?? "", name: i.name, unit: i.unit,
-          quantity: Number(i.quantity), resources: resByItem.get(i.id) ?? [],
+          quantity: Number(i.quantity), reviewNote: i.review_note, resources: resByItem.get(i.id) ?? [],
         })),
     })),
   };
@@ -116,8 +116,8 @@ export async function saveEstimate(doc: EstimateDoc, companyId: number): Promise
       );
       for (const [ii, it] of ch.items.entries()) {
         const i = await execute(
-          "INSERT INTO estimate_items (chapter_id, position, code, name, unit, quantity) VALUES (?, ?, ?, ?, ?, ?)",
-          [c.insertId, ii, txt(it.code, 40) || null, txt(it.name, 500) || "Articol", txt(it.unit, 20) || "buc", num(it.quantity, 0)],
+          "INSERT INTO estimate_items (chapter_id, position, code, name, unit, quantity, review_note) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [c.insertId, ii, txt(it.code, 40) || null, txt(it.name, 500) || "Articol", txt(it.unit, 20) || "buc", num(it.quantity, 0), txt(it.reviewNote, 255) || null],
           conn,
         );
         const rows = it.resources

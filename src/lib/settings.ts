@@ -8,6 +8,8 @@ export type Settings = {
   default_profit_pct: number;
   default_vat_pct: number;
   ai_monthly_requests: number;
+  ai_price_input_per_mtok: number;
+  ai_price_output_per_mtok: number;
 };
 
 export const SETTING_DEFAULTS: Settings = {
@@ -16,6 +18,8 @@ export const SETTING_DEFAULTS: Settings = {
   default_profit_pct: 5,
   default_vat_pct: 21,
   ai_monthly_requests: 200,
+  ai_price_input_per_mtok: 4,
+  ai_price_output_per_mtok: 20,
 };
 
 export const SETTING_LABELS: Record<keyof Settings, string> = {
@@ -24,6 +28,8 @@ export const SETTING_LABELS: Record<keyof Settings, string> = {
   default_profit_pct: "Profit implicit (%)",
   default_vat_pct: "TVA implicit (%)",
   ai_monthly_requests: "Cereri AI pe lună, per firmă",
+  ai_price_input_per_mtok: "Preț AI intrare ($ / 1M tokeni) — pentru estimarea costului",
+  ai_price_output_per_mtok: "Preț AI ieșire ($ / 1M tokeni) — pentru estimarea costului",
 };
 
 /** Setările platformei (editabile din /admin/setari). */

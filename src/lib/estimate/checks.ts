@@ -30,6 +30,7 @@ export function checkEstimate(doc: EstimateDoc): Issue[] {
       const where = `Art. ${ci + 1}.${ii + 1}`;
       const base = { where, itemKey: it.key, chapterKey: ch.key };
       if (!it.name.trim()) issues.push({ ...base, level: "eroare", message: "Articol fără denumire." });
+      if (it.reviewNote) issues.push({ ...base, level: "atentie", message: `De verificat: ${it.reviewNote}` });
       if (!it.unit.trim()) issues.push({ ...base, level: "eroare", message: "Lipsește unitatea de măsură." });
       if (it.quantity <= 0) issues.push({ ...base, level: "eroare", message: "Cantitatea este 0." });
       if (it.resources.length === 0) issues.push({ ...base, level: "eroare", message: "Articolul nu are resurse, deci prețul unitar este 0." });

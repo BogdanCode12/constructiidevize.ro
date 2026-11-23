@@ -3,7 +3,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { execute, query, queryOne } from "../db";
 import { getSettings } from "../settings";
 import { AI_MODEL, AiError, callClaude, type Effort } from "./claude";
-import { fileBlocks, type StoredFile } from "./files";
+import { chatBlocks, fileBlocks, type StoredFile } from "./files";
 import { platformContext } from "./context";
 
 export const SYSTEM_PROMPT = `Ești asistentul platformei ConstructiiDevize.ro pentru firme de construcții din România care pregătesc oferte pentru licitații publice (Legea 98/2016, SEAP/SICAP) și execută lucrări.
@@ -17,10 +17,10 @@ Cum răspunzi:
 - Textele pe care le redactezi (propuneri tehnice, planuri, întrebări) sunt ciorne pe care utilizatorul le verifică și le asumă; marchează între [paranteze drepte] ce trebuie completat de om.
 - Nu oferi consultanță juridică definitivă; semnalează când e nevoie de verificarea unui jurist sau a unui specialist atestat.`;
 
-export type AiTask = { slug: string; name: string; description: string; prompt: string; effort: Effort; needs_files: number; active: number; position: number };
+export type AiTask = { slug: string; name: string; description: string; prompt: string; effort: Effort; needs_files: number; send_originals: number; active: number; position: number };
 
 export async function listAiTasks(onlyActive = true): Promise<AiTask[]> {
-  return query<AiTask>(`SELECT slug, name, description, prompt, effort, needs_files, active, position FROM ai_tasks ${onlyActive ? "WHERE active = 1" : ""} ORDER BY position, name`);
+  return query<AiTask>(`SELECT slug, name, description, prompt, effort, needs_files, send_originals, active, position FROM ai_tasks ${onlyActive ? "WHERE active = 1 AND slug <> 'deviz_ai'" : ""} ORDER BY position, name`);
 }
 
 /** Cereri AI folosite luna aceasta de firmă (sarcini + mesaje de chat). */
@@ -42,15 +42,15 @@ export async function failStaleJobs(): Promise<void> {
 async function projectFiles(companyId: number, projectId: number, ids?: number[]): Promise<StoredFile[]> {
   if (ids && ids.length === 0) return [];
   return query<StoredFile>(
-    `SELECT file_name, file_path, file_size FROM project_files WHERE company_id = ? AND project_id = ? ${ids ? "AND id IN (?)" : ""} ORDER BY created_at, id`,
+    `SELECT id, file_name, file_path, file_size, extracted_text, extracted_pages FROM project_files WHERE company_id = ? AND project_id = ? ${ids ? "AND id IN (?)" : ""} ORDER BY created_at, id`,
     ids ? [companyId, projectId, ids] : [companyId, projectId],
   );
 }
 
 /** Conținutul comun: documentele + datele din platformă (cu cache, ca să nu fie retaxate la fiecare mesaj). */
-async function sharedContent(companyId: number, projectId: number, fileIds?: number[]): Promise<Anthropic.Beta.BetaContentBlockParam[]> {
-  const files = await projectFiles(companyId, projectId, fileIds);
-  const blocks = await fileBlocks(files);
+async function sharedContent(companyId: number, projectId: number, opts: { fileIds?: number[]; originals?: boolean; question?: string }): Promise<Anthropic.Beta.BetaContentBlockParam[]> {
+  const files = await projectFiles(companyId, projectId, opts.fileIds);
+  const blocks = opts.question !== undefined ? await chatBlocks(files, opts.question) : await fileBlocks(files, opts.originals);
   blocks.push({
     type: "text",
     text: `# Date din platformă\n\n${await platformContext(companyId, projectId)}`,
@@ -67,10 +67,10 @@ export async function runJob(jobId: number): Promise<void> {
   if (!job) return;
   await execute("UPDATE ai_jobs SET status = 'running' WHERE id = ?", [jobId]);
   try {
-    const task = await queryOne<AiTask>("SELECT slug, name, description, prompt, effort, needs_files, active, position FROM ai_tasks WHERE slug = ?", [job.task_slug]);
+    const task = await queryOne<AiTask>("SELECT slug, name, description, prompt, effort, needs_files, send_originals, active, position FROM ai_tasks WHERE slug = ?", [job.task_slug]);
     if (!task) throw new AiError("Sarcina AI nu mai există.");
     const ids = typeof job.file_ids === "string" ? (JSON.parse(job.file_ids) as number[]) : job.file_ids ?? [];
-    const content = await sharedContent(job.company_id, job.project_id, ids);
+    const content = await sharedContent(job.company_id, job.project_id, { fileIds: ids, originals: task.send_originals === 1 });
     content.push({
       type: "text",
       text: `# Sarcina: ${task.name}\n\n${task.prompt}${job.instructions ? `\n\n## Instrucțiuni suplimentare de la utilizator\n${job.instructions}` : ""}`,
@@ -101,7 +101,10 @@ export async function runChat(assistantMsgId: number): Promise<void> {
     while (history.length && history[0].role !== "user") history.shift();
     if (!history.length) throw new AiError("Nu există întrebare.");
 
-    const shared = await sharedContent(pending.company_id, pending.project_id);
+    // În chat se trimite doar textul extras. Documentele mici merg întregi (prefix stabil → cache ieftin);
+    // doar la documente foarte mari se aleg fragmentele relevante pentru ultima întrebare.
+    const lastQuestion = [...history].reverse().find((m) => m.role === "user")?.content ?? "";
+    const shared = await sharedContent(pending.company_id, pending.project_id, { question: lastQuestion });
     const messages: Anthropic.Beta.BetaMessageParam[] = history.map((m, i) =>
       i === 0 ? { role: "user", content: [...shared, { type: "text", text: m.content }] } : { role: m.role, content: m.content },
     );

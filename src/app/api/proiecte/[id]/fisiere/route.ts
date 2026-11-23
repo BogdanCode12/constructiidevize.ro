@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { execute, queryOne } from "@/lib/db";
 import { isAllowedFile, MAX_UPLOAD_BYTES, saveUpload } from "@/lib/storage";
 import { PROJECT_FILE_LABELS } from "@/lib/ai/labels";
+import { extractFileText } from "@/lib/ai/files";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +26,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
   for (const f of files) {
     const s = await saveUpload(user.company.id, f);
+    // Textul se extrage o singură dată, la încărcare, și se refolosește în toate analizele și în chat.
+    const e = await extractFileText(f.name, Buffer.from(await f.arrayBuffer()));
     await execute(
-      "INSERT INTO project_files (company_id, project_id, label, file_path, file_name, file_size, mime, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      [user.company.id, projectId, label, s.path, s.name, s.size, s.mime, user.id],
+      "INSERT INTO project_files (company_id, project_id, label, file_path, file_name, file_size, mime, extracted_text, extracted_pages, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [user.company.id, projectId, label, s.path, s.name, s.size, s.mime, e.text, e.pages, user.id],
     );
   }
   revalidatePath(`/panou/proiecte/${projectId}/ai`);

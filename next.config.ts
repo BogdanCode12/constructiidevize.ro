@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   // Fără sharp pe server: imaginile se servesc direct.
   images: { unoptimized: true },
   // mysql2 rămâne în node_modules (nu în bundle), ca să-l poată folosi și scripts/migrate.mjs pe server.
-  serverExternalPackages: ["mysql2"],
+  serverExternalPackages: ["mysql2", "unpdf"],
 };
 
 export default nextConfig;

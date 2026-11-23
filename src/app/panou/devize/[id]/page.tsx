@@ -14,5 +14,5 @@ export default async function EstimatePage({ params }: Params) {
   const id = Number((await params).id);
   const doc = Number.isInteger(id) ? await loadEstimate(id, user.company?.id ?? 0) : null;
   if (!doc) notFound();
-  return <EstimateEditor initial={doc} />;
+  return <EstimateEditor initial={doc} isAdmin={user.role === "admin"} />;
 }

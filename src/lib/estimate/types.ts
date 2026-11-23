@@ -50,6 +50,8 @@ export type EstItem = {
   name: string;
   unit: string;
   quantity: number;
+  /** Notă „de verificat” pusă de import / AI; dispare când utilizatorul confirmă. */
+  reviewNote: string | null;
   resources: EstResource[];
 };
 
