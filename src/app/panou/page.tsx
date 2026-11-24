@@ -78,7 +78,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       </section>
 
       {(deadlines.length > 0 || expiring.length > 0) && (
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2 [&>*]:min-w-0">
           <Card className="p-0">
             <div className="border-b border-line px-5 py-3 font-semibold">Termene în următoarele 14 zile</div>
             {deadlines.length === 0 ? <p className="px-5 py-4 text-sm text-muted">Niciun termen apropiat.</p> : (

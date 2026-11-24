@@ -65,7 +65,7 @@ export default async function ProjectAiPage({ params, searchParams }: { params: 
       </nav>
 
       {tab === "analize" ? (
-        <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px] [&>*]:min-w-0">
           <div className="space-y-6">
             <Card>
               <h2 className="mb-1 font-bold">Rulează o analiză</h2>

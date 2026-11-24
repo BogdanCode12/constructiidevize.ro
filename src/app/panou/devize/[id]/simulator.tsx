@@ -40,7 +40,7 @@ export function Simulator({ doc }: { doc: EstimateDoc }) {
   const baseRecap = recapFromDirect(base, camBase, doc);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[360px_1fr] [&>*]:min-w-0">
       <div className="rounded-xl border border-line bg-white p-5">
         <h2 className="font-bold">Ajustări</h2>
         <p className="mb-4 text-sm text-muted">Nu modifică devizul — doar simulează. Procente pozitive = scumpire, negative = reducere.</p>

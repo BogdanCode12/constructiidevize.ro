@@ -46,7 +46,7 @@ async function Dossier({ companyId }: { companyId: number }) {
   );
   const groups = (Object.keys(DOC_CATEGORIES) as DocCategory[]).map((c) => [c, docs.filter((d) => d.category === c)] as const).filter(([, l]) => l.length);
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px] [&>*]:min-w-0">
       <div className="space-y-6">
         {groups.length === 0 && (
           <Card className="py-12 text-center text-muted">

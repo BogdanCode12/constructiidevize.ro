@@ -77,7 +77,7 @@ async function Situations({ projectId, companyId, contract }: { projectId: numbe
     ),
   ]);
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] [&>*]:min-w-0">
       <Card className="p-0">
         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
           <span className="font-semibold">Situații de lucrări</span>
@@ -133,7 +133,7 @@ async function Finance({ projectId, companyId, fin }: { projectId: number; compa
     ? [["Materiale", plan.material, fin.spentBy.materiale ?? 0], ["Manoperă", plan.manopera, fin.spentBy.manopera ?? 0], ["Utilaje", plan.utilaje, fin.spentBy.utilaje ?? 0], ["Transport", plan.transport, fin.spentBy.transport ?? 0]]
     : [];
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] [&>*]:min-w-0">
       <div className="space-y-6">
         {plan && (
           <Card>
@@ -214,7 +214,7 @@ async function Subcontracts({ projectId, companyId }: { projectId: number; compa
     query<{ id: number; name: string }>("SELECT id, name FROM subcontractors WHERE company_id = ? ORDER BY name", [companyId]),
   ]);
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] [&>*]:min-w-0">
       <Card className="p-0">
         <div className="border-b border-line px-5 py-3.5 font-semibold">Lucrări subcontractate</div>
         {rows.length === 0 ? <p className="px-5 py-8 text-center text-sm text-muted">Nicio lucrare subcontractată.</p> : (
@@ -272,7 +272,7 @@ async function Journal({ projectId, companyId }: { projectId: number; companyId:
     : [];
   const totals = entries.reduce((s, e) => ({ days: s.days + 1, hours: s.hours + Number(e.hours ?? 0) }), { days: 0, hours: 0 });
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] [&>*]:min-w-0">
       <div className="space-y-4">
         {entries.length > 0 && <p className="text-sm text-muted">{totals.days} rapoarte · {fmtMoney(totals.hours).replace(",00", "")} ore lucrate înregistrate</p>}
         {entries.length === 0 && <Card className="py-10 text-center text-sm text-muted">Niciun raport încă. Echipa poate completa raportul zilnic de pe telefon.</Card>}

@@ -135,7 +135,7 @@ export async function RecipeDetailPage({ ctx, id, sp }: { ctx: RecipeCtx; id: st
         </p>
       )}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_300px] [&>*]:min-w-0">
         <Card><RecipeEditor scope={ctx.scope} recipe={r} base={ctx.base} readOnly={readOnly} /></Card>
         <div className="space-y-6">
           <Card>

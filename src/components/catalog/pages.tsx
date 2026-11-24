@@ -100,7 +100,7 @@ export async function CatalogDetail({ ctx, id }: { ctx: CatalogCtx; id: string }
 
       <div className="space-y-6">
         <OffersPanel resource={r} offers={offers} scope={ctx.scope} owner={owner} />
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] [&>*]:min-w-0">
           {owner ? (
             <Card>
               <h2 className="mb-4 font-bold">Date resursă</h2>

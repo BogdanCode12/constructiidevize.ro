@@ -185,36 +185,36 @@ export function EstimateEditor({ initial, isAdmin, rules }: { initial: EstimateD
   return (
     <div className="-mt-2">
       <div className="sticky top-0 z-20 -mx-4 mb-6 border-b-2 border-ink/10 bg-white/95 px-4 pt-3 backdrop-blur sm:-mx-8 sm:px-8">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="min-w-0 flex-1">
-            <Link href="/panou/devize" className="text-sm text-muted hover:text-ink">← Devize · {doc.projectName}</Link>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="min-w-0 basis-full lg:basis-0 lg:flex-1">
+            <Link href="/panou/devize" className="block truncate text-sm text-muted hover:text-ink">← Devize · {doc.projectName}</Link>
             <input
               value={doc.name}
               onChange={(e) => update((d) => ({ ...d, name: e.target.value }))}
               className="block w-full rounded-md border border-transparent bg-transparent text-xl font-bold outline-none hover:border-line focus:border-brand-500 focus:bg-white sm:text-2xl"
             />
           </div>
-          <span className="text-sm text-muted">
+          <span className="basis-full text-xs text-muted sm:basis-auto sm:text-sm">
             {saving ? "Se salvează…" : dirty ? "Modificări nesalvate" : savedAt ? `Salvat la ${savedAt.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}` : "Salvat"}
           </span>
-          <button onClick={() => setShowImport(true)} className="rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200">Import F3</button>
-          <button onClick={() => setShowPrices(true)} className="rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200"
+          <button onClick={() => setShowImport(true)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold hover:border-brand-200 sm:px-4 sm:py-2">Import F3</button>
+          <button onClick={() => setShowPrices(true)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold hover:border-brand-200 sm:px-4 sm:py-2"
             title="Compară prețurile din deviz cu catalogul și alege ce actualizezi">Actualizează prețurile</button>
           {missing.length > 0 && (
             <button onClick={startAi} disabled={!!aiJob}
-              className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-800 hover:border-brand-500 disabled:opacity-60">
+              className="rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-sm font-semibold text-brand-800 hover:border-brand-500 disabled:opacity-60 sm:px-4 sm:py-2">
               {aiJob ? "Se completează…" : `✦ Completează automat (${missing.length})`}
             </button>
           )}
           <a
             href={dirty ? undefined : `/panou/devize/${doc.id}/export`}
             onClick={(e) => { if (dirty) { e.preventDefault(); alert("Salvează devizul înainte de export."); } }}
-            className="cursor-pointer rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200"
+            className="cursor-pointer rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold hover:border-brand-200 sm:px-4 sm:py-2"
           >
             Export Excel
           </a>
           <button onClick={save} disabled={saving || !dirty}
-            className="rounded-lg bg-brand-700 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-800 disabled:opacity-50">
+            className="rounded-lg bg-brand-700 px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-800 disabled:opacity-50 sm:px-5 sm:py-2">
             Salvează
           </button>
         </div>
@@ -528,7 +528,7 @@ function ItemRows({
           </button>
         </td>
         <td className="px-1 py-1"><input value={item.code} onChange={(e) => onItem((it) => ({ ...it, code: e.target.value }))} className={cellCls} placeholder="Cod" /></td>
-        <td className="px-1 py-1"><input value={item.name} onChange={(e) => onItem((it) => ({ ...it, name: e.target.value }))} className={cellCls} placeholder="Denumirea lucrării" /></td>
+        <td className="min-w-56 px-1 py-1"><input value={item.name} onChange={(e) => onItem((it) => ({ ...it, name: e.target.value }))} className={cellCls} placeholder="Denumirea lucrării" /></td>
         <td className="px-1 py-1"><input value={item.unit} onChange={(e) => onItem((it) => ({ ...it, unit: e.target.value }))} className={cellCls} placeholder="mc" /></td>
         <td className="px-1 py-1">
           {item.qtyFormula && evalFormula(item.qtyFormula).ok ? (

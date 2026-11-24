@@ -265,17 +265,17 @@ export function ItemPanel({
                 return (
                   <li key={r.key} className="rounded-lg border border-line">
                     <div className="flex flex-wrap items-start gap-2 px-3 py-2">
-                      <div className="min-w-0 flex-1">
+                      <div className="min-w-0 basis-full sm:basis-0 sm:flex-1">
                         <div className="text-[11px] text-muted">
                           {RES_TYPE_LABEL[r.type]}{r.type === "manopera" && r.tariffKind ? ` · ${TARIFF_KIND_LABEL[r.tariffKind]}` : r.type === "manopera" ? " · tip tarif necunoscut" : ""}
                         </div>
                         <div className="font-medium">{r.name || "—"}</div>
                         <PriceSource r={r} src={src} />
                       </div>
-                      <div className="grid grid-cols-3 gap-1.5 text-xs">
-                        <label className="block w-20"><span className="text-muted">Consum</span><NumInput value={r.norm} onChange={(n) => setRes(r.key, (x) => ({ ...x, norm: n ?? 0 }))} /></label>
-                        <label className="block w-16"><span className="text-muted">Pierd. %</span><NumInput value={r.waste} onChange={(n) => setRes(r.key, (x) => ({ ...x, waste: Math.min(100, Math.max(0, n ?? 0)) }))} /></label>
-                        <label className="block w-24"><span className="text-muted">Preț / {r.unit}</span>
+                      <div className="grid w-full grid-cols-3 gap-1.5 text-xs sm:w-auto">
+                        <label className="block sm:w-20"><span className="text-muted">Consum</span><NumInput value={r.norm} onChange={(n) => setRes(r.key, (x) => ({ ...x, norm: n ?? 0 }))} /></label>
+                        <label className="block sm:w-16"><span className="text-muted">Pierd. %</span><NumInput value={r.waste} onChange={(n) => setRes(r.key, (x) => ({ ...x, waste: Math.min(100, Math.max(0, n ?? 0)) }))} /></label>
+                        <label className="block sm:w-24"><span className="text-muted">Preț / {r.unit}</span>
                           <NumInput value={r.price} onChange={(n) => setRes(r.key, (x) => ({ ...x, price: n ?? 0, priceManual: true, offerId: null }))} />
                         </label>
                       </div>

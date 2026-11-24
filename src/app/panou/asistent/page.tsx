@@ -33,7 +33,7 @@ export default async function AssistantPage() {
     <>
       <PageHeader title="Asistent tehnic" subtitle={`Încarci documentele licitației, iar asistentul analizează cerințele, verifică dosarul și redactează ciorne. Cereri luna aceasta: ${usage.used} din ${usage.limit}.`} />
       {!aiConfigured() && <p className="mb-6 rounded-lg bg-amber-50 px-4 py-3 text-sm">Asistentul tehnic nu este activat încă pe platformă.</p>}
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px] [&>*]:min-w-0">
         <Card className="p-0">
           <div className="border-b border-line px-5 py-3.5 font-semibold">Alege proiectul</div>
           {projects.length === 0 ? (

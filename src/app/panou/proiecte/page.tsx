@@ -23,7 +23,7 @@ export default async function ProjectsPage() {
   return (
     <>
       <PageHeader title="Proiecte" subtitle="Fiecare lucrare sau licitație e un proiect: aici vor sta devizele, documentele și șantierul." />
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] [&>*]:min-w-0">
         <Card className="overflow-x-auto p-0">
           {projects.length === 0 ? (
             <p className="px-5 py-12 text-center text-muted">Niciun proiect încă. Creează-l pe primul din formular.</p>

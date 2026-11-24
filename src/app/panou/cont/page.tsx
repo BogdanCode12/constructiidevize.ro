@@ -17,7 +17,7 @@ export default async function AccountPage() {
   return (
     <>
       <PageHeader title="Contul meu" subtitle={user.email} />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 [&>*]:min-w-0">
         <Card>
           <h2 className="mb-4 font-bold">Profil</h2>
           <ActionForm action={updateProfileAction} submitLabel="Salvează">

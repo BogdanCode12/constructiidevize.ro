@@ -88,7 +88,7 @@ async function Subcontractors({ companyId }: { companyId: number }) {
     [companyId],
   );
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] [&>*]:min-w-0">
       <Card className="overflow-x-auto p-0">
         {subs.length === 0 ? <p className="px-5 py-10 text-center text-sm text-muted">Niciun subcontractant încă.</p> : (
           <table className="w-full text-sm">

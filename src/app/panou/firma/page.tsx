@@ -49,7 +49,7 @@ export default async function CompanyPage({ searchParams }: { searchParams: Prom
           ))}
         </Card>
       )}
-      <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_420px] [&>*]:min-w-0">
         <Card>
           <h2 className="mb-4 font-bold">Datele firmei</h2>
           <CompanyForm company={company} canEdit={canManage} />

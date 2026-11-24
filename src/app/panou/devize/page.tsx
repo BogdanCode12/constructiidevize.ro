@@ -37,7 +37,7 @@ export default async function EstimatesPage({ searchParams }: { searchParams: Pr
   return (
     <>
       <PageHeader title="Devize" subtitle="Devize pe capitole și articole, desfăcute pe materiale, manoperă, utilaje și transport." />
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] [&>*]:min-w-0">
         <Card className="overflow-x-auto p-0">
           {estimates.length === 0 ? (
             <p className="px-5 py-12 text-center text-muted">Niciun deviz încă. Creează-l pe primul din formular.</p>

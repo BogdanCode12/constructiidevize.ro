@@ -40,8 +40,8 @@ const GROUPS: { title: string; links: { href: string; label: string }[] }[] = [
 
 const isActive = (path: string, href: string) => (href === "/admin" ? path === "/admin" : path.startsWith(href));
 
-/** Meniul adminului: vertical (bara din dreapta, pe ecrane mari) sau orizontal (pe telefon). */
-export function AdminNav({ vertical = false }: { vertical?: boolean }) {
+/** Meniul adminului (vertical): bara din stânga pe ecrane mari, lista din butonul „Meniu” pe telefon. */
+export function AdminNav({ vertical = true }: { vertical?: boolean }) {
   const path = usePathname();
   if (vertical) {
     return (
@@ -64,14 +64,5 @@ export function AdminNav({ vertical = false }: { vertical?: boolean }) {
       </nav>
     );
   }
-  return (
-    <nav className="flex gap-1 overflow-x-auto">
-      {GROUPS.flatMap((g) => g.links).map((l) => (
-        <Link key={l.href} href={l.href}
-          className={`whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium ${isActive(path, l.href) ? "border-brand-700 text-white" : "border-transparent text-white/60 hover:text-white"}`}>
-          {l.label}
-        </Link>
-      ))}
-    </nav>
-  );
+  return null;
 }
