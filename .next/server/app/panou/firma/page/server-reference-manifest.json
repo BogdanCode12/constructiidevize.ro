@@ -1,0 +1,145 @@
+{
+  "node": {
+    "0094e3f543f51dcf9d80e56d900a836b75603c68e1": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "logoutAction",
+      "filename": "src/app/panou/actions.ts"
+    },
+    "60df2997448a442dff854b799fb72c21d7b76281a2": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "createProjectAction",
+      "filename": "src/app/panou/actions.ts"
+    },
+    "0069fae4750789ec055dfdcdcdb9aaac4082558d15": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "resendVerificationAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "607f13264642e7ea6c313f676041c0258a8e4ae2be": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "registerAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60887ce4c87127e29806bfbabc9253db5cd3335723": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "resetPasswordAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "608c31ed51069f6b774956319ee726d95af5f911f3": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "forgotPasswordAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60f0d377e326914ccd8e30a8313bfbf94009413247": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "loginAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "405299fd2bfa599be51598df1a43b50a0fe7e0149c": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "anafLookupAction",
+      "filename": "src/app/panou/firma/actions.ts"
+    },
+    "60d513ebe17a98bfc86516f9ab4ccb12181eff2ba3": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "updateCompanyProfileAction",
+      "filename": "src/app/panou/firma/actions.ts"
+    },
+    "4041d3984fc6ba9903955f63d7cff62931635f5bef": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "switchCompanyAction",
+      "filename": "src/app/panou/firma/actions.ts"
+    },
+    "4058504133688f9bb772eab026a23fa056ec54dbfa": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "changeMemberRoleAction",
+      "filename": "src/app/panou/firma/actions.ts"
+    },
+    "406793fc34d6341397d04b2f1fcac2d1857c2381df": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "revokeInvitationAction",
+      "filename": "src/app/panou/firma/actions.ts"
+    },
+    "40bba2b60870d793e87b6a5f4aeca78fd61bf7342d": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "removeMemberAction",
+      "filename": "src/app/panou/firma/actions.ts"
+    },
+    "600a7eb1a6a393bed50544ae366a7b9b3a33243cff": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "exportedName": "inviteMemberAction",
+      "filename": "src/app/panou/firma/actions.ts"
+    }
+  },
+  "edge": {}
+}

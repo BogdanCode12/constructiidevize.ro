@@ -1,0 +1,1 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,24236,e=>{"use strict";var t=e.i(43476);e.s(["ConfirmSubmit",0,function({message:e,children:n,className:r="text-red-700 hover:underline"}){return(0,t.jsx)("button",{className:r,onClick:t=>{confirm(e)||t.preventDefault()},children:n})}])}]);

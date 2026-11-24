@@ -1,0 +1,15 @@
+{
+  "node": {
+    "605b22b7e1d930af94bce7d224f97f198548a41deb": {
+      "workers": {
+        "app/contact/page": {
+          "moduleId": 18708,
+          "async": false
+        }
+      },
+      "exportedName": "contactAction",
+      "filename": "src/app/contact/actions.ts"
+    }
+  },
+  "edge": {}
+}

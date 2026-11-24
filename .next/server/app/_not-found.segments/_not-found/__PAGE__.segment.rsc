@@ -1,0 +1,29 @@
+1:"$Sreact.fragment"
+2:"/_next/static/chunks/0n02atba7yyk4.js"
+3:I[39756,["$2"],"default"]
+4:I[37457,["$2"],"default"]
+5:I[22016,["$2"],""]
+6:I[57668,["$2"],"CookieNotice"]
+d:I[97367,["$2"],"OutletBoundary"]
+e:"$Sreact.suspense"
+11:"ViewportBoundary"
+12:I[97367,["$2"],"$11"]
+13:"MetadataBoundary"
+14:I[97367,["$2"],"$13"]
+15:I[27201,["$2"],"IconMark"]
+:HL["/_next/static/chunks/377w1iv8w6a_3.css","style"]
+8:X
+b:X
+b:C
+c:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","div",null,{"className":"grid min-h-dvh place-items-center px-4 text-center","children":["$","div",null,{"children":[["$","p",null,{"className":"text-6xl font-bold text-brand-700","children":"404"}],["$","p",null,{"className":"mt-3 text-muted","children":"Pagina nu există."}],["$","div",null,{"className":"mt-6","children":["$","$L5",null,{"href":"/","className":"inline-flex items-center justify-center rounded-lg px-5 py-2.5 font-semibold transition bg-brand-700 text-white hover:bg-brand-800","children":"Acasă"}]}]]}]}],null,["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]]}],"p":"$@10","v":null,"s":"$8"}}]]
+9:[["children",{"s":"/_not-found","h":96,"d":{"r":["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]]}],"p":"$@a","v":"$b","s":"$8"},"c":"$Qc"}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/377w1iv8w6a_3.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/0n02atba7yyk4.js","async":true}]],["$","html",null,{"lang":"ro","className":"bYvC1W_variable","children":["$","body",null,{"className":"min-h-dvh font-sans antialiased","children":[["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}],"notFound":[["$","div",null,{"className":"grid min-h-dvh place-items-center px-4 text-center","children":["$","div",null,{"children":[["$","p",null,{"className":"text-6xl font-bold text-brand-700","children":"404"}],["$","p",null,{"className":"mt-3 text-muted","children":"Pagina nu există."}],["$","div",null,{"className":"mt-6","children":["$","$L5",null,{"href":"/","className":"inline-flex items-center justify-center rounded-lg px-5 py-2.5 font-semibold transition bg-brand-700 text-white hover:bg-brand-800","children":"Acasă"}]}]]}]}],[]]}],["$","$L6",null,{}]]}]}]]}],"p":"$@7","v":null,"s":"$8"},"c":"$Q9"},"h":{"r":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L12",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#ffffff"}]]}],["$","$L14",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$e",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"DevizBuild.ro — devize și dosare de licitație pentru construcții"}],["$","meta","1",{"name":"description","content":"Platformă pentru firme de construcții: devize F1–F5 și C5–C9, import F3 cu potrivire automată, asistent tehnic pentru caiete de sarcini, declarații, situații de lucrări și management de șantier."}],["$","link","2",{"rel":"icon","href":"/icon.png?icon.3l7uq7a84wvj4.png","sizes":"512x512","type":"image/png"}],["$","link","3",{"rel":"apple-touch-icon","href":"/apple-icon.png?apple-icon.013_zz64vvmpz.png","sizes":"180x180","type":"image/png"}],["$","$L15","4",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@16","v":null,"s":"$8"}},"a":"$@17","u":"$@18","b":"bQ2TJnneWp6VofIgI9aZE"}
+f:null
+8:300
+18:true
+8:C
+17:0
+a:"$undefined"
+7:"$undefined"
+16:"$undefined"
+10:"$undefined"

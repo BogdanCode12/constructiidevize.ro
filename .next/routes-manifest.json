@@ -1,0 +1,490 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:path*",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        }
+      ],
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+    }
+  ],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/admin/pagini/[slug]",
+      "regex": "^/admin/pagini/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/admin/pagini/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/sabloane/[id]",
+      "regex": "^/admin/sabloane/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/sabloane/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/utilizatori/[id]",
+      "regex": "^/admin/utilizatori/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/utilizatori/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/documente/[id]",
+      "regex": "^/api/documente/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/documente/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/foto/[photoId]",
+      "regex": "^/api/foto/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPphotoId": "nxtPphotoId"
+      },
+      "namedRegex": "^/api/foto/(?<nxtPphotoId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/proiecte/[id]/fisiere",
+      "regex": "^/api/proiecte/([^/]+?)/fisiere(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/proiecte/(?<nxtPid>[^/]+?)/fisiere(?:/)?$"
+    },
+    {
+      "page": "/api/proiecte/[id]/fisiere/[fileId]",
+      "regex": "^/api/proiecte/([^/]+?)/fisiere/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid",
+        "nxtPfileId": "nxtPfileId"
+      },
+      "namedRegex": "^/api/proiecte/(?<nxtPid>[^/]+?)/fisiere/(?<nxtPfileId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/proiecte/[id]/jurnal",
+      "regex": "^/api/proiecte/([^/]+?)/jurnal(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/proiecte/(?<nxtPid>[^/]+?)/jurnal(?:/)?$"
+    },
+    {
+      "page": "/panou/devize/[id]",
+      "regex": "^/panou/devize/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/panou/devize/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/panou/devize/[id]/export",
+      "regex": "^/panou/devize/([^/]+?)/export(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/panou/devize/(?<nxtPid>[^/]+?)/export(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]",
+      "regex": "^/panou/proiecte/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]/ai",
+      "regex": "^/panou/proiecte/([^/]+?)/ai(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)/ai(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]/ai/[jobId]",
+      "regex": "^/panou/proiecte/([^/]+?)/ai/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid",
+        "nxtPjobId": "nxtPjobId"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)/ai/(?<nxtPjobId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]/ai/[jobId]/word",
+      "regex": "^/panou/proiecte/([^/]+?)/ai/([^/]+?)/word(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid",
+        "nxtPjobId": "nxtPjobId"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)/ai/(?<nxtPjobId>[^/]+?)/word(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]/dosar",
+      "regex": "^/panou/proiecte/([^/]+?)/dosar(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)/dosar(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]/export",
+      "regex": "^/panou/proiecte/([^/]+?)/export(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)/export(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]/santier",
+      "regex": "^/panou/proiecte/([^/]+?)/santier(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)/santier(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]/santier/situatii/[sid]",
+      "regex": "^/panou/proiecte/([^/]+?)/santier/situatii/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid",
+        "nxtPsid": "nxtPsid"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)/santier/situatii/(?<nxtPsid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte/[id]/santier/situatii/[sid]/excel",
+      "regex": "^/panou/proiecte/([^/]+?)/santier/situatii/([^/]+?)/excel(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid",
+        "nxtPsid": "nxtPsid"
+      },
+      "namedRegex": "^/panou/proiecte/(?<nxtPid>[^/]+?)/santier/situatii/(?<nxtPsid>[^/]+?)/excel(?:/)?$"
+    },
+    {
+      "page": "/panou/[modul]",
+      "regex": "^/panou/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPmodul": "nxtPmodul"
+      },
+      "namedRegex": "^/panou/(?<nxtPmodul>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/ai",
+      "regex": "^/admin/ai(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/ai(?:/)?$"
+    },
+    {
+      "page": "/admin/mesaje",
+      "regex": "^/admin/mesaje(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/mesaje(?:/)?$"
+    },
+    {
+      "page": "/admin/pagini",
+      "regex": "^/admin/pagini(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/pagini(?:/)?$"
+    },
+    {
+      "page": "/admin/planuri",
+      "regex": "^/admin/planuri(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/planuri(?:/)?$"
+    },
+    {
+      "page": "/admin/resurse",
+      "regex": "^/admin/resurse(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/resurse(?:/)?$"
+    },
+    {
+      "page": "/admin/retete",
+      "regex": "^/admin/retete(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/retete(?:/)?$"
+    },
+    {
+      "page": "/admin/sabloane",
+      "regex": "^/admin/sabloane(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/sabloane(?:/)?$"
+    },
+    {
+      "page": "/admin/setari",
+      "regex": "^/admin/setari(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/setari(?:/)?$"
+    },
+    {
+      "page": "/admin/utilizatori",
+      "regex": "^/admin/utilizatori(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/utilizatori(?:/)?$"
+    },
+    {
+      "page": "/api/cont/export",
+      "regex": "^/api/cont/export(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/cont/export(?:/)?$"
+    },
+    {
+      "page": "/api/cron/alerte",
+      "regex": "^/api/cron/alerte(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/cron/alerte(?:/)?$"
+    },
+    {
+      "page": "/api/documente",
+      "regex": "^/api/documente(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/documente(?:/)?$"
+    },
+    {
+      "page": "/api/health",
+      "regex": "^/api/health(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/health(?:/)?$"
+    },
+    {
+      "page": "/apple-icon.png",
+      "regex": "^/apple\\-icon\\.png(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/apple\\-icon\\.png(?:/)?$"
+    },
+    {
+      "page": "/autentificare",
+      "regex": "^/autentificare(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/autentificare(?:/)?$"
+    },
+    {
+      "page": "/confidentialitate",
+      "regex": "^/confidentialitate(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/confidentialitate(?:/)?$"
+    },
+    {
+      "page": "/confirmare-email",
+      "regex": "^/confirmare\\-email(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/confirmare\\-email(?:/)?$"
+    },
+    {
+      "page": "/contact",
+      "regex": "^/contact(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/contact(?:/)?$"
+    },
+    {
+      "page": "/icon.png",
+      "regex": "^/icon\\.png(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/icon\\.png(?:/)?$"
+    },
+    {
+      "page": "/inregistrare",
+      "regex": "^/inregistrare(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/inregistrare(?:/)?$"
+    },
+    {
+      "page": "/invitatie",
+      "regex": "^/invitatie(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/invitatie(?:/)?$"
+    },
+    {
+      "page": "/panou",
+      "regex": "^/panou(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou(?:/)?$"
+    },
+    {
+      "page": "/panou/abonament",
+      "regex": "^/panou/abonament(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/abonament(?:/)?$"
+    },
+    {
+      "page": "/panou/asistent",
+      "regex": "^/panou/asistent(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/asistent(?:/)?$"
+    },
+    {
+      "page": "/panou/cont",
+      "regex": "^/panou/cont(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/cont(?:/)?$"
+    },
+    {
+      "page": "/panou/devize",
+      "regex": "^/panou/devize(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/devize(?:/)?$"
+    },
+    {
+      "page": "/panou/documente",
+      "regex": "^/panou/documente(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/documente(?:/)?$"
+    },
+    {
+      "page": "/panou/documente/genereaza",
+      "regex": "^/panou/documente/genereaza(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/documente/genereaza(?:/)?$"
+    },
+    {
+      "page": "/panou/firma",
+      "regex": "^/panou/firma(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/firma(?:/)?$"
+    },
+    {
+      "page": "/panou/manopera",
+      "regex": "^/panou/manopera(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/manopera(?:/)?$"
+    },
+    {
+      "page": "/panou/proiecte",
+      "regex": "^/panou/proiecte(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/proiecte(?:/)?$"
+    },
+    {
+      "page": "/panou/resurse",
+      "regex": "^/panou/resurse(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/resurse(?:/)?$"
+    },
+    {
+      "page": "/panou/santier",
+      "regex": "^/panou/santier(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panou/santier(?:/)?$"
+    },
+    {
+      "page": "/parola-uitata",
+      "regex": "^/parola\\-uitata(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/parola\\-uitata(?:/)?$"
+    },
+    {
+      "page": "/preturi",
+      "regex": "^/preturi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/preturi(?:/)?$"
+    },
+    {
+      "page": "/resetare-parola",
+      "regex": "^/resetare\\-parola(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/resetare\\-parola(?:/)?$"
+    },
+    {
+      "page": "/servicii",
+      "regex": "^/servicii(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/servicii(?:/)?$"
+    },
+    {
+      "page": "/termeni",
+      "regex": "^/termeni(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/termeni(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

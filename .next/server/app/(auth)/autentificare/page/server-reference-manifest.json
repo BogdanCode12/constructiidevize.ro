@@ -1,0 +1,55 @@
+{
+  "node": {
+    "0069fae4750789ec055dfdcdcdb9aaac4082558d15": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        }
+      },
+      "exportedName": "resendVerificationAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "607f13264642e7ea6c313f676041c0258a8e4ae2be": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        }
+      },
+      "exportedName": "registerAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60887ce4c87127e29806bfbabc9253db5cd3335723": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        }
+      },
+      "exportedName": "resetPasswordAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "608c31ed51069f6b774956319ee726d95af5f911f3": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        }
+      },
+      "exportedName": "forgotPasswordAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60f0d377e326914ccd8e30a8313bfbf94009413247": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        }
+      },
+      "exportedName": "loginAction",
+      "filename": "src/app/(auth)/actions.ts"
+    }
+  },
+  "edge": {}
+}

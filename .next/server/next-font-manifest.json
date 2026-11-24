@@ -1,0 +1,183 @@
+{
+  "app": {
+    "[project]/src/app/(auth)/autentificare/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/(auth)/confirmare-email/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/(auth)/inregistrare/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/(auth)/invitatie/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/(auth)/parola-uitata/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/(auth)/resetare-parola/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/_not-found/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/ai/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/mesaje/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/pagini/[slug]/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/pagini/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/planuri/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/resurse/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/retete/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/sabloane/[id]/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/sabloane/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/setari/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/utilizatori/[id]/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/admin/utilizatori/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/confidentialitate/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/contact/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/[modul]/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/abonament/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/asistent/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/cont/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/devize/[id]/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/devize/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/documente/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/firma/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/manopera/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/proiecte/[id]/ai/[jobId]/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/proiecte/[id]/ai/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/proiecte/[id]/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/proiecte/[id]/santier/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/proiecte/[id]/santier/situatii/[sid]/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/proiecte/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/resurse/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/panou/santier/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/preturi/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/servicii/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/src/app/termeni/page": [
+      "static/media/ba63f6a0e436df8e-s.p.3-6t-g6q0vh0a.woff2",
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pages": {},
+  "pagesUsingSizeAdjust": false
+}

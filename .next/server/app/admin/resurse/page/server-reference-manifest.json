@@ -1,0 +1,55 @@
+{
+  "node": {
+    "40cafbd394dd88da65e9a786d668a7deaf3f6d74f9": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        }
+      },
+      "exportedName": "deleteResourceAction",
+      "filename": "src/lib/resources/actions.ts"
+    },
+    "60256c0eef6be7adf01e556387015e6c5f76e163b2": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        }
+      },
+      "exportedName": "saveResourceAction",
+      "filename": "src/lib/resources/actions.ts"
+    },
+    "40ee93f14210427c36185026f965e899ddfcbc0868": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        }
+      },
+      "exportedName": "deleteCompanyRecipeAction",
+      "filename": "src/lib/resources/actions.ts"
+    },
+    "604f43e1f1e0e9364b971b3405b224c76f6f3269e9": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        }
+      },
+      "exportedName": "searchCatalogAction",
+      "filename": "src/lib/resources/actions.ts"
+    },
+    "6077c4245f8256ffcf65f8083e2754e70823d25018": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        }
+      },
+      "exportedName": "importResourcesAction",
+      "filename": "src/lib/resources/actions.ts"
+    }
+  },
+  "edge": {}
+}

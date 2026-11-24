@@ -1,0 +1,3 @@
+module.exports=[13935,i=>{"use strict";var t=i.i(43793);async function a(i){try{await (0,t.o)("INSERT INTO activity_log (company_id, user_id, action, details, ip) VALUES (?, ?, ?, ?, ?)",[i.companyId??null,i.userId??null,i.action,i.details?JSON.stringify(i.details):null,i.ip??null])}catch(i){console.error("[activity] nu s-a putut scrie în jurnal",i)}}i.s(["f",0,a])}];
+
+//# sourceMappingURL=src_lib_activity_ts_0la2ogq6ia5zd._.js.map

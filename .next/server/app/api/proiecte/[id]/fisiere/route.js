@@ -1,0 +1,12 @@
+var R=require("../../../../../chunks/[turbopack]_runtime.js")("server/app/api/proiecte/[id]/fisiere/route.js")
+R.c("server/chunks/[root-of-the-server]__0jnqrlco3b_99._.js")
+R.c("server/chunks/_0b1ea580t0h0x._.js")
+R.c("server/chunks/_0efik9pt3bppt._.js")
+R.c("server/chunks/node_modules_next_dist_0w_6_3_nokpiu._.js")
+R.c("server/chunks/node_modules_15d3xay3q88th._.js")
+R.c("server/chunks/node_modules_next_1utulzw9q9p3v._.js")
+R.c("server/chunks/node_modules_next_dist_1osb16xb-p-5x._.js")
+R.c("server/chunks/[root-of-the-server]__0lgrtlrvdjxsy._.js")
+R.c("server/chunks/_next-internal_server_app_api_proiecte_[id]_fisiere_route_actions_0zdqe392bte1n.js")
+R.m(3289)
+module.exports=R.m(3289).exports

@@ -1,0 +1,3 @@
+module.exports=[74533,(a,b,c)=>{b.exports=a.x("node:child_process",()=>require("node:child_process"))},87769,(a,b,c)=>{b.exports=a.x("node:events",()=>require("node:events"))},2157,(a,b,c)=>{b.exports=a.x("node:fs",()=>require("node:fs"))},27092,a=>{"use strict";a.s(["f",0,function(a){let{name:b,inputSchema:c,description:d,run:e,...f}=a;if("object"!==c.type)throw Error(`JSON schema for tool "${b}" must be an object, but got ${c.type}`);return{...f,type:"custom",name:b,input_schema:c,description:d,run:e,parse:a=>a}}])}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__1adkc-sozjy0q._.js.map

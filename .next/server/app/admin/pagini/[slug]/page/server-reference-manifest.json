@@ -1,0 +1,145 @@
+{
+  "node": {
+    "403a74cf96845dce24b9d47f2d57dec17c38e9c7e7": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "toggleContactHandledAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "409aa8084f5d0b58b658b4fa9e5aaeafb6751caf00": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "deleteRecipeAdminAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "40c16ce0b02c5b374e24b7fa634533ae93c7070623": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "deleteUserAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "40d12a504e36ffd6213252fcb07e8577a735078b69": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "promoteRecipeAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "40f5c1b4d4a1085c12f8d1a6ae9dca4615ff726f94": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "logoutUserEverywhereAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "40fa0aa6598f870a667f4fe854a0e0cb0b8e2d4816": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "deleteTemplateAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "604c07e4c2c952a8788fda08ebed92d3af2e0ede9e": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "updateUserAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "60789b6579a4dfefe04357d25f2fac0a772b6cb5c1": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "saveTemplateAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "609b227e642a3ae6df290efe170a73ae3569bf64b7": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "updatePlanAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "60ba7bcdc9f74147e95892914438155e461b6a7207": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "updateSubscriptionAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "60bb654479d55fa9b628c8420efc996b55f527f3b7": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "updateCompanyAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "60bf60cc133342cca8ebb02ca2ba0e51fc8d79c968": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "updateAiTaskAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "60c6f448c0e49c2aeeaa7ee92631c4c2d0a5675f70": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "updateSettingsAction",
+      "filename": "src/app/admin/actions.ts"
+    },
+    "60d17dc41392d2a5aa013159a035afd7227e54ba34": {
+      "workers": {
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        }
+      },
+      "exportedName": "savePageAction",
+      "filename": "src/app/admin/actions.ts"
+    }
+  },
+  "edge": {}
+}

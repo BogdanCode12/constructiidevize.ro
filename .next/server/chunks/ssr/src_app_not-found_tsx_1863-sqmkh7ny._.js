@@ -1,0 +1,3 @@
+module.exports=[3363,a=>{"use strict";var b=a.i(7997),c=a.i(40446);a.s(["default",0,function(){return(0,b.jsx)("div",{className:"grid min-h-dvh place-items-center px-4 text-center",children:(0,b.jsxs)("div",{children:[(0,b.jsx)("p",{className:"text-6xl font-bold text-brand-700",children:"404"}),(0,b.jsx)("p",{className:"mt-3 text-muted",children:"Pagina nu există."}),(0,b.jsx)("div",{className:"mt-6",children:(0,b.jsx)(c.L,{href:"/",children:"Acasă"})})]})})}])},17537,function(a){a.n(a.i(3363))}];
+
+//# sourceMappingURL=src_app_not-found_tsx_1863-sqmkh7ny._.js.map

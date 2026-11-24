@@ -1,0 +1,3 @@
+{
+  "/(auth)/confirmare-email/page": "app/(auth)/confirmare-email/page.js"
+}

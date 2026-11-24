@@ -1,0 +1,25 @@
+{
+  "node": {
+    "4029ba02f42c2a5309da2598b43e2b6c8e530b7332": {
+      "workers": {
+        "app/(auth)/invitatie/page": {
+          "moduleId": 69283,
+          "async": false
+        }
+      },
+      "exportedName": "acceptInvitationAction",
+      "filename": "src/app/(auth)/invitatie/actions.ts"
+    },
+    "60cf875c5f579a8025f6ab67e8323ac4764af7483a": {
+      "workers": {
+        "app/(auth)/invitatie/page": {
+          "moduleId": 69283,
+          "async": false
+        }
+      },
+      "exportedName": "registerFromInvitationAction",
+      "filename": "src/app/(auth)/invitatie/actions.ts"
+    }
+  },
+  "edge": {}
+}

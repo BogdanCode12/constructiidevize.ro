@@ -1,0 +1,125 @@
+{
+  "node": {
+    "0094e3f543f51dcf9d80e56d900a836b75603c68e1": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "logoutAction",
+      "filename": "src/app/panou/actions.ts"
+    },
+    "60df2997448a442dff854b799fb72c21d7b76281a2": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "createProjectAction",
+      "filename": "src/app/panou/actions.ts"
+    },
+    "0069fae4750789ec055dfdcdcdb9aaac4082558d15": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "resendVerificationAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "607f13264642e7ea6c313f676041c0258a8e4ae2be": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "registerAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60887ce4c87127e29806bfbabc9253db5cd3335723": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "resetPasswordAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "608c31ed51069f6b774956319ee726d95af5f911f3": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "forgotPasswordAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60f0d377e326914ccd8e30a8313bfbf94009413247": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "loginAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60e97758a7c96bbc8d69adf38b60440fefa875ff61": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "sendChatAction",
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts"
+    },
+    "4031e77bb997483fca151b9e77a3452c383d55ffe3": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "deleteJobAction",
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts"
+    },
+    "4041b7bcfa698e665d3aa0c830bdb75186aabb7ef8": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "clearChatAction",
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts"
+    },
+    "40b3e2bac8e4b73adc5e26505931c8a92b9ac63830": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "deleteProjectFileAction",
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts"
+    },
+    "603cbfb0c92bdd9f4bf3e7d3cc36e915574f8b441f": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "exportedName": "startAiJobAction",
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts"
+    }
+  },
+  "edge": {}
+}

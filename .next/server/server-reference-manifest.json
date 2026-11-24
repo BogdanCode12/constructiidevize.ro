@@ -1,0 +1,1766 @@
+{
+  "node": {
+    "0069fae4750789ec055dfdcdcdb9aaac4082558d15": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        },
+        "app/(auth)/inregistrare/page": {
+          "moduleId": 98161,
+          "async": false
+        },
+        "app/(auth)/parola-uitata/page": {
+          "moduleId": 97337,
+          "async": false
+        },
+        "app/(auth)/resetare-parola/page": {
+          "moduleId": 76732,
+          "async": false
+        },
+        "app/panou/[modul]/page": {
+          "moduleId": 6010,
+          "async": false
+        },
+        "app/panou/abonament/page": {
+          "moduleId": 16669,
+          "async": false
+        },
+        "app/panou/asistent/page": {
+          "moduleId": 95178,
+          "async": false
+        },
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        },
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        },
+        "app/panou/documente/page": {
+          "moduleId": 66687,
+          "async": false
+        },
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        },
+        "app/panou/manopera/page": {
+          "moduleId": 32892,
+          "async": false
+        },
+        "app/panou/page": {
+          "moduleId": 82782,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        },
+        "app/panou/proiecte/page": {
+          "moduleId": 72541,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        },
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/(auth)/actions.ts",
+      "exportedName": "resendVerificationAction"
+    },
+    "607f13264642e7ea6c313f676041c0258a8e4ae2be": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        },
+        "app/(auth)/inregistrare/page": {
+          "moduleId": 98161,
+          "async": false
+        },
+        "app/(auth)/parola-uitata/page": {
+          "moduleId": 97337,
+          "async": false
+        },
+        "app/(auth)/resetare-parola/page": {
+          "moduleId": 76732,
+          "async": false
+        },
+        "app/panou/[modul]/page": {
+          "moduleId": 6010,
+          "async": false
+        },
+        "app/panou/abonament/page": {
+          "moduleId": 16669,
+          "async": false
+        },
+        "app/panou/asistent/page": {
+          "moduleId": 95178,
+          "async": false
+        },
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        },
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        },
+        "app/panou/documente/page": {
+          "moduleId": 66687,
+          "async": false
+        },
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        },
+        "app/panou/manopera/page": {
+          "moduleId": 32892,
+          "async": false
+        },
+        "app/panou/page": {
+          "moduleId": 82782,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        },
+        "app/panou/proiecte/page": {
+          "moduleId": 72541,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        },
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/(auth)/actions.ts",
+      "exportedName": "registerAction"
+    },
+    "60887ce4c87127e29806bfbabc9253db5cd3335723": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        },
+        "app/(auth)/inregistrare/page": {
+          "moduleId": 98161,
+          "async": false
+        },
+        "app/(auth)/parola-uitata/page": {
+          "moduleId": 97337,
+          "async": false
+        },
+        "app/(auth)/resetare-parola/page": {
+          "moduleId": 76732,
+          "async": false
+        },
+        "app/panou/[modul]/page": {
+          "moduleId": 6010,
+          "async": false
+        },
+        "app/panou/abonament/page": {
+          "moduleId": 16669,
+          "async": false
+        },
+        "app/panou/asistent/page": {
+          "moduleId": 95178,
+          "async": false
+        },
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        },
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        },
+        "app/panou/documente/page": {
+          "moduleId": 66687,
+          "async": false
+        },
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        },
+        "app/panou/manopera/page": {
+          "moduleId": 32892,
+          "async": false
+        },
+        "app/panou/page": {
+          "moduleId": 82782,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        },
+        "app/panou/proiecte/page": {
+          "moduleId": 72541,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        },
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/(auth)/actions.ts",
+      "exportedName": "resetPasswordAction"
+    },
+    "608c31ed51069f6b774956319ee726d95af5f911f3": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        },
+        "app/(auth)/inregistrare/page": {
+          "moduleId": 98161,
+          "async": false
+        },
+        "app/(auth)/parola-uitata/page": {
+          "moduleId": 97337,
+          "async": false
+        },
+        "app/(auth)/resetare-parola/page": {
+          "moduleId": 76732,
+          "async": false
+        },
+        "app/panou/[modul]/page": {
+          "moduleId": 6010,
+          "async": false
+        },
+        "app/panou/abonament/page": {
+          "moduleId": 16669,
+          "async": false
+        },
+        "app/panou/asistent/page": {
+          "moduleId": 95178,
+          "async": false
+        },
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        },
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        },
+        "app/panou/documente/page": {
+          "moduleId": 66687,
+          "async": false
+        },
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        },
+        "app/panou/manopera/page": {
+          "moduleId": 32892,
+          "async": false
+        },
+        "app/panou/page": {
+          "moduleId": 82782,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        },
+        "app/panou/proiecte/page": {
+          "moduleId": 72541,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        },
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/(auth)/actions.ts",
+      "exportedName": "forgotPasswordAction"
+    },
+    "60f0d377e326914ccd8e30a8313bfbf94009413247": {
+      "workers": {
+        "app/(auth)/autentificare/page": {
+          "moduleId": 98719,
+          "async": false
+        },
+        "app/(auth)/inregistrare/page": {
+          "moduleId": 98161,
+          "async": false
+        },
+        "app/(auth)/parola-uitata/page": {
+          "moduleId": 97337,
+          "async": false
+        },
+        "app/(auth)/resetare-parola/page": {
+          "moduleId": 76732,
+          "async": false
+        },
+        "app/panou/[modul]/page": {
+          "moduleId": 6010,
+          "async": false
+        },
+        "app/panou/abonament/page": {
+          "moduleId": 16669,
+          "async": false
+        },
+        "app/panou/asistent/page": {
+          "moduleId": 95178,
+          "async": false
+        },
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        },
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        },
+        "app/panou/documente/page": {
+          "moduleId": 66687,
+          "async": false
+        },
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        },
+        "app/panou/manopera/page": {
+          "moduleId": 32892,
+          "async": false
+        },
+        "app/panou/page": {
+          "moduleId": 82782,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        },
+        "app/panou/proiecte/page": {
+          "moduleId": 72541,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        },
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/(auth)/actions.ts",
+      "exportedName": "loginAction"
+    },
+    "4029ba02f42c2a5309da2598b43e2b6c8e530b7332": {
+      "workers": {
+        "app/(auth)/invitatie/page": {
+          "moduleId": 69283,
+          "async": false
+        }
+      },
+      "filename": "src/app/(auth)/invitatie/actions.ts",
+      "exportedName": "acceptInvitationAction"
+    },
+    "60cf875c5f579a8025f6ab67e8323ac4764af7483a": {
+      "workers": {
+        "app/(auth)/invitatie/page": {
+          "moduleId": 69283,
+          "async": false
+        }
+      },
+      "filename": "src/app/(auth)/invitatie/actions.ts",
+      "exportedName": "registerFromInvitationAction"
+    },
+    "403a74cf96845dce24b9d47f2d57dec17c38e9c7e7": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "toggleContactHandledAction"
+    },
+    "409aa8084f5d0b58b658b4fa9e5aaeafb6751caf00": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "deleteRecipeAdminAction"
+    },
+    "40c16ce0b02c5b374e24b7fa634533ae93c7070623": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "deleteUserAction"
+    },
+    "40d12a504e36ffd6213252fcb07e8577a735078b69": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "promoteRecipeAction"
+    },
+    "40f5c1b4d4a1085c12f8d1a6ae9dca4615ff726f94": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "logoutUserEverywhereAction"
+    },
+    "40fa0aa6598f870a667f4fe854a0e0cb0b8e2d4816": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "deleteTemplateAction"
+    },
+    "604c07e4c2c952a8788fda08ebed92d3af2e0ede9e": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "updateUserAction"
+    },
+    "60789b6579a4dfefe04357d25f2fac0a772b6cb5c1": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "saveTemplateAction"
+    },
+    "609b227e642a3ae6df290efe170a73ae3569bf64b7": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "updatePlanAction"
+    },
+    "60ba7bcdc9f74147e95892914438155e461b6a7207": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "updateSubscriptionAction"
+    },
+    "60bb654479d55fa9b628c8420efc996b55f527f3b7": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "updateCompanyAction"
+    },
+    "60bf60cc133342cca8ebb02ca2ba0e51fc8d79c968": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "updateAiTaskAction"
+    },
+    "60c6f448c0e49c2aeeaa7ee92631c4c2d0a5675f70": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "updateSettingsAction"
+    },
+    "60d17dc41392d2a5aa013159a035afd7227e54ba34": {
+      "workers": {
+        "app/admin/ai/page": {
+          "moduleId": 83323,
+          "async": false
+        },
+        "app/admin/mesaje/page": {
+          "moduleId": 87699,
+          "async": false
+        },
+        "app/admin/pagini/[slug]/page": {
+          "moduleId": 76451,
+          "async": false
+        },
+        "app/admin/planuri/page": {
+          "moduleId": 61848,
+          "async": false
+        },
+        "app/admin/retete/page": {
+          "moduleId": 94719,
+          "async": false
+        },
+        "app/admin/sabloane/[id]/page": {
+          "moduleId": 14565,
+          "async": false
+        },
+        "app/admin/setari/page": {
+          "moduleId": 23241,
+          "async": false
+        },
+        "app/admin/utilizatori/[id]/page": {
+          "moduleId": 92239,
+          "async": false
+        }
+      },
+      "filename": "src/app/admin/actions.ts",
+      "exportedName": "savePageAction"
+    },
+    "40cafbd394dd88da65e9a786d668a7deaf3f6d74f9": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        }
+      },
+      "filename": "src/lib/resources/actions.ts",
+      "exportedName": "deleteResourceAction"
+    },
+    "60256c0eef6be7adf01e556387015e6c5f76e163b2": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        }
+      },
+      "filename": "src/lib/resources/actions.ts",
+      "exportedName": "saveResourceAction"
+    },
+    "40ee93f14210427c36185026f965e899ddfcbc0868": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        }
+      },
+      "filename": "src/lib/resources/actions.ts",
+      "exportedName": "deleteCompanyRecipeAction"
+    },
+    "604f43e1f1e0e9364b971b3405b224c76f6f3269e9": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        },
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        }
+      },
+      "filename": "src/lib/resources/actions.ts",
+      "exportedName": "searchCatalogAction"
+    },
+    "6077c4245f8256ffcf65f8083e2754e70823d25018": {
+      "workers": {
+        "app/admin/resurse/page": {
+          "moduleId": 59363,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        }
+      },
+      "filename": "src/lib/resources/actions.ts",
+      "exportedName": "importResourcesAction"
+    },
+    "605b22b7e1d930af94bce7d224f97f198548a41deb": {
+      "workers": {
+        "app/contact/page": {
+          "moduleId": 18708,
+          "async": false
+        }
+      },
+      "filename": "src/app/contact/actions.ts",
+      "exportedName": "contactAction"
+    },
+    "0094e3f543f51dcf9d80e56d900a836b75603c68e1": {
+      "workers": {
+        "app/panou/[modul]/page": {
+          "moduleId": 6010,
+          "async": false
+        },
+        "app/panou/abonament/page": {
+          "moduleId": 16669,
+          "async": false
+        },
+        "app/panou/asistent/page": {
+          "moduleId": 95178,
+          "async": false
+        },
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        },
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        },
+        "app/panou/documente/page": {
+          "moduleId": 66687,
+          "async": false
+        },
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        },
+        "app/panou/manopera/page": {
+          "moduleId": 32892,
+          "async": false
+        },
+        "app/panou/page": {
+          "moduleId": 82782,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        },
+        "app/panou/proiecte/page": {
+          "moduleId": 72541,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        },
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/actions.ts",
+      "exportedName": "logoutAction"
+    },
+    "60df2997448a442dff854b799fb72c21d7b76281a2": {
+      "workers": {
+        "app/panou/[modul]/page": {
+          "moduleId": 6010,
+          "async": false
+        },
+        "app/panou/abonament/page": {
+          "moduleId": 16669,
+          "async": false
+        },
+        "app/panou/asistent/page": {
+          "moduleId": 95178,
+          "async": false
+        },
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        },
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        },
+        "app/panou/documente/page": {
+          "moduleId": 66687,
+          "async": false
+        },
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        },
+        "app/panou/manopera/page": {
+          "moduleId": 32892,
+          "async": false
+        },
+        "app/panou/page": {
+          "moduleId": 82782,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        },
+        "app/panou/proiecte/page": {
+          "moduleId": 72541,
+          "async": false
+        },
+        "app/panou/resurse/page": {
+          "moduleId": 41586,
+          "async": false
+        },
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/actions.ts",
+      "exportedName": "createProjectAction"
+    },
+    "60434c6b70c378b7ec0d9960a223a0b493b7e0ad33": {
+      "workers": {
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/cont/actions.ts",
+      "exportedName": "deleteAccountAction"
+    },
+    "604d6b65eb782d85487c6996ecfc5b4b33a49fff2b": {
+      "workers": {
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/cont/actions.ts",
+      "exportedName": "updateProfileAction"
+    },
+    "60d138589457cca1415fc975e1cf46e8dddfe27d04": {
+      "workers": {
+        "app/panou/cont/page": {
+          "moduleId": 99532,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/cont/actions.ts",
+      "exportedName": "changePasswordAction"
+    },
+    "40117b43a161e49d17c788305f24748b0292eff82c": {
+      "workers": {
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "recipeItemAction"
+    },
+    "409d3940d0a538ef8439b79032c1a18b7c407f3ced": {
+      "workers": {
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "importF3Action"
+    },
+    "40b22c9bd032dd728a209779e4c216d12a5927692d": {
+      "workers": {
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "deleteEstimateAction"
+    },
+    "40bbff5a1ba51aa1e0d4abe116a80c06bfe9191557": {
+      "workers": {
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "estimatorJobAction"
+    },
+    "40c32a53db3c57c52ac9507a192f9fbfc908af8695": {
+      "workers": {
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "saveEstimateAction"
+    },
+    "602a74b1602b9b5018bc1a59d33da536d176289e39": {
+      "workers": {
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "startEstimatorAction"
+    },
+    "6063716672853472a62c6a0e948cd7e963184677c0": {
+      "workers": {
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "createEstimateAction"
+    },
+    "60c273020fcafde3fdfc87b213697583335144bb8d": {
+      "workers": {
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "searchRecipesAction"
+    },
+    "60f814d1e43e96d38fe175e7bbea1dae8a99a52695": {
+      "workers": {
+        "app/panou/devize/[id]/page": {
+          "moduleId": 47989,
+          "async": true
+        },
+        "app/panou/devize/page": {
+          "moduleId": 53574,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/devize/actions.ts",
+      "exportedName": "saveRecipeAction"
+    },
+    "40ed8413f967ceddc41b5714b861e770a322a232aa": {
+      "workers": {
+        "app/panou/documente/page": {
+          "moduleId": 66687,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/documente/actions.ts",
+      "exportedName": "deleteDocumentAction"
+    },
+    "405299fd2bfa599be51598df1a43b50a0fe7e0149c": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/firma/actions.ts",
+      "exportedName": "anafLookupAction"
+    },
+    "60d513ebe17a98bfc86516f9ab4ccb12181eff2ba3": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/firma/actions.ts",
+      "exportedName": "updateCompanyProfileAction"
+    },
+    "4041d3984fc6ba9903955f63d7cff62931635f5bef": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/firma/actions.ts",
+      "exportedName": "switchCompanyAction"
+    },
+    "4058504133688f9bb772eab026a23fa056ec54dbfa": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/firma/actions.ts",
+      "exportedName": "changeMemberRoleAction"
+    },
+    "406793fc34d6341397d04b2f1fcac2d1857c2381df": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/firma/actions.ts",
+      "exportedName": "revokeInvitationAction"
+    },
+    "40bba2b60870d793e87b6a5f4aeca78fd61bf7342d": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/firma/actions.ts",
+      "exportedName": "removeMemberAction"
+    },
+    "600a7eb1a6a393bed50544ae366a7b9b3a33243cff": {
+      "workers": {
+        "app/panou/firma/page": {
+          "moduleId": 42012,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/firma/actions.ts",
+      "exportedName": "inviteMemberAction"
+    },
+    "400045030c2704f999d9806d5eb1a3dadfe2852720": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/actions.ts",
+      "exportedName": "deleteProjectAction"
+    },
+    "405e057f2fd255cbf2df0ad127354a5242ec1e0729": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/actions.ts",
+      "exportedName": "toggleDeadlineAction"
+    },
+    "40e3bb6debdd2534e7efed73277e420e27f6fcffaa": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/actions.ts",
+      "exportedName": "deleteDeadlineAction"
+    },
+    "60808ce318682a02ea3177222eeda574c66b336040": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/actions.ts",
+      "exportedName": "updateProjectAction"
+    },
+    "60bf360a07a36c01049fa7933e323ea638c89a0bab": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/actions.ts",
+      "exportedName": "addDeadlineAction"
+    },
+    "60e97758a7c96bbc8d69adf38b60440fefa875ff61": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts",
+      "exportedName": "sendChatAction"
+    },
+    "4031e77bb997483fca151b9e77a3452c383d55ffe3": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts",
+      "exportedName": "deleteJobAction"
+    },
+    "4041b7bcfa698e665d3aa0c830bdb75186aabb7ef8": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts",
+      "exportedName": "clearChatAction"
+    },
+    "40b3e2bac8e4b73adc5e26505931c8a92b9ac63830": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts",
+      "exportedName": "deleteProjectFileAction"
+    },
+    "603cbfb0c92bdd9f4bf3e7d3cc36e915574f8b441f": {
+      "workers": {
+        "app/panou/proiecte/[id]/ai/[jobId]/page": {
+          "moduleId": 40424,
+          "async": true
+        },
+        "app/panou/proiecte/[id]/ai/page": {
+          "moduleId": 30039,
+          "async": true
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/ai/actions.ts",
+      "exportedName": "startAiJobAction"
+    },
+    "400ae7ee2ffd043b97495e0fb6a94c84a83433c0b3": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "deleteJournalAction"
+    },
+    "401500841a93267794d3665a2f33d1dde965e88211": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "newSituationAction"
+    },
+    "401cd640bc274f5bffc9ad2cd1404b9820ec3b1ecb": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "deleteTransactionAction"
+    },
+    "4074214750ae8d67856684b7a139529bfe1d04f3ad": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "deleteSubcontractAction"
+    },
+    "4087a6cd0eed27b64ae3afe597db27eb5983511fbc": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "deleteSituationAction"
+    },
+    "6074610dcd6c797562e5f9e7088b15ef3a5f383a4c": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "addTransactionAction"
+    },
+    "608557c56b7502fc48e80253d52ba11f4a2c495e77": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "setContractAction"
+    },
+    "6099b7b1db9ec3bcbe30ae36f3162c4f3e99486c18": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "addSubcontractAction"
+    },
+    "70d73b4076f596f3cdc592b3b54dc33c8982edc45c": {
+      "workers": {
+        "app/panou/proiecte/[id]/santier/page": {
+          "moduleId": 32727,
+          "async": false
+        },
+        "app/panou/proiecte/[id]/santier/situatii/[sid]/page": {
+          "moduleId": 36542,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/proiecte/[id]/santier/actions.ts",
+      "exportedName": "saveSituationAction"
+    },
+    "40553631eaa5f8476dea13684eb1ef358d4ac2d9fa": {
+      "workers": {
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/santier/actions.ts",
+      "exportedName": "deleteSubcontractorAction"
+    },
+    "60ef3c052ab982b2db4392f48d7eb158a05475697a": {
+      "workers": {
+        "app/panou/santier/page": {
+          "moduleId": 10785,
+          "async": false
+        }
+      },
+      "filename": "src/app/panou/santier/actions.ts",
+      "exportedName": "saveSubcontractorAction"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "Ty8VonB+6hAsJhLWPOe3UuAkgRkH5TwryDXsUQAZyvU="
+}

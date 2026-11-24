@@ -1,0 +1,125 @@
+{
+  "node": {
+    "0094e3f543f51dcf9d80e56d900a836b75603c68e1": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "logoutAction",
+      "filename": "src/app/panou/actions.ts"
+    },
+    "60df2997448a442dff854b799fb72c21d7b76281a2": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "createProjectAction",
+      "filename": "src/app/panou/actions.ts"
+    },
+    "0069fae4750789ec055dfdcdcdb9aaac4082558d15": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "resendVerificationAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "607f13264642e7ea6c313f676041c0258a8e4ae2be": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "registerAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60887ce4c87127e29806bfbabc9253db5cd3335723": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "resetPasswordAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "608c31ed51069f6b774956319ee726d95af5f911f3": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "forgotPasswordAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "60f0d377e326914ccd8e30a8313bfbf94009413247": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "loginAction",
+      "filename": "src/app/(auth)/actions.ts"
+    },
+    "400045030c2704f999d9806d5eb1a3dadfe2852720": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "deleteProjectAction",
+      "filename": "src/app/panou/proiecte/[id]/actions.ts"
+    },
+    "405e057f2fd255cbf2df0ad127354a5242ec1e0729": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "toggleDeadlineAction",
+      "filename": "src/app/panou/proiecte/[id]/actions.ts"
+    },
+    "40e3bb6debdd2534e7efed73277e420e27f6fcffaa": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "deleteDeadlineAction",
+      "filename": "src/app/panou/proiecte/[id]/actions.ts"
+    },
+    "60808ce318682a02ea3177222eeda574c66b336040": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "updateProjectAction",
+      "filename": "src/app/panou/proiecte/[id]/actions.ts"
+    },
+    "60bf360a07a36c01049fa7933e323ea638c89a0bab": {
+      "workers": {
+        "app/panou/proiecte/[id]/page": {
+          "moduleId": 40149,
+          "async": false
+        }
+      },
+      "exportedName": "addDeadlineAction",
+      "filename": "src/app/panou/proiecte/[id]/actions.ts"
+    }
+  },
+  "edge": {}
+}

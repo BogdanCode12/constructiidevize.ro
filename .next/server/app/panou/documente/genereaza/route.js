@@ -1,0 +1,12 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/panou/documente/genereaza/route.js")
+R.c("server/chunks/src_lib_activity_ts_0la2ogq6ia5zd._.js")
+R.c("server/chunks/src_lib_estimate_repo_ts_0tzzqh9cwe856._.js")
+R.c("server/chunks/[root-of-the-server]__1fhrah3iwv4-a._.js")
+R.c("server/chunks/_114dzjy63ee4m._.js")
+R.c("server/chunks/node_modules_next_dist_0ku_biribeqcf._.js")
+R.c("server/chunks/src_lib_templates_ts_0bskwjhnwupl_._.js")
+R.c("server/chunks/[root-of-the-server]__0lgrtlrvdjxsy._.js")
+R.c("server/chunks/_0efik9pt3bppt._.js")
+R.c("server/chunks/_next-internal_server_app_panou_documente_genereaza_route_actions_10psaifo3cjn7.js")
+R.m(31146)
+module.exports=R.m(31146).exports

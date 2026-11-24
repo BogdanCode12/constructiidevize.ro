@@ -1,0 +1,3 @@
+module.exports=[5050,(a,b,c)=>{"use strict";Object.defineProperty(c,"__esModule",{value:!0});var d={callServer:function(){return f.callServer},createServerReference:function(){return h.createServerReference},findSourceMapURL:function(){return g.findSourceMapURL}};for(var e in d)Object.defineProperty(c,e,{enumerable:!0,get:d[e]});let f=a.r(20611),g=a.r(1722),h=a.r(38783)},65906,a=>{"use strict";var b=a.i(87924);a.s(["ConfirmSubmit",0,function({message:a,children:c,className:d="text-red-700 hover:underline"}){return(0,b.jsx)("button",{className:d,onClick:b=>{confirm(a)||b.preventDefault()},children:c})}])}];
+
+//# sourceMappingURL=_1iowqngcdwbde._.js.map
