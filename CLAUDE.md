@@ -4,7 +4,7 @@
 
 Platformă SaaS pentru firme de construcții din România: devize (F1–F5, C5–C9), dosar de licitație, asistent AI.
 Stack: Next.js 16 + React 19 + TypeScript, Tailwind v4, MySQL/MariaDB (`mysql2`, migrări în `sql/NNN_*.sql`),
-găzduire cPanel (Setup Node.js App, build standalone, publicare automată prin FTP din GitHub Actions la push pe `main`). Detalii în README.md.
+găzduire cPanel (Setup Node.js App, build standalone, publicare automată la push pe `main`: GitHub Actions urcă o arhivă prin FTP, un cron cPanel o despachetează). Detalii în README.md.
 
 ## Reguli stabilite cu proprietarul
 

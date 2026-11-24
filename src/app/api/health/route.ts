@@ -1,13 +1,24 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { query } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-/** Verificare rapidă după publicare: aplicația rulează și vede baza de date. */
+/** Versiunea care rulează (scrisă de GitHub Actions în BUILD_SHA; citită o dată, la pornire). */
+const BUILD = (() => {
+  try {
+    return readFileSync(join(process.cwd(), "BUILD_SHA"), "utf8").trim();
+  } catch {
+    return "local";
+  }
+})();
+
+/** Verificare rapidă după publicare: aplicația rulează, vede baza de date și ce versiune are. */
 export async function GET() {
   try {
     await query("SELECT 1");
-    return Response.json({ ok: true, db: true, time: new Date().toISOString() });
+    return Response.json({ ok: true, db: true, build: BUILD, time: new Date().toISOString() });
   } catch {
-    return Response.json({ ok: false, db: false }, { status: 503 });
+    return Response.json({ ok: false, db: false, build: BUILD }, { status: 503 });
   }
 }

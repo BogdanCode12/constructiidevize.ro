@@ -18,10 +18,11 @@ Platformă SaaS pentru firme de construcții: devize, calcul manoperă și ore d
 sql/                    structura bazei de date (numerotată, se aplică în ordine)
 scripts/migrate.mjs     aplică fișierele SQL noi (ține evidența în schema_migrations)
 scripts/create-admin.mjs  face admin un cont existent
+scripts/cpanel-unpack.sh  rulat din cron pe cPanel: despachetează arhiva urcată de GitHub și repornește aplicația
 src/app/                pagini: site public, (auth), panou, admin, api/health
 src/lib/                bază de date, autentificare, email, planuri, module
 src/components/         componente UI
-.github/workflows/      build automat și publicare prin FTP
+.github/workflows/      build automat și publicare (arhivă prin FTP)
 ```
 
 ## Dezvoltare locală
@@ -43,7 +44,7 @@ npm run admin:create -- emailul@tau.ro
 
 ## Publicare pe cPanel
 
-Fluxul: **push pe `main` → GitHub Actions face build-ul → îl urcă prin FTP în folderul aplicației → aplicația repornește → se aplică migrările SQL noi.** Durează câteva minute; progresul se vede în tabul *Actions* de pe GitHub.
+Fluxul: **push pe `main` → GitHub Actions face build-ul → îl urcă prin FTP ca o singură arhivă în `.deploy/` → cron-ul din cPanel (la fiecare minut) o despachetează și repornește aplicația → se aplică migrările SQL noi.** Durează 1–3 minute; progresul se vede în tabul *Actions* de pe GitHub. Dacă build-ul eșuează, site-ul rămâne pe versiunea veche.
 
 ### O singură dată, la configurare
 
@@ -62,14 +63,19 @@ Fluxul: **push pe `main` → GitHub Actions face build-ul → îl urcă prin FTP
    - `FTP_DIR` (opțional): folderul aplicației față de rădăcina contului FTP, dacă nu e chiar rădăcina (de ex. `constructiidevize/`)
    - `SITE_URL`: de ex. `https://domeniul.ro`
    - `CRON_SECRET`: același text ca în variabilele aplicației
-5. **Alerte zilnice pe email.** În *Cron Jobs*, o dată pe zi:
+5. **Cron de publicare.** În *Cron Jobs*, „Once Per Minute (* * * * *)”, cu comanda:
+   ```
+   /bin/bash $HOME/constructiidevize/.deploy/unpack.sh >> $HOME/constructiidevize-deploy.log 2>&1
+   ```
+   Scriptul (`scripts/cpanel-unpack.sh`) e urcat de GitHub la fiecare publicare; dacă nu e nicio arhivă nouă, nu face nimic.
+6. **Alerte zilnice pe email.** În *Cron Jobs*, o dată pe zi:
    ```
    curl -s "https://domeniul.ro/api/cron/alerte?key=CRON_SECRET" > /dev/null
    ```
-6. **Fișiere încărcate.** Documentele clienților se salvează în `~/constructiidevize-uploads`, în afara aplicației, ca să nu fie atinse la publicare. Folderul se poate schimba cu `UPLOAD_DIR`. Include-l în backup.
-7. **Asistentul AI.** Adaugă `ANTHROPIC_API_KEY` (cheia din console.anthropic.com) în variabilele aplicației. Fără cheie, platforma merge normal, iar asistentul apare ca neactivat. Pentru teste fără cost, `AI_MOCK=1` întoarce răspunsuri simulate. Modelul implicit e `claude-opus-5-5` și se schimbă cu `AI_MODEL`.
-8. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true}`.
-9. **Admin.** Creează-ți un cont din site, apoi în phpMyAdmin, în tabelul `users`, setează `role` = `admin` pe rândul tău.
+7. **Fișiere încărcate.** Documentele clienților se salvează în `~/constructiidevize-uploads`, în afara aplicației, ca să nu fie atinse la publicare. Folderul se poate schimba cu `UPLOAD_DIR`. Include-l în backup.
+8. **Asistentul AI.** Adaugă `ANTHROPIC_API_KEY` (cheia din console.anthropic.com) în variabilele aplicației. Fără cheie, platforma merge normal, iar asistentul apare ca neactivat. Pentru teste fără cost, `AI_MOCK=1` întoarce răspunsuri simulate. Modelul implicit e `claude-opus-5-5` și se schimbă cu `AI_MODEL`.
+9. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true,"build":"…"}` (`build` = commit-ul publicat).
+10. **Admin.** Creează-ți un cont din site, apoi în phpMyAdmin, în tabelul `users`, setează `role` = `admin` pe rândul tău.
 
 ## Ce poate face clientul
 

@@ -1,13 +1,15 @@
 name: Build & publicare
 
-# La fiecare push pe main: verificare tipuri, build Next.js (standalone), urcare prin FTP în folderul
-# aplicației din cPanel, repornire (tmp/restart.txt) și aplicarea migrărilor SQL noi.
+# La fiecare push pe main: verificare tipuri, build Next.js (standalone), apoi publicare:
+#   1. build-ul se strânge într-o arhivă și se urcă prin FTP în .deploy/ (un singur fișier, rapid);
+#   2. cron-ul din cPanel (la fiecare minut, scripts/cpanel-unpack.sh) o despachetează și repornește aplicația;
+#   3. după ce site-ul raportează noua versiune (/api/health), se aplică migrările SQL noi.
 #
 # Secrets necesare (GitHub → Settings → Secrets and variables → Actions):
-#   FTP_SERVER     ex: ftp.devizconstruct.ro
+#   FTP_SERVER     ex: ftp.domeniu.ro
 #   FTP_USERNAME   contul FTP (cu folderul aplicației ca rădăcină)
 #   FTP_PASSWORD
-#   FTP_DIR        opțional: folderul aplicației față de rădăcina contului FTP (implicit ./)
+#   FTP_DIR        opțional: folderul aplicației față de rădăcina contului FTP (ex: constructiidevize/)
 #   SITE_URL       ex: https://devizconstruct.ro
 #   CRON_SECRET    același ca în variabilele aplicației din cPanel
 on:
@@ -41,32 +43,51 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
 
-      - name: Pregătește pachetul
+      - name: Pregătește arhiva
         run: |
-          mkdir -p release/.next release/tmp
+          mkdir -p release/.next
           cp -r .next/standalone/. release/
           cp -r .next/static release/.next/static
           cp -r public release/public
           cp -r sql scripts release/
           rm -f release/.env
-          # Passenger repornește aplicația când se schimbă acest fișier.
-          echo "${GITHUB_SHA}" > release/tmp/restart.txt
+          echo "${GITHUB_SHA}" > release/BUILD_SHA
+          (cd release && zip -qr -9 ../deploy.zip .)
+          ls -lh deploy.zip
 
-      - name: Urcă prin FTP
+      - name: Urcă arhiva prin FTP
         if: env.DEPLOY == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: ./release/
-          server-dir: ${{ secrets.FTP_DIR || './' }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            .env
-            stderr.log
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+        run: |
+          base="ftp://${FTP_SERVER}/${FTP_DIR}"
+          base="${base%/}/.deploy/"
+          up() {
+            # FTPS obligatoriu; dacă certificatul serverului nu se potrivește cu numele, reîncercăm fără verificarea lui.
+            curl -sS --ssl-reqd --ftp-create-dirs --user "${FTP_USERNAME}:${FTP_PASSWORD}" "$@" \
+              || curl -sS --ssl-reqd --insecure --ftp-create-dirs --user "${FTP_USERNAME}:${FTP_PASSWORD}" "$@"
+          }
+          up -T scripts/cpanel-unpack.sh "${base}unpack.sh"
+          # Arhiva se urcă sub alt nume și se redenumește la final, ca cron-ul să nu prindă un fișier pe jumătate.
+          up -T deploy.zip "${base}deploy.zip.part" -Q "-RNFR deploy.zip.part" -Q "-RNTO deploy.zip"
+          echo "Arhiva a fost urcată."
+
+      - name: Așteaptă noua versiune pe site
+        if: env.DEPLOY == 'true'
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          # Cron-ul rulează la fiecare minut; așteptăm până la ~5 minute.
+          for i in $(seq 1 30); do
+            build=$(curl -s -m 15 "${SITE_URL}/api/health" | sed -n 's/.*"build":"\([^"]*\)".*/\1/p')
+            if [ "$build" = "${GITHUB_SHA}" ]; then echo "Site-ul rulează versiunea nouă."; exit 0; fi
+            sleep 10
+          done
+          echo "Site-ul nu a preluat versiunea nouă în 5 minute. Verifică cron-ul din cPanel (unpack.sh) și jurnalul ~/constructiidevize-deploy.log."
+          exit 1
 
       - name: Migrări bază de date
         if: env.DEPLOY == 'true'
@@ -74,7 +95,6 @@ jobs:
           SITE_URL: ${{ secrets.SITE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          # Aplicația pornește la prima cerere după repornire; încercăm de câteva ori.
           for i in 1 2 3 4 5 6; do
             if out=$(curl -fsS -X POST -H "Authorization: Bearer ${CRON_SECRET}" "${SITE_URL}/api/cron/migrari"); then
               echo "$out"; exit 0
