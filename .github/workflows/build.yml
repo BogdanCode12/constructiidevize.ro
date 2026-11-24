@@ -83,7 +83,12 @@ jobs:
           for i in $(seq 1 30); do
             health=$(curl -s -m 15 "${SITE_URL}/api/health" || true)
             build=$(echo "$health" | sed -n 's/.*"build":"\([^"]*\)".*/\1/p')
-            if [ "$build" = "${GITHUB_SHA}" ]; then echo "Site-ul rulează versiunea nouă: $health"; exit 0; fi
+            if [ "$build" = "${GITHUB_SHA}" ]; then
+              echo "Site-ul rulează versiunea nouă: $health"
+              if echo "$health" | grep -q '"db":true'; then exit 0; fi
+              echo "::error::Aplicația nu se poate conecta la baza de date. Verifică DB_NAME / DB_USER / DB_PASSWORD în Setup Node.js App."
+              exit 1
+            fi
             sleep 10
           done
           echo "Site-ul nu a preluat versiunea nouă în 5 minute. Verifică cron-ul din cPanel (unpack.sh) și jurnalul ~/constructiidevize-deploy.log."

@@ -19,7 +19,9 @@ export async function GET() {
     await query("SELECT 1");
     const m = await query<{ n: number }>("SELECT COUNT(*) AS n FROM schema_migrations").catch(() => [{ n: 0 }]);
     return Response.json({ ok: true, db: true, build: BUILD, migrations: Number(m[0]?.n ?? 0), time: new Date().toISOString() });
-  } catch {
-    return Response.json({ ok: false, db: false, build: BUILD }, { status: 503 });
+  } catch (err) {
+    // Doar codul erorii (ex: ER_ACCESS_DENIED_ERROR, ER_BAD_DB_ERROR, ECONNREFUSED), fără detalii sensibile.
+    const code = (err as { code?: string }).code ?? "UNKNOWN";
+    return Response.json({ ok: false, db: false, error: code, build: BUILD }, { status: 503 });
   }
 }
