@@ -44,7 +44,7 @@ npm run admin:create -- emailul@tau.ro
 
 ## Publicare pe cPanel
 
-Fluxul: **push pe `main` → GitHub Actions face build-ul → îl urcă prin FTP ca o singură arhivă în `.deploy/` → cron-ul din cPanel (la fiecare minut) o despachetează și repornește aplicația → se aplică migrările SQL noi.** Durează 1–3 minute; progresul se vede în tabul *Actions* de pe GitHub. Dacă build-ul eșuează, site-ul rămâne pe versiunea veche.
+Fluxul: **push pe `main` → GitHub Actions face build-ul → îl urcă prin FTP ca o singură arhivă în `.deploy/` → cron-ul din cPanel (la fiecare minut) o despachetează și repornește aplicația → la pornire, aplicația își aplică singură migrările SQL noi.** Durează 1–3 minute; progresul se vede în tabul *Actions* de pe GitHub. Dacă build-ul eșuează, site-ul rămâne pe versiunea veche.
 
 ### O singură dată, la configurare
 
@@ -62,7 +62,6 @@ Fluxul: **push pe `main` → GitHub Actions face build-ul → îl urcă prin FTP
    - `FTP_USERNAME`, `FTP_PASSWORD`: contul de la pasul 3
    - `FTP_DIR` (opțional): folderul aplicației față de rădăcina contului FTP, dacă nu e chiar rădăcina (de ex. `constructiidevize/`)
    - `SITE_URL`: de ex. `https://domeniul.ro`
-   - `CRON_SECRET`: același text ca în variabilele aplicației
 5. **Cron de publicare.** În *Cron Jobs*, „Once Per Minute (* * * * *)”, cu comanda:
    ```
    /bin/bash $HOME/constructiidevize/.deploy/unpack.sh >> $HOME/constructiidevize-deploy.log 2>&1

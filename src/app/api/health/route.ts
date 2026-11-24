@@ -17,7 +17,8 @@ const BUILD = (() => {
 export async function GET() {
   try {
     await query("SELECT 1");
-    return Response.json({ ok: true, db: true, build: BUILD, time: new Date().toISOString() });
+    const m = await query<{ n: number }>("SELECT COUNT(*) AS n FROM schema_migrations").catch(() => [{ n: 0 }]);
+    return Response.json({ ok: true, db: true, build: BUILD, migrations: Number(m[0]?.n ?? 0), time: new Date().toISOString() });
   } catch {
     return Response.json({ ok: false, db: false, build: BUILD }, { status: 503 });
   }
