@@ -9,6 +9,7 @@ export const NAV = [
   { href: "/", label: "Acasă" },
   { href: "/servicii", label: "Servicii" },
   { href: "/abonamente", label: "Abonamente" },
+  { href: "/noutati", label: "Noutăți" },
   { href: "/contact", label: "Contact" },
 ];
 

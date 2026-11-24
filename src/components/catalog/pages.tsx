@@ -94,7 +94,7 @@ export async function CatalogDetail({ ctx, id }: { ctx: CatalogCtx; id: string }
         <div className="flex items-center gap-2">
           <StatusBadge status={r.status} />
           {r.priceInfo?.expired && <StatusBadge status="expirat" />}
-          {ctx.scope === "company" && r.global && <span className="rounded bg-canvas px-1.5 py-0.5 text-[11px] font-semibold uppercase text-muted">catalog DevizBuild</span>}
+          {ctx.scope === "company" && r.global && <span className="rounded bg-canvas px-1.5 py-0.5 text-[11px] font-semibold uppercase text-muted">catalog DevizConstruct</span>}
         </div>
       </PageHeader>
 

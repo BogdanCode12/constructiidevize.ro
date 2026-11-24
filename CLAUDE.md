@@ -1,6 +1,6 @@
-# DevizBuild.ro — note pentru dezvoltare
+# DevizConstruct.ro — note pentru dezvoltare
 
-(Repo-ul se numește constructiidevize.ro; numele comercial al platformei este **DevizBuild.ro**.)
+(Repo-ul se numește constructiidevize.ro; numele comercial al platformei este **DevizConstruct.ro**.)
 
 Platformă SaaS pentru firme de construcții din România: devize (F1–F5, C5–C9), dosar de licitație, asistent AI.
 Stack: Next.js 16 + React 19 + TypeScript, Tailwind v4, MySQL/MariaDB (`mysql2`, migrări în `sql/NNN_*.sql`),
@@ -8,7 +8,7 @@ găzduire cPanel (Setup Node.js App, build standalone, publicare automată la pu
 
 ## Reguli stabilite cu proprietarul
 
-- **Brand:** DevizBuild.ro. Culori: alb curat, negru (`ink` #0c0c0d) și roșul din siglă (`brand-700` #C71319).
+- **Brand:** DevizConstruct.ro (din nov. 2026; înainte DevizBuild.ro). Sigla: `devizconstruct-logo.png` / `-white.png`, iconița din macara. Culori: alb curat, negru (`ink` #0c0c0d) și roșul din siglă (`brand-700` #C71319).
   Sigla e în `public/brand/` (variantă albă pentru fundal închis). Font: Inter peste tot (Helvetica ca rezervă).
   Prima secțiune are ca fundal imaginea `public/brand/hero-building.webp` (clădire: schiță → finisat), aleasă de proprietar.
   Design elegant, simplu, serios, fără cifre sau testimoniale inventate.
@@ -17,7 +17,7 @@ găzduire cPanel (Setup Node.js App, build standalone, publicare automată la pu
 - **Fără cuvântul „AI” în textele văzute de clienți** (site și cont): se spune „asistent tehnic”, „asistentul” sau
   „automat”. Panoul de admin și codul pot folosi termenii tehnici.
 - Meniul site-ului e plutitor (bară rotunjită, desprinsă de margini), cu paginile centrate.
-- Site public: Acasă, Servicii, Abonamente (`/abonamente`; `/preturi` redirecționează), Contact + Autentificare / Contul meu. Textele principale (titlul de pe
+- Site public: Acasă, Servicii, Abonamente (`/abonamente`; `/preturi` redirecționează), Noutăți (blog `/noutati`, articole din admin → Noutăți; tabel `posts`, imagini în `uploadRoot()/blog` servite prin `/media/blog/…`; sitemap.xml, robots.txt, RSS, JSON-LD), Contact + Autentificare / Contul meu. Textele principale (titlul de pe
   prima pagină, întrebările frecvente, datele de contact, paginile legale) se editează din admin → Pagini.
 - Tot ce ține de conținutul platformei trebuie să poată fi modificat din panoul de admin (planuri, prețuri,
   catalog de resurse, șabloane de documente, instrucțiunile AI, setări, limite).

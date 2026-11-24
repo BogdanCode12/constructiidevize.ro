@@ -34,5 +34,5 @@ export function emailLayout(title: string, body: string, cta?: { label: string; 
     : "";
   return `<div style="font-family:Helvetica,Arial,sans-serif;max-width:560px;margin:auto;color:#1c2526">
     <h2 style="color:#c71319">${title}</h2>${body}${button}
-    <p style="font-size:12px;color:#888;margin-top:36px">DevizBuild.ro</p></div>`;
+    <p style="font-size:12px;color:#888;margin-top:36px">DevizConstruct.ro</p></div>`;
 }

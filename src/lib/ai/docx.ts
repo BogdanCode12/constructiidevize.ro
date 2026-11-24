@@ -65,7 +65,7 @@ export async function markdownToDocx(title: string, md: string): Promise<Buffer>
     i++;
   }
   const doc = new Document({
-    creator: "DevizBuild.ro",
+    creator: "DevizConstruct.ro",
     styles: { default: { document: { run: { font: "Arial" } } } },
     sections: [{ properties: { page: { margin: { top: 1134, bottom: 1134, left: 1247, right: 1134 } } }, children }],
   });

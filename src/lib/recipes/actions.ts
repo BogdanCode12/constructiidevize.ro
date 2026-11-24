@@ -177,7 +177,7 @@ export async function setRecipeStatusAction(_: FormState, data: FormData): Promi
     );
     if (!r || Number(r.n) === 0) return { error: "Nu poți valida un articol fără resurse și consumuri." };
     if (Number(r.zero) > 0) return { error: "Toate resursele trebuie să aibă consum mai mare decât 0." };
-    if (companyId === null && !r.norm_source) return { error: "Completează sursa normei / rețetei înainte de validare (ex. „rețetă proprie DevizBuild”, fișă tehnică producător)." };
+    if (companyId === null && !r.norm_source) return { error: "Completează sursa normei / rețetei înainte de validare (ex. „rețetă proprie DevizConstruct”, fișă tehnică producător)." };
     await transaction(async (conn) => {
       await execute("UPDATE recipes SET status = 'verificat', verified_at = NOW(), verified_by = ? WHERE id = ?", [userId, id], conn);
       const prev = await queryOne<{ previous_id: number | null }>("SELECT previous_id FROM recipes WHERE id = ?", [id], conn);

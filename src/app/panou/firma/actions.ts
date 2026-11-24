@@ -81,7 +81,7 @@ export async function inviteMemberAction(_: FormState, data: FormData): Promise<
   await sendMail(
     email,
     `Invitație în ${user.company.name}`,
-    emailLayout("Ai fost invitat", `<p>${escapeHtml(user.name)} te invită să lucrezi în contul firmei <b>${escapeHtml(user.company.name)}</b> pe DevizBuild.ro.</p>`, {
+    emailLayout("Ai fost invitat", `<p>${escapeHtml(user.name)} te invită să lucrezi în contul firmei <b>${escapeHtml(user.company.name)}</b> pe DevizConstruct.ro.</p>`, {
       label: "Acceptă invitația",
       href: link,
     }),

@@ -1,4 +1,4 @@
-# DevizBuild.ro
+# DevizConstruct.ro
 
 (repo: constructiidevize.ro)
 

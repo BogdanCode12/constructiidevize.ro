@@ -1,9 +1,12 @@
 import { Fragment, type ReactNode } from "react";
 
+/** Doar adrese sigure: pagini din site, https://, mailto:. */
+export const safeUrl = (u: string) => (/^(https:\/\/|mailto:|\/(?!\/))/i.test(u.trim()) ? u.trim() : null);
+
 /** Markdown simplu → elemente React (fără HTML brut, deci sigur pentru textul generat de AI). */
 function inline(text: string, keyBase: string): ReactNode[] {
   const out: ReactNode[] = [];
-  const re = /(\*\*[^*]+\*\*|`[^`]+`|\*[^*\s][^*]*\*|_[^_\s][^_]*_)/g;
+  const re = /(\[[^\]]+\]\([^)\s]+\)|\*\*[^*]+\*\*|`[^`]+`|\*[^*\s][^*]*\*|_[^_\s][^_]*_)/g;
   let last = 0;
   let m: RegExpExecArray | null;
   let i = 0;
@@ -11,7 +14,14 @@ function inline(text: string, keyBase: string): ReactNode[] {
     if (m.index > last) out.push(text.slice(last, m.index));
     const t = m[0];
     const k = `${keyBase}-${i++}`;
-    if (t.startsWith("**")) out.push(<strong key={k}>{t.slice(2, -2)}</strong>);
+    const link = t.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/);
+    if (link) {
+      const href = safeUrl(link[2]);
+      const external = !!href && /^https:/i.test(href);
+      out.push(href
+        ? <a key={k} href={href} className="font-medium text-brand-700 underline underline-offset-2 hover:text-brand-800" {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{link[1]}</a>
+        : link[1]);
+    } else if (t.startsWith("**")) out.push(<strong key={k}>{t.slice(2, -2)}</strong>);
     else if (t.startsWith("`")) out.push(<code key={k} className="rounded bg-canvas px-1 text-[0.9em]">{t.slice(1, -1)}</code>);
     else out.push(<em key={k}>{t.slice(1, -1)}</em>);
     last = m.index + t.length;
@@ -22,7 +32,10 @@ function inline(text: string, keyBase: string): ReactNode[] {
 
 const cells = (line: string) => line.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
 
-export function Markdown({ text }: { text: string }) {
+/**
+ * `article`: pentru articolele de blog — titluri reale (h2/h3, importante pentru SEO), text mai mare, imagini.
+ */
+export function Markdown({ text, article = false }: { text: string; article?: boolean }) {
   const lines = text.replace(/\r/g, "").split("\n");
   const blocks: ReactNode[] = [];
   let i = 0;
@@ -46,7 +59,26 @@ export function Markdown({ text }: { text: string }) {
       blocks.push(<blockquote key={key} className="my-3 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-4 py-2.5">{inline(quote.join(" "), key)}</blockquote>);
       continue;
     }
+    const img = line.trim().match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/);
+    if (img && safeUrl(img[2])) {
+      blocks.push(
+        <figure key={key} className="my-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={safeUrl(img[2])!} alt={img[1]} loading="lazy" className="w-full rounded-xl border border-line" />
+          {img[1] && <figcaption className="mt-2 text-center text-sm text-muted">{img[1]}</figcaption>}
+        </figure>,
+      );
+      i++;
+      continue;
+    }
     const h = line.match(/^(#{1,4})\s+(.*)$/);
+    if (h && article) {
+      const level = h[1].length;
+      if (level <= 2) blocks.push(<h2 key={key} className="mt-10 mb-3 text-2xl font-semibold tracking-tight text-ink">{inline(h[2], key)}</h2>);
+      else blocks.push(<h3 key={key} className="mt-7 mb-2 text-xl font-semibold text-ink">{inline(h[2], key)}</h3>);
+      i++;
+      continue;
+    }
     if (h) {
       const cls = ["", "text-xl font-bold mt-6", "text-lg font-bold mt-6", "font-bold mt-4", "font-semibold mt-3"][h[1].length];
       blocks.push(<p key={key} className={`${cls} mb-2`}>{inline(h[2], key)}</p>);
@@ -89,12 +121,12 @@ export function Markdown({ text }: { text: string }) {
       continue;
     }
     const para: string[] = [];
-    while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|```|>|\s*\||\s*([-*•]|\d+[.)])\s)/.test(lines[i])) para.push(lines[i++]);
+    while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|```|>|\s*\||\s*([-*•]|\d+[.)])\s|\s*!\[)/.test(lines[i])) para.push(lines[i++]);
     blocks.push(
       <p key={key} className="my-2 leading-relaxed">
         {para.map((p, j) => <Fragment key={j}>{j > 0 && <br />}{inline(p, `${key}${j}`)}</Fragment>)}
       </p>,
     );
   }
-  return <div className="text-[15px]">{blocks}</div>;
+  return <div className={article ? "text-[17px] leading-[1.75] text-ink/90 [&_p]:my-4 [&_li]:my-1.5" : "text-[15px]"}>{blocks}</div>;
 }

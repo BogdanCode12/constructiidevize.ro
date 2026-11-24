@@ -130,7 +130,7 @@ export default async function HomePage() {
       {/* DEVIZ DIN BAZĂ */}
       <section className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:py-28 [&>*]:min-w-0">
         <div>
-          <SectionTitle eyebrow="Diferența DevizBuild" title="Devizul vine din baza ta de date, nu din ghicit" />
+          <SectionTitle eyebrow="Diferența DevizConstruct" title="Devizul vine din baza ta de date, nu din ghicit" />
           <p className="mt-6 text-lg leading-relaxed text-muted">
             Fiecare articol importat se caută întâi în rețetele firmei și în catalogul platformei. Ce se găsește sigur intră direct în deviz, ce seamănă e marcat pentru verificare, iar asistentul tehnic completează doar restul, căutând tot în baza de date.
           </p>
@@ -215,7 +215,7 @@ export default async function HomePage() {
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff14_1px,transparent_1px),linear-gradient(to_bottom,#ffffff14_1px,transparent_1px)] bg-[size:40px_40px]" />
           <div className="relative flex flex-wrap items-center justify-between gap-8">
             <div>
-              <h2 className="text-3xl font-semibold sm:text-4xl">Pregătește următoarea ofertă în DevizBuild.</h2>
+              <h2 className="text-3xl font-semibold sm:text-4xl">Pregătește următoarea ofertă în DevizConstruct.</h2>
               <p className="mt-3 text-white/80">Cont gratuit în mai puțin de un minut.</p>
             </div>
             <div className="flex flex-wrap gap-3">

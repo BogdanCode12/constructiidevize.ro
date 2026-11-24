@@ -12,13 +12,13 @@ export function SiteFooter() {
             Platformă pentru firme de construcții din România: devize, dosare de licitație și urmărirea execuției, într-un singur loc.
           </p>
         </div>
-        <FooterCol title="Platformă" links={[["/servicii", "Servicii"], ["/abonamente", "Abonamente"], ["/inregistrare", "Creează cont"], ["/autentificare", "Autentificare"]]} />
+        <FooterCol title="Platformă" links={[["/servicii", "Servicii"], ["/abonamente", "Abonamente"], ["/noutati", "Noutăți"], ["/inregistrare", "Creează cont"], ["/autentificare", "Autentificare"]]} />
         <FooterCol title="Servicii" links={[["/servicii#devize", "Devize F1–F5, C5–C9"], ["/servicii#ai", "Asistent tehnic"], ["/servicii#documente", "Dosar de licitație"], ["/servicii#santier", "Șantier"]]} />
         <FooterCol title="Companie" links={[["/contact", "Contact"], ["/termeni", "Termeni și condiții"], ["/confidentialitate", "Confidențialitate"]]} />
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 px-4 py-6 text-xs sm:px-6">
-          <span>© {year} DevizBuild.ro. Toate drepturile rezervate.</span>
+          <span>© {year} DevizConstruct.ro. Toate drepturile rezervate.</span>
           <span>Documentele generate se verifică de specialiști înainte de depunere.</span>
         </div>
       </div>

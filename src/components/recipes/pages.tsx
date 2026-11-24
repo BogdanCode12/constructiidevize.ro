@@ -148,7 +148,7 @@ export async function RecipeDetailPage({ ctx, id, sp }: { ctx: RecipeCtx; id: st
               {r.missingPrices > 0 && <div className="pt-1 text-xs text-amber-800">{r.missingPrices} resurse fără preț în catalog.</div>}
             </dl>
             {owner && <div className="mt-4"><RecipeStatusActions scope={ctx.scope} id={r.id} status={r.status} superseded={superseded} /></div>}
-            {!owner && <p className="mt-3 text-xs text-muted">Articol din baza DevizBuild. Îl poți duplica în articolele firmei ca să-l adaptezi.</p>}
+            {!owner && <p className="mt-3 text-xs text-muted">Articol din baza DevizConstruct. Îl poți duplica în articolele firmei ca să-l adaptezi.</p>}
           </Card>
           <Card>
             <h2 className="mb-3 font-bold">Versiuni</h2>

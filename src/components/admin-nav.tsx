@@ -27,6 +27,7 @@ const GROUPS: { title: string; links: { href: string; label: string }[] }[] = [
     links: [
       { href: "/admin/sabloane", label: "Șabloane documente" },
       { href: "/admin/pagini", label: "Pagini" },
+      { href: "/admin/noutati", label: "Noutăți (blog)" },
     ],
   },
   {

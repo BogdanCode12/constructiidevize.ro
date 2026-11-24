@@ -105,7 +105,7 @@ export function OffersPanel({
         </Card>
       )}
       <Card>
-        <h2 className="font-bold">{owner ? "Prețuri și istoric" : "Prețul de referință DevizBuild"}</h2>
+        <h2 className="font-bold">{owner ? "Prețuri și istoric" : "Prețul de referință DevizConstruct"}</h2>
         <p className="mt-1 mb-4 text-sm text-muted">
           {owner
             ? "Fiecare preț nou se adaugă în istoric; prețurile vechi nu se suprascriu. Prețul de referință e cel folosit implicit în devize."

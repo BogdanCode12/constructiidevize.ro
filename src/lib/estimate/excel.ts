@@ -318,7 +318,7 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
 
 export async function estimateWorkbook(doc: EstimateDoc, info: WorkbookInfo): Promise<ArrayBuffer> {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "DevizBuild.ro";
+  wb.creator = "DevizConstruct.ro";
   addEstimateSheets(wb, doc, info);
   return (await wb.xlsx.writeBuffer()) as ArrayBuffer;
 }
@@ -326,7 +326,7 @@ export async function estimateWorkbook(doc: EstimateDoc, info: WorkbookInfo): Pr
 /** F1 — centralizatorul obiectivului (proiectului): un rând pe fiecare deviz / obiect. */
 export async function projectWorkbook(docs: EstimateDoc[], info: WorkbookInfo): Promise<ArrayBuffer> {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "DevizBuild.ro";
+  wb.creator = "DevizConstruct.ro";
   const ws = wb.addWorksheet("F1");
   titleBlock(ws, "Formular F1 — Centralizatorul cheltuielilor pe obiectiv", [`Ofertant: ${info.company}`, `Obiectiv: ${info.project}`], 6);
   headerRow(ws, ["Nr.", "Obiect / deviz", "Valoare C+M", "Echipamente", "Total fără TVA", "TVA", "Total cu TVA"]);
