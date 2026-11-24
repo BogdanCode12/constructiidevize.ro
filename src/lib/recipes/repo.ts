@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { execute, query, queryOne, transaction } from "../db";
 import { normKey, normUnit, similarity } from "../estimate/normalize";
 import { effNorm } from "../estimate/calc";
-import type { EstItem, EstResource, ResType } from "../estimate/types";
+import type { EstItem, EstResource, ResType, TariffKind } from "../estimate/types";
 
 export type RecipeStatus = "draft" | "verificat" | "depasit";
 export type RecipeHit = { id: number; global: boolean; code: string | null; name: string; unit: string; uses: number; unitPrice: number; score: number; status: RecipeStatus };
@@ -55,14 +55,14 @@ export async function searchRecipes(companyId: number, q: string, unit?: string,
   }));
 }
 
-type RRow = { recipe_id: number; resource_id: number | null; type: ResType; code: string | null; name: string; unit: string; norm: string; waste_pct: string; price: string };
+type RRow = { recipe_id: number; resource_id: number | null; type: ResType; code: string | null; name: string; unit: string; norm: string; waste_pct: string; price: string; tariff_kind: TariffKind | null };
 
 /** Resursele rețetelor, cu prețul aplicabil firmei (propriu sau de referință), dacă resursa e vizibilă. */
 async function recipeResources(companyId: number, recipeIds: number[]): Promise<Map<number, EstResource[]>> {
   const map = new Map<number, EstResource[]>();
   if (!recipeIds.length) return map;
   const rows = await query<RRow>(
-    `SELECT rr.recipe_id, rr.resource_id, rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.waste_pct, rr.price
+    `SELECT rr.recipe_id, rr.resource_id, rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.waste_pct, rr.price, rr.tariff_kind
        FROM recipe_resources rr WHERE rr.recipe_id IN (?) ORDER BY rr.recipe_id, rr.position`,
     [recipeIds],
   );
@@ -80,6 +80,7 @@ async function recipeResources(companyId: number, recipeIds: number[]): Promise<
       norm: Number(x.norm),
       waste: Number(x.waste_pct),
       price: c ? (c.price ?? 0) : Number(x.price),
+      tariffKind: x.type === "manopera" ? (c ? c.tariffKind : x.tariff_kind) : null,
     });
     map.set(x.recipe_id, list);
   }
@@ -128,8 +129,9 @@ export async function saveRecipe(companyId: number | null, item: Pick<EstItem, "
     );
     const id = ins.insertId;
     if (prev) await execute("UPDATE recipes SET status = 'depasit', superseded_by = ? WHERE id = ?", [id, prev.id], conn);
-    const rows = item.resources.map((r, i) => [id, i, r.resourceId, r.type, r.code || null, r.name.slice(0, 255), r.unit.slice(0, 20), r.norm, Math.min(100, Math.max(0, r.waste || 0)), r.price]);
-    if (rows.length) await execute("INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, waste_pct, price) VALUES ?", [rows], conn);
+    const rows = item.resources.map((r, i) => [id, i, r.resourceId, r.type, r.code || null, r.name.slice(0, 255), r.unit.slice(0, 20), r.norm,
+      Math.min(100, Math.max(0, r.waste || 0)), r.price, r.type === "manopera" ? (r.tariffKind ?? null) : null]);
+    if (rows.length) await execute("INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, tariff_kind) VALUES ?", [rows], conn);
     return id;
   });
 }
@@ -196,6 +198,7 @@ export async function refreshPrices(companyId: number, res: EstResource[]): Prom
     const c = r.resourceId ? cur.get(r.resourceId) : undefined;
     return {
       ...r, key: randomUUID(), resourceId: c ? r.resourceId : null, waste: r.waste ?? 0,
+      tariffKind: r.type === "manopera" ? (c ? c.tariffKind : (r.tariffKind ?? null)) : null,
       price: c ? (c.price ?? 0) : r.price, name: c?.name ?? r.name, unit: c?.unit ?? r.unit, code: c?.code ?? r.code,
     };
   });

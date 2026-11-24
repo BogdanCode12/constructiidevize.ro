@@ -3,7 +3,8 @@ import { ActionForm } from "@/components/action-form";
 import { Card, Field, PageHeader } from "@/components/ui";
 import { query } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
-import { fmtMoney } from "@/lib/estimate/calc";
+import { fmtMoney, recap } from "@/lib/estimate/calc";
+import { loadEstimate } from "@/lib/estimate/repo";
 import { createEstimateAction } from "./actions";
 
 export const metadata = { title: "Devize" };
@@ -19,19 +20,19 @@ export default async function EstimatesPage({ searchParams }: { searchParams: Pr
     "SELECT id, name FROM projects WHERE company_id = ? AND status <> 'anulat' ORDER BY created_at DESC",
     [companyId],
   );
-  const estimates = await query<{
-    id: number; name: string; project_name: string; updated_at: Date; direct: string | null;
-    overhead_pct: string; profit_pct: string; items: number;
-  }>(
-    `SELECT e.id, e.name, p.name AS project_name, e.updated_at, e.overhead_pct, e.profit_pct,
-            (SELECT SUM(i.quantity * r.norm * (1 + r.waste_pct / 100) * r.price) FROM estimate_item_resources r
-               JOIN estimate_items i ON i.id = r.item_id JOIN estimate_chapters c ON c.id = i.chapter_id
-              WHERE c.estimate_id = e.id) AS direct,
+  const estimates = await query<{ id: number; name: string; project_name: string; updated_at: Date; items: number }>(
+    `SELECT e.id, e.name, p.name AS project_name, e.updated_at,
             (SELECT COUNT(*) FROM estimate_items i JOIN estimate_chapters c ON c.id = i.chapter_id WHERE c.estimate_id = e.id) AS items
        FROM estimates e JOIN projects p ON p.id = e.project_id
       WHERE e.company_id = ? ORDER BY e.updated_at DESC`,
     [companyId],
   );
+  // Totalul vine din același motor de calcul ca editorul (CAM, bazele și rotunjirile devizului).
+  const totals = new Map<number, number>();
+  for (const e of estimates) {
+    const d = await loadEstimate(e.id, companyId);
+    if (d) totals.set(e.id, recap(d).totalNoVat);
+  }
 
   return (
     <>
@@ -53,9 +54,7 @@ export default async function EstimatesPage({ searchParams }: { searchParams: Pr
               </thead>
               <tbody className="divide-y divide-line">
                 {estimates.map((e) => {
-                  const direct = Number(e.direct ?? 0);
-                  const oh = direct * Number(e.overhead_pct) / 100;
-                  const total = (direct + oh) * (1 + Number(e.profit_pct) / 100);
+                  const total = totals.get(e.id) ?? 0;
                   return (
                     <tr key={e.id} className="hover:bg-canvas">
                       <td className="px-5 py-3 font-medium"><Link href={`/panou/devize/${e.id}`} className="text-brand-700 hover:underline">{e.name}</Link></td>

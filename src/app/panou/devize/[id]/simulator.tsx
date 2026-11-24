@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { NumInput } from "./parts";
-import { directBreakdown, fmtMoney, recapFromDirect, sumCM, zero } from "@/lib/estimate/calc";
+import { camBaseOf, directBreakdown, fmtMoney, recapFromDirect, zero } from "@/lib/estimate/calc";
 import { RES_TYPE_PLURAL, RES_TYPES, type EstimateDoc, type ResType } from "@/lib/estimate/types";
 
 type Sim = Record<ResType, number> & { qty: number; overheadPct: number; profitPct: number; discount: number; target: number };
 
 /**
  * Calculator profit + simulator preț ofertă.
- * Costul real = cost direct (prețurile din deviz) + cheltuieli indirecte + echipamente.
+ * Costul real = cost direct (prețurile din deviz, cu CAM) + cheltuieli indirecte + echipamente (fără profit).
  * Prețul ofertat = prețurile ajustate, cu indirecte și profit, minus discount.
  */
 export function Simulator({ doc }: { doc: EstimateDoc }) {
@@ -20,23 +20,24 @@ export function Simulator({ doc }: { doc: EstimateDoc }) {
   const set = (k: keyof Sim) => (n: number | null) => setS((x) => ({ ...x, [k]: n ?? 0 }));
 
   const base = directBreakdown(doc);
+  const camBase = camBaseOf(doc);
   const qf = 1 + s.qty / 100;
 
   // Cost real: prețurile de cost din deviz, la cantitățile ajustate.
   const costDirect = zero();
   for (const t of RES_TYPES) costDirect[t] = base[t] * qf;
-  const realCost = sumCM(costDirect) * (1 + doc.overheadPct / 100) + costDirect.echipament;
+  const realCost = recapFromDirect(costDirect, camBase * qf, { ...doc, profitPct: 0, vatPct: 0 }).totalNoVat;
 
   // Ofertă: prețuri ajustate pe categorii + procentele simulate − discount.
   const simDirect = zero();
   for (const t of RES_TYPES) simDirect[t] = base[t] * qf * (1 + s[t] / 100);
-  const sim = recapFromDirect(simDirect, { overheadPct: s.overheadPct, profitPct: s.profitPct, vatPct: doc.vatPct });
+  const sim = recapFromDirect(simDirect, camBase * qf * (1 + s.manopera / 100), { ...doc, overheadPct: s.overheadPct, profitPct: s.profitPct });
   const offer = sim.totalNoVat * (1 - s.discount / 100);
   const profit = offer - realCost;
   const margin = offer > 0 ? (profit / offer) * 100 : 0;
   const targetPrice = realCost / (1 - Math.min(s.target, 99) / 100);
 
-  const baseRecap = recapFromDirect(base, doc);
+  const baseRecap = recapFromDirect(base, camBase, doc);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[360px_1fr]">

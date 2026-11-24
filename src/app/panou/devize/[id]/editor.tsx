@@ -9,7 +9,8 @@ import { Gantt } from "./gantt";
 import { checkEstimate, type Issue } from "@/lib/estimate/checks";
 import { chapterBreakdown, effNorm, fmtMoney, fmtQty, itemTotal, itemUnitBreakdown, itemUnitPrice, recap, sum } from "@/lib/estimate/calc";
 import {
-  RES_TYPE_LABEL, RES_TYPES, type EstChapter, type EstimateDoc, type EstItem, type EstResource, type ResType,
+  OVERHEAD_BASE_LABEL, PROFIT_BASE_LABEL, RES_TYPE_LABEL, RES_TYPES, ROUNDING_LABEL,
+  type EstChapter, type EstimateDoc, type EstItem, type EstResource, type OverheadBase, type ProfitBase, type ResType, type RoundingMode, type TariffKind,
 } from "@/lib/estimate/types";
 
 type Tab = "deviz" | "verificari" | "simulator" | "grafic";
@@ -165,7 +166,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
 
   return (
     <div className="-mt-2">
-      <div className="sticky top-0 z-20 -mx-4 mb-6 border-b border-line bg-canvas/95 px-4 pt-3 backdrop-blur sm:-mx-8 sm:px-8">
+      <div className="sticky top-0 z-20 -mx-4 mb-6 border-b-2 border-ink/10 bg-white/95 px-4 pt-3 backdrop-blur sm:-mx-8 sm:px-8">
         <div className="flex flex-wrap items-center gap-3">
           <div className="min-w-0 flex-1">
             <Link href="/panou/devize" className="text-sm text-muted hover:text-ink">← Devize · {doc.projectName}</Link>
@@ -242,7 +243,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
         <>
           <div className="space-y-6">
             {doc.chapters.map((ch, ci) => {
-              const chTotal = sum(chapterBreakdown(ch));
+              const chTotal = sum(chapterBreakdown(ch, doc.rounding));
               return (
                 <section key={ch.key} id={`k-${ch.key}`}
                   className={`rounded-xl border bg-white transition ${flash === ch.key ? "border-amber-400 ring-4 ring-amber-100" : "border-line"}`}>
@@ -284,6 +285,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
                             nr={`${ci + 1}.${ii + 1}`}
                             item={it}
                             open={expanded.has(it.key)}
+                            rounding={doc.rounding}
                             flash={flash === it.key}
                             onToggle={() => toggle(it.key)}
                             onItem={(fn) => setItem(ci, ii, fn)}
@@ -329,14 +331,40 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
 
           <section className="mt-8 grid gap-6 lg:grid-cols-2">
             <div className="rounded-xl border border-line bg-white p-5">
-              <h2 className="mb-3 font-bold">Recapitulație</h2>
+              <h2 className="mb-1 font-bold">Recapitulație</h2>
+              <details className="mb-3 text-xs text-muted">
+                <summary className="cursor-pointer">
+                  Reguli de calcul{doc.rulesDate ? ` din ${new Intl.DateTimeFormat("ro-RO").format(new Date(`${doc.rulesDate}T12:00:00`))}` : ""} · {ROUNDING_LABEL[doc.rounding].toLowerCase()}
+                </summary>
+                <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                  <label>Baza indirectelor
+                    <select value={doc.overheadBase} onChange={(e) => update((d) => ({ ...d, overheadBase: e.target.value as OverheadBase }))} className={`${cellCls} mt-0.5`}>
+                      {(Object.keys(OVERHEAD_BASE_LABEL) as OverheadBase[]).map((k) => <option key={k} value={k}>{OVERHEAD_BASE_LABEL[k]}</option>)}
+                    </select>
+                  </label>
+                  <label>Baza profitului
+                    <select value={doc.profitBase} onChange={(e) => update((d) => ({ ...d, profitBase: e.target.value as ProfitBase }))} className={`${cellCls} mt-0.5`}>
+                      {(Object.keys(PROFIT_BASE_LABEL) as ProfitBase[]).map((k) => <option key={k} value={k}>{PROFIT_BASE_LABEL[k]}</option>)}
+                    </select>
+                  </label>
+                  <label>Rotunjire
+                    <select value={doc.rounding} onChange={(e) => update((d) => ({ ...d, rounding: e.target.value as RoundingMode }))} className={`${cellCls} mt-0.5`}>
+                      {(Object.keys(ROUNDING_LABEL) as RoundingMode[]).map((k) => <option key={k} value={k}>{ROUNDING_LABEL[k]}</option>)}
+                    </select>
+                  </label>
+                </div>
+                <p className="mt-2">Valorile au fost copiate din regulile platformei la crearea devizului; modificarea lor aici nu schimbă alte devize.</p>
+              </details>
               <dl className="space-y-1.5 text-sm">
-                {(["material", "manopera", "utilaj", "transport"] as ResType[]).map((t) => (
-                  <Row key={t} label={t === "utilaj" ? "Utilaje" : RES_TYPE_LABEL[t]} value={r.direct[t]} />
-                ))}
+                {(["material", "manopera"] as ResType[]).map((t) => <Row key={t} label={RES_TYPE_LABEL[t]} value={r.direct[t]} />)}
+                <PctRow label="CAM" pct={doc.camPct} value={r.cam} onPct={(n) => update((d) => ({ ...d, camPct: n }))}
+                  hint={`din manopera la cost salarial (${fmtMoney(r.camBase)} lei)`} />
+                {(["utilaj", "transport"] as ResType[]).map((t) => <Row key={t} label={t === "utilaj" ? "Utilaje" : RES_TYPE_LABEL[t]} value={r.direct[t]} />)}
                 <Row label="Total cheltuieli directe C+M" value={r.directTotal} strong />
-                <PctRow label="Cheltuieli indirecte" pct={doc.overheadPct} value={r.overhead} onPct={(n) => update((d) => ({ ...d, overheadPct: n }))} />
-                <PctRow label="Profit" pct={doc.profitPct} value={r.profit} onPct={(n) => update((d) => ({ ...d, profitPct: n }))} />
+                <PctRow label="Cheltuieli indirecte" pct={doc.overheadPct} value={r.overhead} onPct={(n) => update((d) => ({ ...d, overheadPct: n }))}
+                  hint={doc.overheadBase === "manopera" ? "din manoperă + CAM" : "din costul direct"} />
+                <PctRow label="Profit" pct={doc.profitPct} value={r.profit} onPct={(n) => update((d) => ({ ...d, profitPct: n }))}
+                  hint={doc.profitBase === "direct" ? "din costul direct" : "din direct + indirecte"} />
                 <Row label="Valoare construcții-montaj" value={r.cmTotal} strong />
                 {r.equipment > 0 && <Row label="Echipamente tehnologice" value={r.equipment} />}
                 <Row label="Total fără TVA" value={r.totalNoVat} strong />
@@ -409,15 +437,16 @@ function Row({ label, value, strong }: { label: string; value: number; strong?: 
   );
 }
 
-function PctRow({ label, pct, value, onPct }: { label: string; pct: number; value: number; onPct: (n: number) => void }) {
+function PctRow({ label, pct, value, onPct, hint }: { label: string; pct: number; value: number; onPct: (n: number) => void; hint?: string }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <dt className="flex items-center gap-2 text-muted">
+      <dt className="flex flex-wrap items-center gap-x-2 text-muted">
         {label}
         <span className="flex w-20 items-center rounded-md border border-line">
           <NumInput value={pct} onChange={(n) => onPct(n ?? 0)} className="py-0.5" />
           <span className="pr-2 text-xs">%</span>
         </span>
+        {hint && <span className="text-xs">{hint}</span>}
       </dt>
       <dd className="tabular-nums">{fmtMoney(value)} lei</dd>
     </div>
@@ -425,9 +454,9 @@ function PctRow({ label, pct, value, onPct }: { label: string; pct: number; valu
 }
 
 function ItemRows({
-  nr, item, open, flash, onToggle, onItem, onRes, onMove, onDuplicate, onDelete, onSaveRecipe, isAdmin,
+  nr, item, open, flash, onToggle, onItem, onRes, onMove, onDuplicate, onDelete, onSaveRecipe, isAdmin, rounding,
 }: {
-  nr: string; item: EstItem; open: boolean; flash: boolean;
+  nr: string; item: EstItem; open: boolean; flash: boolean; rounding: RoundingMode;
   onToggle: () => void;
   onItem: (fn: (it: EstItem) => EstItem) => void;
   onRes: (ri: number, fn: (r: EstResource) => EstResource) => void;
@@ -437,7 +466,7 @@ function ItemRows({
   onSaveRecipe: (global: boolean) => void;
   isAdmin: boolean;
 }) {
-  const ub = itemUnitBreakdown(item);
+  const ub = itemUnitBreakdown(item, rounding);
   const addRes = (r: Omit<EstResource, "key">) => onItem((it) => ({ ...it, resources: [...it.resources, { ...r, key: newKey() }] }));
   return (
     <>
@@ -451,8 +480,8 @@ function ItemRows({
         <td className="px-1 py-1"><input value={item.name} onChange={(e) => onItem((it) => ({ ...it, name: e.target.value }))} className={cellCls} placeholder="Denumirea lucrării" /></td>
         <td className="px-1 py-1"><input value={item.unit} onChange={(e) => onItem((it) => ({ ...it, unit: e.target.value }))} className={cellCls} placeholder="mc" /></td>
         <td className="px-1 py-1"><NumInput value={item.quantity} onChange={(n) => onItem((it) => ({ ...it, quantity: n ?? 0 }))} /></td>
-        <td className="px-2 py-2.5 text-right tabular-nums">{fmtMoney(itemUnitPrice(item))}</td>
-        <td className="px-2 py-2.5 text-right font-semibold tabular-nums">{fmtMoney(itemTotal(item))}</td>
+        <td className="px-2 py-2.5 text-right tabular-nums">{fmtMoney(itemUnitPrice(item, rounding))}</td>
+        <td className="px-2 py-2.5 text-right font-semibold tabular-nums">{fmtMoney(itemTotal(item, rounding))}</td>
         <td className="px-2 py-2.5 text-right whitespace-nowrap text-muted">
           <button title="Mută sus" onClick={() => onMove(-1)} className="px-1 hover:text-ink">↑</button>
           <button title="Mută jos" onClick={() => onMove(1)} className="px-1 hover:text-ink">↓</button>
@@ -498,6 +527,16 @@ function ItemRows({
                         <select value={res.type} onChange={(e) => onRes(ri, (x) => ({ ...x, type: e.target.value as ResType }))} className={cellCls}>
                           {RES_TYPES.map((t) => <option key={t} value={t}>{RES_TYPE_LABEL[t]}</option>)}
                         </select>
+                        {res.type === "manopera" && (
+                          <select value={res.tariffKind ?? ""} title="Tipul tarifului: CAM se aplică doar pe cost salarial"
+                            onChange={(e) => onRes(ri, (x) => ({ ...x, tariffKind: (e.target.value || null) as TariffKind | null }))}
+                            className={`${cellCls} mt-0.5 text-[11px] ${res.tariffKind ? "" : "text-amber-800"}`}>
+                            <option value="">tarif necunoscut</option>
+                            <option value="cost_salarial">cost salarial (+CAM)</option>
+                            <option value="echipa">tarif echipă</option>
+                            <option value="comercial">tarif comercial</option>
+                          </select>
+                        )}
                       </td>
                       <td className="px-1 py-0.5"><input value={res.code} onChange={(e) => onRes(ri, (x) => ({ ...x, code: e.target.value }))} className={cellCls} /></td>
                       <td className="px-1 py-0.5"><input value={res.name} onChange={(e) => onRes(ri, (x) => ({ ...x, name: e.target.value }))} className={cellCls} placeholder="Denumire" /></td>
@@ -518,7 +557,7 @@ function ItemRows({
               </table>
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-3 py-2.5">
                 <ResourcePicker
-                  onPick={(c) => addRes({ resourceId: c.id, type: c.type, code: c.code ?? "", name: c.name, unit: c.unit, norm: 1, waste: 0, price: c.price ?? 0 })}
+                  onPick={(c) => addRes({ resourceId: c.id, type: c.type, code: c.code ?? "", name: c.name, unit: c.unit, norm: 1, waste: 0, price: c.price ?? 0, tariffKind: c.tariffKind })}
                   onManual={(t) => addRes({ resourceId: null, type: t, code: "", name: "", unit: t === "material" || t === "echipament" ? "buc" : "ora", norm: 1, waste: 0, price: 0 })}
                 />
                 <div className="flex flex-wrap gap-3 text-muted">

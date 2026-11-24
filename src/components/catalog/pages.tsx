@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, PageHeader } from "../ui";
 import { ConfirmSubmit } from "../confirm-submit";
-import { getSettings } from "@/lib/settings";
+import { currentVat } from "@/lib/rules";
 import { getResource, listCategories, listOffers, listResources } from "@/lib/resources/repo";
 import { deleteResourceAction } from "@/lib/resources/actions";
 import {
@@ -32,20 +32,20 @@ const btnGhost = "rounded-lg border-2 border-ink/15 bg-white px-4 py-2 text-sm f
 export async function CatalogList({ ctx, sp, header = true, children }: { ctx: CatalogCtx; sp: SP; header?: boolean; children?: React.ReactNode }) {
   const type = ctx.types.includes(sp.tip as ResType) ? (sp.tip as ResType) : undefined;
   const status = ["verificat", "neverificat", "inactiv", "expirat", "fara_pret"].includes(sp.status ?? "") ? (sp.status as ResStatus | "expirat" | "fara_pret") : undefined;
-  const [resources, categories, settings] = await Promise.all([
+  const [resources, categories, vatPct] = await Promise.all([
     listResources({
       companyId: ctx.companyId, includeGlobal: true, types: type ? [type] : ctx.types, category: sp.categorie || undefined,
       status, q: sp.q?.trim() || undefined, includeInactive: ctx.scope === "global" || status === "inactiv",
     }),
     listCategories(ctx.companyId, type ? [type] : ctx.types),
-    getSettings(),
+    currentVat(),
   ]);
   return (
     <>
       {header && <PageHeader title={ctx.title} subtitle={ctx.subtitle} />}
       {children}
       <ResourceList
-        resources={resources} basePath={ctx.basePath} types={ctx.types} categories={categories} vatPct={settings.default_vat_pct}
+        resources={resources} basePath={ctx.basePath} types={ctx.types} categories={categories} vatPct={vatPct}
         scope={ctx.scope} filters={{ type, category: sp.categorie, status: sp.status, q: sp.q }}
         actions={<>
           <Link href={`${ctx.basePath}/import`} className={btnGhost}>Import Excel</Link>

@@ -1,6 +1,9 @@
 import "server-only";
 import ExcelJS from "exceljs";
-import { aggregateResources, effNorm, itemUnitBreakdown, recap, sum, chapterBreakdown, sumCM } from "./calc";
+import {
+  aggregateResources, chapterBreakdown, chapterCamBase, chapterRecap, effNorm, itemCamBase, itemCamUnit, itemUnitBreakdown, itemValueBreakdown,
+  recap, sum, type Recap,
+} from "./calc";
 import { RES_TYPE_LABEL, RES_TYPES, type EstimateDoc, type ResType } from "./types";
 
 /*
@@ -50,6 +53,10 @@ export type WorkbookInfo = { company: string; project: string };
 export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: WorkbookInfo) {
   const lines = [`Ofertant: ${info.company}`, `Obiectiv: ${info.project}`, `Obiect / deviz: ${doc.name}`];
   const r = recap(doc);
+  const mode = doc.rounding;
+  const PU = mode === "pret_unitar";
+  /** În modul „preț unitar rotunjit”, formulele se rotunjesc la 2 zecimale exact ca în aplicație. */
+  const rnd = (expr: string) => (PU ? `ROUND(${expr},2)` : expr);
 
   // Foile se creează în ordinea finală și se completează după.
   const f2 = wb.addWorksheet("F2");
@@ -58,19 +65,21 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
   const rc = wb.addWorksheet("Recapitulatie");
 
   // ---------- Analize de preț ----------
-  titleBlock(an, "Analize de preț pe articole (consum × (1 + pierderi) × preț unitar)", lines, 8);
-  an.columns = [{ width: 14 }, { width: 12 }, { width: 50 }, { width: 8 }, { width: 12 }, { width: 10 }, { width: 13 }, { width: 14 }];
+  titleBlock(an, "Analize de preț pe articole (consum × (1 + pierderi) × preț unitar)", lines, 9);
+  an.columns = [{ width: 14 }, { width: 12 }, { width: 50 }, { width: 8 }, { width: 12 }, { width: 10 }, { width: 13 }, { width: 14 }, { width: 9 }];
   const unitRefs = new Map<string, Record<ResType, string>>();
+  const camRefs = new Map<string, string>();
 
   doc.chapters.forEach((ch, ci) =>
     ch.items.forEach((it, ii) => {
       const nr = `${ci + 1}.${ii + 1}`;
       const t = an.addRow([`Art. ${nr}`, it.code, `${it.name} (${it.unit})`]);
       t.font = { bold: true };
-      headerRow(an, ["Tip", "Cod", "Resursă", "U.M.", "Consum", "Pierderi %", "Preț unitar", "Valoare / U.M."]);
+      headerRow(an, ["Tip", "Cod", "Resursă", "U.M.", "Consum", "Pierderi %", "Preț unitar", "Valoare / U.M.", "Bază CAM"]);
       const first = an.rowCount + 1;
       for (const res of it.resources) {
-        const row = an.addRow([RES_TYPE_LABEL[res.type], res.code, res.name, res.unit, res.norm, res.waste || 0, res.price]);
+        const row = an.addRow([RES_TYPE_LABEL[res.type], res.code, res.name, res.unit, res.norm, res.waste || 0, res.price, null,
+          res.type === "manopera" && res.tariffKind === "cost_salarial" ? 1 : 0]);
         row.getCell(8).value = f(`E${row.number}*(1+F${row.number}/100)*G${row.number}`, effNorm(res) * res.price);
         fmt(row, [5], QTY);
         fmt(row, [7, 8], MONEY);
@@ -90,8 +99,13 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
       tot.getCell(8).value = f(`SUM(H${totalRows[0]}:H${totalRows[totalRows.length - 1]})`, sum(ub));
       tot.font = { bold: true };
       fmt(tot, [8], MONEY);
+      const camRow = an.addRow(["", "", "Manoperă la cost salarial (bază CAM / U.M.)"]);
+      camRow.getCell(8).value = f(`SUMIF(I${first}:I${last},1,H${first}:H${last})`, itemCamUnit(it));
+      fmt(camRow, [8], MONEY);
+      camRow.font = { italic: true };
       an.addRow([]);
       unitRefs.set(it.key, refs);
+      camRefs.set(it.key, ref("Analize", 8, camRow.number));
     }),
   );
 
@@ -104,22 +118,23 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
     row.getCell(2).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFF4D6" } };
     return `'Recapitulatie'!$B$${row.number}`;
   };
-  const indPct = pctRow("Cheltuieli indirecte (% din direct C+M) — editabil", doc.overheadPct);
-  const profPct = pctRow("Profit (% din direct + indirecte) — editabil", doc.profitPct);
+  const camPct = pctRow("CAM (% din manopera la cost salarial) — editabil", doc.camPct);
+  const indPct = pctRow(`Cheltuieli indirecte (${doc.overheadBase === "manopera" ? "% din manoperă + CAM" : "% din direct C+M"}) — editabil`, doc.overheadPct);
+  const profPct = pctRow(`Profit (${doc.profitBase === "direct" ? "% din direct" : "% din direct + indirecte"}) — editabil`, doc.profitPct);
   const vatPct = pctRow("TVA (%) — editabil", doc.vatPct);
   rc.addRow([]);
 
   // ---------- F3: lista cantităților de lucrări ----------
-  titleBlock(f3, "Formular F3 — Lista cu cantitățile de lucrări (cost direct pe articole)", lines, 17);
+  titleBlock(f3, "Formular F3 — Lista cu cantitățile de lucrări (cost direct pe articole)", lines, 18);
   headerRow(f3, [
     "Nr.", "Cod", "Denumire articol", "U.M.", "Cantitate",
     "Material / UM", "Manoperă / UM", "Utilaj / UM", "Transport / UM", "Echipament / UM", "Preț unitar", "Valoare",
-    "Val. material", "Val. manoperă", "Val. utilaj", "Val. transport", "Val. echipament",
+    "Val. material", "Val. manoperă", "Val. utilaj", "Val. transport", "Val. echipament", "Bază CAM (manoperă cost salarial)",
   ]);
   f3.columns = [
     { width: 7 }, { width: 11 }, { width: 50 }, { width: 7 }, { width: 11 },
     { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 15 },
-    { width: 13 }, { width: 13 }, { width: 13 }, { width: 13 }, { width: 13 },
+    { width: 13 }, { width: 13 }, { width: 13 }, { width: 13 }, { width: 13 }, { width: 15 },
   ];
   const subRows: number[] = [];
   doc.chapters.forEach((ch, ci) => {
@@ -127,25 +142,28 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
     h.font = { bold: true };
     const first = f3.rowCount + 1;
     ch.items.forEach((it, ii) => {
-      const ub = itemUnitBreakdown(it);
+      const ub = itemUnitBreakdown(it, mode);
+      const vb = itemValueBreakdown(it, mode);
       const refs = unitRefs.get(it.key)!;
       const row = f3.addRow([`${ci + 1}.${ii + 1}`, it.code, it.name, it.unit, it.quantity]);
       const n = row.number;
-      RES_TYPES.forEach((type, k) => (row.getCell(6 + k).value = f(refs[type], ub[type])));
+      RES_TYPES.forEach((type, k) => (row.getCell(6 + k).value = f(rnd(refs[type]), ub[type])));
       row.getCell(11).value = f(`SUM(F${n}:J${n})`, sum(ub));
-      row.getCell(12).value = f(`E${n}*K${n}`, sum(ub) * it.quantity);
-      RES_TYPES.forEach((type, k) => (row.getCell(13 + k).value = f(`E${n}*${COLS[5 + k]}${n}`, ub[type] * it.quantity)));
+      row.getCell(12).value = f(`SUM(M${n}:Q${n})`, sum(vb));
+      RES_TYPES.forEach((type, k) => (row.getCell(13 + k).value = f(rnd(`E${n}*${COLS[5 + k]}${n}`), vb[type])));
+      row.getCell(18).value = f(rnd(`E${n}*${camRefs.get(it.key)}`), itemCamBase(it, mode));
       row.getCell(3).alignment = { wrapText: true, vertical: "top" };
       fmt(row, [5], QTY);
-      fmt(row, [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], MONEY);
+      fmt(row, [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], MONEY);
     });
     const last = Math.max(first, f3.rowCount);
-    const b = chapterBreakdown(ch);
+    const b = chapterBreakdown(ch, mode);
     const st = f3.addRow(["", "", `Total capitol ${ci + 1}`]);
     st.getCell(12).value = f(`SUM(L${first}:L${last})`, sum(b));
     RES_TYPES.forEach((type, k) => (st.getCell(13 + k).value = f(`SUM(${COLS[12 + k]}${first}:${COLS[12 + k]}${last})`, b[type])));
+    st.getCell(18).value = f(`SUM(R${first}:R${last})`, chapterCamBase(ch, mode));
     st.font = { bold: true };
-    fmt(st, [12, 13, 14, 15, 16, 17], MONEY);
+    fmt(st, [12, 13, 14, 15, 16, 17, 18], MONEY);
     subRows.push(st.number);
   });
   const sumOf = (col: number) => (subRows.length ? subRows.map((n) => `'F3'!${COLS[col - 1]}${n}`).join("+") : "0");
@@ -159,48 +177,54 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
   };
   const mat = lineRow("Materiale", sumOf(13), r.direct.material);
   const man = lineRow("Manoperă", sumOf(14), r.direct.manopera);
+  const camB = lineRow("   bază CAM: manopera la cost salarial", sumOf(18), r.camBase);
+  const cam = lineRow("CAM — contribuția asiguratorie pentru muncă", rnd(`${camB}*${camPct}/100`), r.cam);
   const utl = lineRow("Utilaje", sumOf(15), r.direct.utilaj);
   const trs = lineRow("Transport", sumOf(16), r.direct.transport);
-  const dir = lineRow("Total cheltuieli directe C+M", `${mat}+${man}+${utl}+${trs}`, r.directTotal, true);
-  const ind = lineRow("Cheltuieli indirecte", `${dir}*${indPct}/100`, r.overhead);
-  const prof = lineRow("Profit", `(${dir}+${ind})*${profPct}/100`, r.profit);
+  const dir = lineRow("Total cheltuieli directe C+M", `${mat}+${man}+${cam}+${utl}+${trs}`, r.directTotal, true);
+  const ind = lineRow("Cheltuieli indirecte", rnd(`${doc.overheadBase === "manopera" ? `(${man}+${cam})` : dir}*${indPct}/100`), r.overhead);
+  const prof = lineRow("Profit", rnd(`${doc.profitBase === "direct" ? dir : `(${dir}+${ind})`}*${profPct}/100`), r.profit);
   const cm = lineRow("Valoare construcții-montaj", `${dir}+${ind}+${prof}`, r.cmTotal, true);
   const ech = lineRow("Echipamente tehnologice (fără indirecte și profit)", sumOf(17), r.equipment);
   const tnv = lineRow("TOTAL FĂRĂ TVA", `${cm}+${ech}`, r.totalNoVat, true);
-  const tva = lineRow("TVA", `${tnv}*${vatPct}/100`, r.vat);
+  const tva = lineRow("TVA", rnd(`${tnv}*${vatPct}/100`), r.vat);
   const ttl = lineRow("TOTAL CU TVA", `${tnv}+${tva}`, r.total, true);
   rc.addRow([]);
   rc.addRow(["Total ore manoperă (ore-om)", "", r.laborHours]).getCell(3).numFmt = QTY;
 
   // ---------- F2: deviz pe obiect (pe capitole) ----------
-  titleBlock(f2, "Formular F2 — Deviz pe obiect (centralizator pe capitole de lucrări)", lines, 9);
-  headerRow(f2, ["Nr.", "Capitol de lucrări", "Direct C+M", "Echipamente", "Indirecte", "Profit", "Total fără TVA", "TVA", "Total cu TVA"]);
-  f2.columns = [{ width: 7 }, { width: 46 }, { width: 15 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 16 }, { width: 14 }, { width: 16 }];
+  titleBlock(f2, "Formular F2 — Deviz pe obiect (centralizator pe capitole de lucrări)", lines, 11);
+  headerRow(f2, ["Nr.", "Capitol de lucrări", "Direct C+M fără CAM", "CAM", "Direct C+M", "Echipamente", "Indirecte", "Profit", "Total fără TVA", "TVA", "Total cu TVA"]);
+  f2.columns = [{ width: 7 }, { width: 42 }, { width: 15 }, { width: 12 }, { width: 15 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 16 }, { width: 14 }, { width: 16 }];
   const f2first = f2.rowCount + 1;
+  const chRecaps = doc.chapters.map((ch) => chapterRecap(ch, doc));
   doc.chapters.forEach((ch, ci) => {
-    const b = chapterBreakdown(ch);
-    const d = sumCM(b);
-    const i = (d * doc.overheadPct) / 100;
-    const p = ((d + i) * doc.profitPct) / 100;
-    const t = d + i + p + b.echipament;
+    const cr = chRecaps[ci];
     const row = f2.addRow([ci + 1, ch.name]);
     const n = row.number;
-    const s = subRows[ci];
-    row.getCell(3).value = f(`'F3'!L${s}-'F3'!Q${s}`, d);
-    row.getCell(4).value = f(`'F3'!Q${s}`, b.echipament);
-    row.getCell(5).value = f(`C${n}*${indPct}/100`, i);
-    row.getCell(6).value = f(`(C${n}+E${n})*${profPct}/100`, p);
-    row.getCell(7).value = f(`C${n}+D${n}+E${n}+F${n}`, t);
-    row.getCell(8).value = f(`G${n}*${vatPct}/100`, (t * doc.vatPct) / 100);
-    row.getCell(9).value = f(`G${n}+H${n}`, t * (1 + doc.vatPct / 100));
-    fmt(row, [3, 4, 5, 6, 7, 8, 9], MONEY);
+    const st = subRows[ci];
+    row.getCell(3).value = f(`'F3'!L${st}-'F3'!Q${st}`, cr.directTotal - cr.cam);
+    row.getCell(4).value = f(rnd(`'F3'!R${st}*${camPct}/100`), cr.cam);
+    row.getCell(5).value = f(`C${n}+D${n}`, cr.directTotal);
+    row.getCell(6).value = f(`'F3'!Q${st}`, cr.equipment);
+    row.getCell(7).value = f(rnd(`${doc.overheadBase === "manopera" ? `('F3'!N${st}+D${n})` : `E${n}`}*${indPct}/100`), cr.overhead);
+    row.getCell(8).value = f(rnd(`${doc.profitBase === "direct" ? `E${n}` : `(E${n}+G${n})`}*${profPct}/100`), cr.profit);
+    row.getCell(9).value = f(`E${n}+F${n}+G${n}+H${n}`, cr.totalNoVat);
+    row.getCell(10).value = f(rnd(`I${n}*${vatPct}/100`), cr.vat);
+    row.getCell(11).value = f(`I${n}+J${n}`, cr.total);
+    fmt(row, [3, 4, 5, 6, 7, 8, 9, 10, 11], MONEY);
   });
   const f2last = Math.max(f2first, f2.rowCount);
   const f2tot = f2.addRow(["", "TOTAL OBIECT"]);
-  const totals = [r.directTotal, r.equipment, r.overhead, r.profit, r.totalNoVat, r.vat, r.total];
-  for (let c = 3; c <= 9; c++) f2tot.getCell(c).value = f(`SUM(${COLS[c - 1]}${f2first}:${COLS[c - 1]}${f2last})`, totals[c - 3]);
+  const tsum = (k: (x: Recap) => number) => chRecaps.reduce((acc, x) => acc + k(x), 0);
+  const totals = [
+    tsum((x) => x.directTotal - x.cam), tsum((x) => x.cam), tsum((x) => x.directTotal), tsum((x) => x.equipment),
+    tsum((x) => x.overhead), tsum((x) => x.profit), tsum((x) => x.totalNoVat), tsum((x) => x.vat), tsum((x) => x.total),
+  ];
+  for (let c = 3; c <= 11; c++) f2tot.getCell(c).value = f(`SUM(${COLS[c - 1]}${f2first}:${COLS[c - 1]}${f2last})`, totals[c - 3]);
   f2tot.font = { bold: true };
-  fmt(f2tot, [3, 4, 5, 6, 7, 8, 9], MONEY);
+  fmt(f2tot, [3, 4, 5, 6, 7, 8, 9, 10, 11], MONEY);
+  if (PU) f2.addRow(["", "Rotunjirile pe capitole pot face ca totalul F2 să difere cu câțiva bani de Recapitulație (calculată pe total)."]);
 
   // ---------- C5–C9: liste de consumuri ----------
   const lists: [ResType, string, string][] = [

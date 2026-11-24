@@ -73,8 +73,15 @@ async function allowedResourceIds(raw: unknown, companyId: number | null): Promi
 
 async function writeResources(recipeId: number, list: RecipeResInput[], conn: Parameters<typeof execute>[2]) {
   await execute("DELETE FROM recipe_resources WHERE recipe_id = ?", [recipeId], conn);
-  const rows = list.map((r, i) => [recipeId, i, r.resourceId, r.type, r.code || null, r.name, r.unit, r.norm, r.waste, 0, r.note || null]);
-  if (rows.length) await execute("INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, note) VALUES ?", [rows], conn);
+  // Tipul tarifului manoperei se ia din catalog (decide CAM).
+  const ids = list.map((r) => r.resourceId).filter((x): x is number => !!x);
+  const kinds = new Map(
+    (ids.length ? await query<{ id: number; tariff_kind: string | null }>("SELECT id, tariff_kind FROM resources WHERE id IN (?)", [ids], conn) : [])
+      .map((x) => [x.id, x.tariff_kind]),
+  );
+  const rows = list.map((r, i) => [recipeId, i, r.resourceId, r.type, r.code || null, r.name, r.unit, r.norm, r.waste, 0,
+    r.type === "manopera" && r.resourceId ? (kinds.get(r.resourceId) ?? null) : null, r.note || null]);
+  if (rows.length) await execute("INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, tariff_kind, note) VALUES ?", [rows], conn);
 }
 
 /**
@@ -206,9 +213,9 @@ export async function duplicateRecipeAction(data: FormData): Promise<void> {
       [companyId, name, normKey(name, src.unit), userId, id], conn,
     );
     await execute(
-      `INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, note)
+      `INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, tariff_kind, note)
        SELECT ?, rr.position, CASE WHEN res.company_id IS NULL OR res.company_id <=> ? THEN rr.resource_id ELSE NULL END,
-              rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.waste_pct, rr.price, rr.note
+              rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.waste_pct, rr.price, rr.tariff_kind, rr.note
          FROM recipe_resources rr LEFT JOIN resources res ON res.id = rr.resource_id WHERE rr.recipe_id = ?`,
       [ins.insertId, companyId ?? -1, id], conn,
     );
@@ -253,8 +260,8 @@ export async function promoteRecipeAction(data: FormData): Promise<void> {
     );
     // Resursele private ale firmei nu intră în catalogul global: rămân ca text (fără legătură), de înlocuit cu resurse din catalog.
     await execute(
-      `INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, note)
-       SELECT ?, rr.position, CASE WHEN res.company_id IS NULL THEN rr.resource_id ELSE NULL END, rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.waste_pct, 0, rr.note
+      `INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, tariff_kind, note)
+       SELECT ?, rr.position, CASE WHEN res.company_id IS NULL THEN rr.resource_id ELSE NULL END, rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.waste_pct, 0, rr.tariff_kind, rr.note
          FROM recipe_resources rr LEFT JOIN resources res ON res.id = rr.resource_id WHERE rr.recipe_id = ?`,
       [ins.insertId, id], conn,
     );

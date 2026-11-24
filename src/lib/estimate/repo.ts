@@ -1,7 +1,11 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { execute, query, queryOne, transaction } from "../db";
-import { RES_TYPES, type EstimateDoc, type EstResource, type ResType } from "./types";
+import {
+  RES_TYPES, type EstimateDoc, type EstResource, type OverheadBase, type ProfitBase, type ResType, type RoundingMode, type TariffKind,
+} from "./types";
+
+const TARIFFS: TariffKind[] = ["cost_salarial", "echipa", "comercial"];
 
 const k = () => randomUUID();
 
@@ -9,9 +13,11 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
   const est = await queryOne<{
     id: number; name: string; project_id: number; project_name: string;
     overhead_pct: string; profit_pct: string; vat_pct: string; start_date: Date | string | null; hours_per_day: string;
+    cam_pct: string; overhead_base: OverheadBase; profit_base: ProfitBase; rounding_mode: RoundingMode; rules_date: string | null;
   }>(
     `SELECT e.id, e.name, e.project_id, p.name AS project_name, e.overhead_pct, e.profit_pct, e.vat_pct,
-            DATE_FORMAT(e.start_date, '%Y-%m-%d') AS start_date, e.hours_per_day
+            DATE_FORMAT(e.start_date, '%Y-%m-%d') AS start_date, e.hours_per_day,
+            e.cam_pct, e.overhead_base, e.profit_base, e.rounding_mode, DATE_FORMAT(e.rules_date, '%Y-%m-%d') AS rules_date
        FROM estimates e JOIN projects p ON p.id = e.project_id
       WHERE e.id = ? AND e.company_id = ?`,
     [id, companyId],
@@ -30,9 +36,9 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
   );
   const res = await query<{
     item_id: number; resource_id: number | null; type: ResType; code: string | null;
-    name: string; unit: string; norm: string; waste_pct: string; price: string;
+    name: string; unit: string; norm: string; waste_pct: string; price: string; tariff_kind: TariffKind | null;
   }>(
-    `SELECT r.item_id, r.resource_id, r.type, r.code, r.name, r.unit, r.norm, r.waste_pct, r.price
+    `SELECT r.item_id, r.resource_id, r.type, r.code, r.name, r.unit, r.norm, r.waste_pct, r.price, r.tariff_kind
        FROM estimate_item_resources r
        JOIN estimate_items i ON i.id = r.item_id
        JOIN estimate_chapters c ON c.id = i.chapter_id
@@ -45,7 +51,7 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
     const list = resByItem.get(r.item_id) ?? [];
     list.push({
       key: k(), resourceId: r.resource_id, type: r.type, code: r.code ?? "", name: r.name,
-      unit: r.unit, norm: Number(r.norm), waste: Number(r.waste_pct), price: Number(r.price),
+      unit: r.unit, norm: Number(r.norm), waste: Number(r.waste_pct), price: Number(r.price), tariffKind: r.tariff_kind,
     });
     resByItem.set(r.item_id, list);
   }
@@ -58,6 +64,11 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
     overheadPct: Number(est.overhead_pct),
     profitPct: Number(est.profit_pct),
     vatPct: Number(est.vat_pct),
+    camPct: Number(est.cam_pct),
+    overheadBase: est.overhead_base,
+    profitBase: est.profit_base,
+    rounding: est.rounding_mode,
+    rulesDate: est.rules_date,
     startDate: est.start_date ? String(est.start_date) : null,
     hoursPerDay: Number(est.hours_per_day),
     chapters: chapters.map((c) => ({
@@ -96,9 +107,12 @@ export async function saveEstimate(doc: EstimateDoc, companyId: number): Promise
     if (!owned) throw new Error("Devizul nu există.");
 
     await execute(
-      "UPDATE estimates SET name = ?, overhead_pct = ?, profit_pct = ?, vat_pct = ?, start_date = ?, hours_per_day = ? WHERE id = ?",
+      `UPDATE estimates SET name = ?, overhead_pct = ?, profit_pct = ?, vat_pct = ?, cam_pct = ?, overhead_base = ?, profit_base = ?, rounding_mode = ?,
+         start_date = ?, hours_per_day = ? WHERE id = ?`,
       [
-        txt(doc.name, 190) || "Deviz", num(doc.overheadPct, 0, 1000), num(doc.profitPct, 0, 1000), num(doc.vatPct, 0, 100),
+        txt(doc.name, 190) || "Deviz", num(doc.overheadPct, 0, 1000), num(doc.profitPct, 0, 1000), num(doc.vatPct, 0, 100), num(doc.camPct, 0, 100),
+        doc.overheadBase === "manopera" ? "manopera" : "direct", doc.profitBase === "direct" ? "direct" : "direct_indirecte",
+        doc.rounding === "pret_unitar" ? "pret_unitar" : "final",
         doc.startDate && /^\d{4}-\d{2}-\d{2}$/.test(doc.startDate) ? doc.startDate : null, num(doc.hoursPerDay, 1, 24) || 8, doc.id,
       ],
       conn,
@@ -127,10 +141,11 @@ export async function saveEstimate(doc: EstimateDoc, companyId: number): Promise
             i.insertId, ri, r.resourceId && Number.isInteger(r.resourceId) ? r.resourceId : null, r.type,
             txt(r.code, 40) || null, txt(r.name, 255) || "Resursă", txt(r.unit, 20) || "buc",
             num(r.norm, 0), Math.min(100, Math.max(0, num(r.waste, 0))), num(r.price, 0),
+            r.type === "manopera" && TARIFFS.includes(r.tariffKind as TariffKind) ? r.tariffKind : null,
           ]);
         if (rows.length) {
           await execute(
-            "INSERT INTO estimate_item_resources (item_id, position, resource_id, type, code, name, unit, norm, waste_pct, price) VALUES ?",
+            "INSERT INTO estimate_item_resources (item_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, tariff_kind) VALUES ?",
             [rows],
             conn,
           );

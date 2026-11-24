@@ -125,7 +125,7 @@ export async function updatePlanAction(_: FormState, data: FormData): Promise<Fo
 export async function updateSettingsAction(_: FormState, data: FormData): Promise<FormState> {
   const admin = await requireAdmin();
   const limits: Record<keyof Settings, [number, number]> = {
-    trial_days: [0, 365], default_overhead_pct: [0, 100], default_profit_pct: [0, 100], default_vat_pct: [0, 100],
+    trial_days: [0, 365],
     ai_monthly_requests: [0, 100000], ai_price_input_per_mtok: [0, 1000], ai_price_output_per_mtok: [0, 1000],
   };
   const values: Partial<Settings> = {};

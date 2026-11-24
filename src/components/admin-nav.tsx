@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/admin/resurse", label: "Materiale & Prețuri" },
   { href: "/admin/manopera", label: "Manoperă & Utilaje" },
   { href: "/admin/retete", label: "Articole & Norme" },
+  { href: "/admin/reguli", label: "Reguli de calcul" },
   { href: "/admin/sabloane", label: "Șabloane documente" },
   { href: "/admin/ai", label: "Asistent AI" },
   { href: "/admin/pagini", label: "Pagini" },

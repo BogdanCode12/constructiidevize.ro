@@ -21,6 +21,16 @@ export const RES_TYPE_PLURAL: Record<ResType, string> = {
   echipament: "Echipamente",
 };
 
+export type OverheadBase = "direct" | "manopera";
+export type ProfitBase = "direct_indirecte" | "direct";
+export type RoundingMode = "final" | "pret_unitar";
+export const OVERHEAD_BASE_LABEL: Record<OverheadBase, string> = { direct: "% din costul direct C+M", manopera: "% din manoperă (inclusiv CAM)" };
+export const PROFIT_BASE_LABEL: Record<ProfitBase, string> = { direct_indirecte: "% din direct + indirecte", direct: "% din costul direct" };
+export const ROUNDING_LABEL: Record<RoundingMode, string> = {
+  final: "Fără rotunjiri intermediare (doar la afișare)",
+  pret_unitar: "Prețul unitar pe categorii rotunjit la 2 zecimale (ca în F3)",
+};
+
 export type ResStatus = "neverificat" | "verificat" | "inactiv";
 export type TariffKind = "cost_salarial" | "echipa" | "comercial";
 export type PriceSource = "manual" | "import" | "oferta_furnizor" | "negociat";
@@ -116,6 +126,8 @@ export type EstResource = {
   /** Pierderi tehnologice (%), separat de consum: consum efectiv = norm × (1 + waste/100). */
   waste: number;
   price: number;
+  /** La manoperă: tipul tarifului (copiat din catalog). CAM se aplică doar pe „cost_salarial”. */
+  tariffKind?: TariffKind | null;
 };
 
 export type EstItem = {
@@ -147,6 +159,16 @@ export type EstimateDoc = {
   overheadPct: number;
   profitPct: number;
   vatPct: number;
+  /** CAM (%), aplicat doar pe manopera cu tarif „cost salarial”. */
+  camPct: number;
+  /** Baza cheltuielilor indirecte: costul direct C+M sau doar manopera (+CAM). */
+  overheadBase: OverheadBase;
+  /** Baza profitului: direct + indirecte sau doar directul. */
+  profitBase: ProfitBase;
+  /** „final” = fără rotunjiri intermediare; „pret_unitar” = prețul unitar pe categorii rotunjit la 2 zecimale. */
+  rounding: RoundingMode;
+  /** Data regulilor (TVA, CAM, procente) cu care a fost creat devizul. */
+  rulesDate: string | null;
   startDate: string | null;
   hoursPerDay: number;
   chapters: EstChapter[];

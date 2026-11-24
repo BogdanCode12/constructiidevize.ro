@@ -2,7 +2,7 @@ import "server-only";
 import ExcelJS from "exceljs";
 import { execute, query, queryOne, transaction } from "../db";
 import { loadEstimate } from "../estimate/repo";
-import { itemUnitBreakdown, recap, sumCM } from "../estimate/calc";
+import { offerUnitPriceOf, recap, type RecapCfg } from "../estimate/calc";
 import { normKey, normText } from "../estimate/normalize";
 import type { EstimateDoc, EstItem } from "../estimate/types";
 
@@ -16,10 +16,9 @@ export type SituationStatus = keyof typeof SITUATION_STATUS;
 export const itemKey = (chapter: string, code: string | null, name: string, unit: string, occurrence = 0) =>
   `${normText(chapter).slice(0, 60)}|${(code ?? "").trim().toLowerCase()}|${normKey(name, unit)}#${occurrence}`.slice(0, 300);
 
-/** Prețul unitar de ofertă: cost direct C+M cu indirecte și profit, plus echipamentele (fără TVA). */
-export function offerUnitPrice(item: EstItem, doc: Pick<EstimateDoc, "overheadPct" | "profitPct">): number {
-  const b = itemUnitBreakdown(item);
-  return sumCM(b) * (1 + doc.overheadPct / 100) * (1 + doc.profitPct / 100) + b.echipament;
+/** Prețul unitar de ofertă: cost direct C+M (cu CAM), cu indirecte și profit după regulile devizului, plus echipamentele (fără TVA). */
+export function offerUnitPrice(item: EstItem, doc: RecapCfg): number {
+  return offerUnitPriceOf(item, doc);
 }
 
 export async function createSituation(companyId: number, projectId: number, estimateId: number, userId: number): Promise<number> {

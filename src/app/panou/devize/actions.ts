@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { execute, queryOne } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { logActivity } from "@/lib/activity";
-import { getSettings } from "@/lib/settings";
+import { estimateDefaults } from "@/lib/rules";
 import { saveEstimate } from "@/lib/estimate/repo";
 import type { EstimateDoc } from "@/lib/estimate/types";
 import type { FormState } from "@/components/action-form";
@@ -30,10 +30,12 @@ export async function createEstimateAction(_: FormState, data: FormData): Promis
   const project = await queryOne<{ id: number }>("SELECT id FROM projects WHERE id = ? AND company_id = ?", [projectId, companyId]);
   if (!project) return { error: "Alege un proiect." };
 
-  const s = await getSettings();
+  // Regulile valabile azi se copiază în deviz; nu se mai schimbă dacă se modifică ulterior în admin.
+  const d = await estimateDefaults();
   const res = await execute(
-    "INSERT INTO estimates (company_id, project_id, name, overhead_pct, profit_pct, vat_pct, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [companyId, projectId, name, s.default_overhead_pct, s.default_profit_pct, s.default_vat_pct, user.id],
+    `INSERT INTO estimates (company_id, project_id, name, overhead_pct, profit_pct, vat_pct, cam_pct, overhead_base, profit_base, rounding_mode, rules_date, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [companyId, projectId, name, d.overheadPct, d.profitPct, d.vatPct, d.camPct, d.overheadBase, d.profitBase, d.rounding, d.rulesDate, user.id],
   );
   await execute("INSERT INTO estimate_chapters (estimate_id, position, name) VALUES (?, 0, 'Capitolul 1')", [res.insertId]);
   await logActivity({ companyId, userId: user.id, action: "deviz.creat", details: { id: res.insertId, name } });
