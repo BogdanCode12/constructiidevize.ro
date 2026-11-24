@@ -34,31 +34,35 @@ export default async function HomePage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/hero-building.webp" srcSet="/brand/hero-building-960.webp 960w, /brand/hero-building.webp 1672w"
           sizes="(min-width: 1024px) 75vw, 100vw" alt="" aria-hidden fetchPriority="high"
-          className="hero-zoom pointer-events-none absolute top-0 right-0 -z-10 h-full w-full object-cover object-[70%_center] lg:w-[76%] lg:object-center" />
-        {/* textul stă pe alb, iar clădirea se pierde treptat în fundal */}
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,#fff_0%,#fff_30%,rgba(255,255,255,.86)_46%,rgba(255,255,255,0)_70%)] max-lg:bg-[linear-gradient(180deg,#fff_0%,rgba(255,255,255,.92)_55%,rgba(255,255,255,.55)_100%)]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-white to-transparent" />
+          className="hero-zoom pointer-events-none absolute top-0 right-0 -z-10 hidden h-full w-[76%] object-cover object-center lg:block" />
+        {/* pe ecrane mari: textul stă pe alb, iar clădirea se pierde treptat în fundal */}
+        <div className="pointer-events-none absolute inset-0 -z-10 hidden bg-[linear-gradient(90deg,#fff_0%,#fff_30%,rgba(255,255,255,.86)_46%,rgba(255,255,255,0)_70%)] lg:block" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 hidden h-40 bg-gradient-to-t from-white to-transparent lg:block" />
 
-        <div className="relative mx-auto grid min-h-[640px] max-w-7xl items-center gap-10 px-4 pt-14 pb-20 sm:px-6 lg:min-h-[720px] lg:grid-cols-[1.05fr_1fr] lg:pt-16">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pt-10 pb-6 sm:px-6 sm:pt-14 lg:min-h-[720px] lg:grid-cols-[1.05fr_1fr] lg:pt-16 lg:pb-20">
           <div className="animate-rise">
-            <h1 className="text-4xl leading-[1.06] font-semibold tracking-[-0.03em] text-ink sm:text-5xl lg:text-[3.7rem]">
+            <h1 className="text-[2.1rem] leading-[1.08] font-semibold tracking-[-0.03em] text-ink sm:text-5xl lg:text-[3.7rem]">
               {hero?.title ?? "Devize corecte. Dosare complete. Lucrări sub control."}
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{hero?.body}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/inregistrare" className="rounded-lg bg-brand-700 px-6 py-3.5 font-semibold text-white shadow-[0_10px_30px_-10px_rgba(199,19,25,.6)] transition hover:bg-brand-800">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">{hero?.body}</p>
+            <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
+              <Link href="/inregistrare" className="rounded-lg bg-brand-700 px-6 py-3.5 text-center font-semibold text-white shadow-[0_10px_30px_-10px_rgba(199,19,25,.6)] transition hover:bg-brand-800">
                 Începe gratuit {trial_days} zile
               </Link>
-              <Link href="/servicii" className="rounded-lg border border-ink/15 bg-white px-6 py-3.5 font-semibold text-ink transition hover:border-ink/40">
+              <Link href="/servicii" className="rounded-lg border border-ink/15 bg-white px-6 py-3.5 text-center font-semibold text-ink transition hover:border-ink/40">
                 Vezi serviciile
               </Link>
             </div>
-            <ul className="mt-8 grid max-w-xl gap-2 text-sm text-muted sm:grid-cols-2">
+            <ul className="mt-7 grid max-w-xl gap-2 text-sm text-muted sm:mt-8 sm:grid-cols-2">
               {["Fără card la înscriere", "Excel cu formule verificabile", "Formulare F1–F5 și C5–C9", "Datele firmei din ANAF, automat"].map((t) => (
                 <li key={t} className="flex items-center gap-2"><Check /> {t}</li>
               ))}
             </ul>
           </div>
+          {/* pe telefon și tabletă: clădirea întreagă, sub text, ieșind lin din alb */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/hero-building-960.webp" alt="" aria-hidden
+            className="-mx-4 w-[calc(100%+2rem)] max-w-none object-cover sm:-mx-6 sm:w-[calc(100%+3rem)] lg:hidden [mask-image:linear-gradient(180deg,transparent_0%,#000_22%,#000_80%,transparent_100%)]" />
         </div>
       </section>
 
