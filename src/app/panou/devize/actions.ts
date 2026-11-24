@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { execute, queryOne } from "@/lib/db";
+import { execute, query, queryOne } from "@/lib/db";
 import { requireUser } from "@/lib/auth/session";
 import { logActivity } from "@/lib/activity";
 import { estimateDefaults } from "@/lib/rules";
@@ -15,7 +15,8 @@ import { parseF3Text, parseF3Xlsx } from "@/lib/estimate/f3";
 import { aiConfigured } from "@/lib/ai/claude";
 import { monthlyUsage } from "@/lib/ai/jobs";
 import { runEstimatorJob, type EstimatorInput, type EstimatorProposal } from "@/lib/ai/estimator";
-import type { EstItem } from "@/lib/estimate/types";
+import type { CatalogResource, EstItem, PriceOffer } from "@/lib/estimate/types";
+import { effectivePrices, isExpired, listOffers } from "@/lib/resources/repo";
 
 async function companyOf() {
   const user = await requireUser();
@@ -153,3 +154,50 @@ export async function estimatorJobAction(jobId: number): Promise<{ status: strin
   return { status: job.status, error: job.error ?? undefined };
 }
 
+
+export type OfferBrief = {
+  id: number; resourceId: number; supplier: string | null; priceRon: number; obtainedAt: string; validUntil: string | null; expired: boolean;
+  status: "neverificat" | "verificat" | "inactiv"; transportIncluded: boolean | null; source: string; own: boolean;
+};
+
+/**
+ * Sursele prețurilor din deviz: starea actuală din catalog a resurselor legate (prețul aplicabil firmei)
+ * și detaliile ofertelor cu care au fost preluate prețurile (valabilitate, status, furnizor).
+ * Doar resursele și ofertele vizibile firmei.
+ */
+export async function priceSourcesAction(resourceIds: number[], offerIds: number[]): Promise<{
+  resources: Record<number, CatalogResource>; offers: Record<number, OfferBrief>;
+}> {
+  const { companyId } = await companyOf();
+  const rids = [...new Set(resourceIds.filter((n) => Number.isInteger(n) && n > 0))].slice(0, 2000);
+  const oids = [...new Set(offerIds.filter((n) => Number.isInteger(n) && n > 0))].slice(0, 2000);
+  const res = await effectivePrices(companyId, rids);
+  const offers: Record<number, OfferBrief> = {};
+  if (oids.length) {
+    const rows = await query<{
+      id: number; resource_id: number; company_id: number | null; supplier: string | null; price_ron: string; obtained_at: Date; valid_until: Date | null;
+      status: OfferBrief["status"]; transport_included: number | null; source: string;
+    }>(
+      `SELECT p.id, p.resource_id, p.company_id, p.supplier, p.price_ron, p.obtained_at, p.valid_until, p.status, p.transport_included, p.source
+         FROM resource_prices p JOIN resources r ON r.id = p.resource_id
+        WHERE p.id IN (?) AND (p.company_id IS NULL OR p.company_id = ?) AND (r.company_id IS NULL OR r.company_id = ?)`,
+      [oids, companyId, companyId],
+    );
+    const ymd = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : null);
+    for (const o of rows) {
+      const valid = ymd(o.valid_until);
+      offers[o.id] = {
+        id: o.id, resourceId: o.resource_id, supplier: o.supplier, priceRon: Number(o.price_ron), obtainedAt: ymd(o.obtained_at)!, validUntil: valid,
+        expired: isExpired(valid), status: o.status, transportIncluded: o.transport_included === null ? null : o.transport_included === 1,
+        source: o.source, own: o.company_id === companyId,
+      };
+    }
+  }
+  return { resources: Object.fromEntries(res), offers };
+}
+
+/** Toate ofertele active ale unei resurse vizibile firmei (catalog + prețurile proprii), pentru comparație. */
+export async function resourceOffersAction(resourceId: number): Promise<PriceOffer[]> {
+  const { companyId } = await companyOf();
+  return (await listOffers(resourceId, companyId)).filter((o) => o.status !== "inactiv");
+}

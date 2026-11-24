@@ -41,8 +41,9 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
   const res = await query<{
     item_id: number; resource_id: number | null; type: ResType; code: string | null;
     name: string; unit: string; norm: string; waste_pct: string; price: string; tariff_kind: TariffKind | null;
+    price_offer_id: number | null; price_manual: number;
   }>(
-    `SELECT r.item_id, r.resource_id, r.type, r.code, r.name, r.unit, r.norm, r.waste_pct, r.price, r.tariff_kind
+    `SELECT r.item_id, r.resource_id, r.type, r.code, r.name, r.unit, r.norm, r.waste_pct, r.price, r.tariff_kind, r.price_offer_id, r.price_manual
        FROM estimate_item_resources r
        JOIN estimate_items i ON i.id = r.item_id
        JOIN estimate_chapters c ON c.id = i.chapter_id
@@ -56,6 +57,7 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
     list.push({
       key: k(), resourceId: r.resource_id, type: r.type, code: r.code ?? "", name: r.name,
       unit: r.unit, norm: Number(r.norm), waste: Number(r.waste_pct), price: Number(r.price), tariffKind: r.tariff_kind,
+      offerId: r.price_offer_id, priceManual: r.price_manual === 1,
     });
     resByItem.set(r.item_id, list);
   }
@@ -153,10 +155,11 @@ export async function saveEstimate(doc: EstimateDoc, companyId: number): Promise
             txt(r.code, 40) || null, txt(r.name, 255) || "Resursă", txt(r.unit, 20) || "buc",
             num(r.norm, 0), Math.min(100, Math.max(0, num(r.waste, 0))), num(r.price, 0),
             r.type === "manopera" && TARIFFS.includes(r.tariffKind as TariffKind) ? r.tariffKind : null,
+            r.offerId && Number.isInteger(r.offerId) && !r.priceManual ? r.offerId : null, r.priceManual ? 1 : 0,
           ]);
         if (rows.length) {
           await execute(
-            "INSERT INTO estimate_item_resources (item_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, tariff_kind) VALUES ?",
+            "INSERT INTO estimate_item_resources (item_id, position, resource_id, type, code, name, unit, norm, waste_pct, price, tariff_kind, price_offer_id, price_manual) VALUES ?",
             [rows],
             conn,
           );

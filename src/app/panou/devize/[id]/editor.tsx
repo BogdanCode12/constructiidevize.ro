@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { saveEstimateAction, deleteEstimateAction, estimatorJobAction, saveRecipeAction, startEstimatorAction } from "../actions";
 import { cellCls, ImportDialog, newKey, NumInput, RecipePicker, ResourcePicker } from "./parts";
+import { QuantityBlock } from "./quantity-block";
 import { Simulator } from "./simulator";
 import { Gantt } from "./gantt";
 import { checkEstimate, type Issue } from "@/lib/estimate/checks";
@@ -555,7 +556,7 @@ function ItemRows({
                       <td className="px-1 py-0.5"><input value={res.unit} onChange={(e) => onRes(ri, (x) => ({ ...x, unit: e.target.value }))} className={cellCls} /></td>
                       <td className="px-1 py-0.5"><NumInput value={res.norm} onChange={(n) => onRes(ri, (x) => ({ ...x, norm: n ?? 0 }))} /></td>
                       <td className="px-1 py-0.5"><NumInput value={res.waste} onChange={(n) => onRes(ri, (x) => ({ ...x, waste: Math.min(100, Math.max(0, n ?? 0)) }))} /></td>
-                      <td className="px-1 py-0.5"><NumInput value={res.price} onChange={(n) => onRes(ri, (x) => ({ ...x, price: n ?? 0 }))} /></td>
+                      <td className="px-1 py-0.5"><NumInput value={res.price} onChange={(n) => onRes(ri, (x) => ({ ...x, price: n ?? 0, priceManual: true, offerId: null }))} /></td>
                       <td className="px-2 py-0.5 text-right tabular-nums">{fmtMoney(effNorm(res) * res.price)}</td>
                       <td className="px-1 text-center">
                         <button title="Elimină" onClick={() => onItem((it) => ({ ...it, resources: it.resources.filter((_, i) => i !== ri) }))} className="text-red-700">✕</button>
@@ -569,7 +570,7 @@ function ItemRows({
               </table>
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-3 py-2.5">
                 <ResourcePicker
-                  onPick={(c) => addRes({ resourceId: c.id, type: c.type, code: c.code ?? "", name: c.name, unit: c.unit, norm: 1, waste: 0, price: c.price ?? 0, tariffKind: c.tariffKind })}
+                  onPick={(c) => addRes({ resourceId: c.id, type: c.type, code: c.code ?? "", name: c.name, unit: c.unit, norm: 1, waste: 0, price: c.price ?? 0, tariffKind: c.tariffKind, offerId: c.priceInfo?.offerId ?? null })}
                   onManual={(t) => addRes({ resourceId: null, type: t, code: "", name: "", unit: t === "material" || t === "echipament" ? "buc" : "ora", norm: 1, waste: 0, price: 0 })}
                 />
                 <div className="flex flex-wrap gap-3 text-muted">
@@ -583,46 +584,5 @@ function ItemRows({
         </tr>
       )}
     </>
-  );
-}
-
-/** „Cum s-a calculat?” — formula cantității, dimensiunile cu sursa lor, ipotezele și marcajul de estimare. */
-function QuantityBlock({ item, onItem }: { item: EstItem; onItem: (fn: (it: EstItem) => EstItem) => void }) {
-  const f = item.qtyFormula ?? "";
-  const r = f.trim() ? evalFormula(f) : null;
-  return (
-    <div className="mb-2 rounded-lg border border-line bg-white p-3 text-sm">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold">Cantitatea — cum s-a calculat</span>
-        <span className="text-xs text-muted">ex. 30[lungime gard] × 0,40[lățime] × 0,80[adâncime]</span>
-      </div>
-      <div className="mt-2 grid gap-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <input value={f} placeholder="Formula (opțional): dimensiuni × … , cu sursa între [ ]"
-          onChange={(e) => {
-            const v = e.target.value;
-            const res = v.trim() ? evalFormula(v) : null;
-            onItem((it) => ({ ...it, qtyFormula: v || null, quantity: res?.ok ? res.value : it.quantity }));
-          }}
-          className={`${cellCls} border-ink/15 font-mono ${r && !r.ok ? "border-red-400" : ""}`} />
-        <input value={item.qtyNote ?? ""} placeholder="Sursa datelor / ipoteze (ex. planșa A-02; adâncimea din studiul geo)"
-          onChange={(e) => onItem((it) => ({ ...it, qtyNote: e.target.value || null }))} className={`${cellCls} border-ink/15`} />
-      </div>
-      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-        {r?.ok && (
-          <span className="tabular-nums">
-            {r.pretty} = <b>{fmtQty(r.value)} {item.unit}</b>
-            {r.dims.some((d) => d.label) && (
-              <span className="ml-2 text-xs text-muted">({r.dims.filter((d) => d.label).map((d) => `${fmtQty(d.value)} = ${d.label}`).join("; ")})</span>
-            )}
-          </span>
-        )}
-        {r && !r.ok && <span className="text-red-700">{r.error}</span>}
-        {!r && <span className="text-xs text-muted">Fără formulă: cantitatea e introdusă direct (din F3 sau manual).</span>}
-        <label className="ml-auto flex items-center gap-1.5 text-xs">
-          <input type="checkbox" checked={!!item.qtyEstimated} onChange={(e) => onItem((it) => ({ ...it, qtyEstimated: e.target.checked }))} className="size-3.5 accent-brand-700" />
-          Cantitate estimată — necesită verificare
-        </label>
-      </div>
-    </div>
   );
 }

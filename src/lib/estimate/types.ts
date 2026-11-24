@@ -128,6 +128,10 @@ export type EstResource = {
   price: number;
   /** La manoperă: tipul tarifului (copiat din catalog). CAM se aplică doar pe „cost_salarial”. */
   tariffKind?: TariffKind | null;
+  /** Oferta din catalog cu care a fost preluat prețul (pentru valabilitate / status). */
+  offerId?: number | null;
+  /** Preț introdus manual în deviz (nu se actualizează automat din catalog). */
+  priceManual?: boolean;
 };
 
 export type EstItem = {

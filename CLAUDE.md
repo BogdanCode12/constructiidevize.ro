@@ -64,6 +64,11 @@ Făcut:
 - **Pct. 5:** efort configurabil, cost estimat în /admin/ai (prețuri în Setări), opțiunea `send_originals` pe sarcină.
 - **Pct. 6:** chat-ul trimite textul extras; la documente mari, doar fragmentele relevante pentru ultima întrebare.
 
+Motor profesional (Etapa 1 din promptul proprietarului), făcut: catalog cu oferte/istoric/status (sql 024),
+Articole & Norme cu versiuni și pierderi (025), Reguli de calcul TVA/CAM/indirecte/profit + șablon recapitulație (026),
+formula cantității (027), sursa prețului în deviz (028). Rămase: panoul lateral din editor (alegere ofertă, actualizare prețuri
+cu diferențe), verificatorul cu 3 niveluri, teste automate (există teste de lucru în .tmp-tests/, neversionate).
+
 De făcut: Batch API pentru devize mari; reglarea instrucțiunilor și a pragurilor de asemănare pe date reale (necesită cheie API).
 Notă: tool runner-ul din SDK folosește automat message threads (beta `message-threads-2026-08-12`).
 

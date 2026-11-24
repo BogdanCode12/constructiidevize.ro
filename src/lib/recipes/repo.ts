@@ -81,6 +81,7 @@ async function recipeResources(companyId: number, recipeIds: number[]): Promise<
       waste: Number(x.waste_pct),
       price: c ? (c.price ?? 0) : Number(x.price),
       tariffKind: x.type === "manopera" ? (c ? c.tariffKind : x.tariff_kind) : null,
+      offerId: c?.priceInfo?.offerId ?? null,
     });
     map.set(x.recipe_id, list);
   }
@@ -199,6 +200,7 @@ export async function refreshPrices(companyId: number, res: EstResource[]): Prom
     return {
       ...r, key: randomUUID(), resourceId: c ? r.resourceId : null, waste: r.waste ?? 0,
       tariffKind: r.type === "manopera" ? (c ? c.tariffKind : (r.tariffKind ?? null)) : null,
+      offerId: c ? (c.priceInfo?.offerId ?? null) : (r.offerId ?? null), priceManual: false,
       price: c ? (c.price ?? 0) : r.price, name: c?.name ?? r.name, unit: c?.unit ?? r.unit, code: c?.code ?? r.code,
     };
   });
