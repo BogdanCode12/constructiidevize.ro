@@ -43,7 +43,7 @@ body {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
-/* Ilustrația din panou (bloc în construcție): rulează o dată (~5 s) și din nou la trecerea mouse-ului. */
+/* Ilustrația din panou (bloc în construcție): rulează o singură dată (~5 s), la încărcarea paginii. */
 @keyframes bGhost { from { opacity: 0; } to { opacity: .22; } }
 @keyframes bBuild { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes bFinish { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
