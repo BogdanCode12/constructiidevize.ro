@@ -5,6 +5,7 @@ import {
   recap, sum, type Recap,
 } from "./calc";
 import { RES_TYPE_LABEL, RES_TYPES, type EstimateDoc, type ResType } from "./types";
+import { evalFormula } from "./formula";
 
 /*
  * Export Excel cu formule verificabile:
@@ -125,16 +126,17 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
   rc.addRow([]);
 
   // ---------- F3: lista cantităților de lucrări ----------
-  titleBlock(f3, "Formular F3 — Lista cu cantitățile de lucrări (cost direct pe articole)", lines, 18);
+  titleBlock(f3, "Formular F3 — Lista cu cantitățile de lucrări (cost direct pe articole)", lines, 19);
   headerRow(f3, [
     "Nr.", "Cod", "Denumire articol", "U.M.", "Cantitate",
     "Material / UM", "Manoperă / UM", "Utilaj / UM", "Transport / UM", "Echipament / UM", "Preț unitar", "Valoare",
     "Val. material", "Val. manoperă", "Val. utilaj", "Val. transport", "Val. echipament", "Bază CAM (manoperă cost salarial)",
+    "Calculul cantității (sursă, ipoteze)",
   ]);
   f3.columns = [
     { width: 7 }, { width: 11 }, { width: 50 }, { width: 7 }, { width: 11 },
     { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 15 },
-    { width: 13 }, { width: 13 }, { width: 13 }, { width: 13 }, { width: 13 }, { width: 15 },
+    { width: 13 }, { width: 13 }, { width: 13 }, { width: 13 }, { width: 13 }, { width: 15 }, { width: 48 },
   ];
   const subRows: number[] = [];
   doc.chapters.forEach((ch, ci) => {
@@ -147,6 +149,19 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
       const refs = unitRefs.get(it.key)!;
       const row = f3.addRow([`${ci + 1}.${ii + 1}`, it.code, it.name, it.unit, it.quantity]);
       const n = row.number;
+      // Cantitatea calculată dintr-o formulă se scrie ca formulă Excel (verificabilă), cu sursa dimensiunilor alături.
+      const fr = it.qtyFormula ? evalFormula(it.qtyFormula) : null;
+      if (fr?.ok) row.getCell(5).value = f(fr.excel, it.quantity);
+      const how = [
+        fr?.ok ? `${fr.pretty} = ${it.quantity} ${it.unit}` : "",
+        fr?.ok ? fr.dims.filter((d) => d.label).map((d) => `${d.value} = ${d.label}`).join("; ") : "",
+        it.qtyNote ?? "",
+        it.qtyEstimated ? "CANTITATE ESTIMATĂ — necesită verificare" : "",
+      ].filter(Boolean).join(" · ");
+      if (how) {
+        row.getCell(19).value = how;
+        row.getCell(19).alignment = { wrapText: true, vertical: "top" };
+      }
       RES_TYPES.forEach((type, k) => (row.getCell(6 + k).value = f(rnd(refs[type]), ub[type])));
       row.getCell(11).value = f(`SUM(F${n}:J${n})`, sum(ub));
       row.getCell(12).value = f(`SUM(M${n}:Q${n})`, sum(vb));

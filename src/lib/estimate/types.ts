@@ -136,6 +136,12 @@ export type EstItem = {
   name: string;
   unit: string;
   quantity: number;
+  /** Formula cantității (ex. „30[lungime] × 0,40 × 0,80”); când există, cantitatea se calculează din ea. */
+  qtyFormula?: string | null;
+  /** Sursa dimensiunilor și ipotezele folosite. */
+  qtyNote?: string | null;
+  /** Cantitate estimată (date insuficiente) — necesită verificare. */
+  qtyEstimated?: boolean;
   /** Notă „de verificat” pusă de import / AI; dispare când utilizatorul confirmă. */
   reviewNote: string | null;
   resources: EstResource[];

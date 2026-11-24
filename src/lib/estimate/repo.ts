@@ -1,4 +1,5 @@
 import "server-only";
+import { evalFormula } from "./formula";
 import { randomUUID } from "node:crypto";
 import { execute, query, queryOne, transaction } from "../db";
 import {
@@ -28,8 +29,11 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
     "SELECT id, name, team_size, start_day FROM estimate_chapters WHERE estimate_id = ? ORDER BY position, id",
     [id],
   );
-  const items = await query<{ id: number; chapter_id: number; code: string | null; name: string; unit: string; quantity: string; review_note: string | null }>(
-    `SELECT i.id, i.chapter_id, i.code, i.name, i.unit, i.quantity, i.review_note
+  const items = await query<{
+    id: number; chapter_id: number; code: string | null; name: string; unit: string; quantity: string; review_note: string | null;
+    qty_formula: string | null; qty_note: string | null; qty_estimated: number;
+  }>(
+    `SELECT i.id, i.chapter_id, i.code, i.name, i.unit, i.quantity, i.review_note, i.qty_formula, i.qty_note, i.qty_estimated
        FROM estimate_items i JOIN estimate_chapters c ON c.id = i.chapter_id
       WHERE c.estimate_id = ? ORDER BY i.position, i.id`,
     [id],
@@ -81,6 +85,7 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
         .map((i) => ({
           key: k(), code: i.code ?? "", name: i.name, unit: i.unit,
           quantity: Number(i.quantity), reviewNote: i.review_note, resources: resByItem.get(i.id) ?? [],
+          qtyFormula: i.qty_formula, qtyNote: i.qty_note, qtyEstimated: i.qty_estimated === 1,
         })),
     })),
   };
@@ -129,9 +134,15 @@ export async function saveEstimate(doc: EstimateDoc, companyId: number): Promise
         conn,
       );
       for (const [ii, it] of ch.items.entries()) {
+        // Când există formulă validă, cantitatea se calculează din ea (sursa adevărului e formula).
+        const formula = txt(it.qtyFormula, 500);
+        const fr = formula ? evalFormula(formula) : null;
+        const qty = fr?.ok ? fr.value : num(it.quantity, 0);
         const i = await execute(
-          "INSERT INTO estimate_items (chapter_id, position, code, name, unit, quantity, review_note) VALUES (?, ?, ?, ?, ?, ?, ?)",
-          [c.insertId, ii, txt(it.code, 40) || null, txt(it.name, 500) || "Articol", txt(it.unit, 20) || "buc", num(it.quantity, 0), txt(it.reviewNote, 255) || null],
+          `INSERT INTO estimate_items (chapter_id, position, code, name, unit, quantity, qty_formula, qty_note, qty_estimated, review_note)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [c.insertId, ii, txt(it.code, 40) || null, txt(it.name, 500) || "Articol", txt(it.unit, 20) || "buc", qty,
+            formula || null, txt(it.qtyNote, 1000) || null, it.qtyEstimated ? 1 : 0, txt(it.reviewNote, 255) || null],
           conn,
         );
         const rows = it.resources
