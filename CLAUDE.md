@@ -64,10 +64,15 @@ Făcut:
 - **Pct. 5:** efort configurabil, cost estimat în /admin/ai (prețuri în Setări), opțiunea `send_originals` pe sarcină.
 - **Pct. 6:** chat-ul trimite textul extras; la documente mari, doar fragmentele relevante pentru ultima întrebare.
 
-Motor profesional (Etapa 1 din promptul proprietarului), făcut: catalog cu oferte/istoric/status (sql 024),
-Articole & Norme cu versiuni și pierderi (025), Reguli de calcul TVA/CAM/indirecte/profit + șablon recapitulație (026),
-formula cantității (027), sursa prețului în deviz (028). Rămase: panoul lateral din editor (alegere ofertă, actualizare prețuri
-cu diferențe), verificatorul cu 3 niveluri, teste automate (există teste de lucru în .tmp-tests/, neversionate).
+Motor profesional (Etapa 1 din promptul proprietarului) — făcut:
+- catalog cu oferte, istoric, status și prețuri proprii ale firmei (sql 024; `src/lib/resources/`, `src/components/catalog/`);
+- Articole & Norme cu versiuni, sursa normei și pierderi tehnologice (025; `src/lib/recipes/`, `src/components/recipes/`);
+- Reguli de calcul TVA/CAM/indirecte/profit + șablon de recapitulație (026; `src/lib/rules.ts`), copiate pe deviz la creare;
+- motorul de calcul în `src/lib/estimate/calc.ts` (CAM doar pe manopera la cost salarial, baze, rotunjiri), formula cantității (027),
+  sursa prețului în deviz (028), datele originale din F3 (029);
+- editor: panou lateral pe articol, compararea ofertelor, „Actualizează prețurile”; verificator cu 3 niveluri (`checks.ts`);
+- teste: `npm test` (și în CI) și `npm run test:db`, în `tests/`.
+Următor (Etapa 2 din prompt): Modul B cu estimări marcate de asistent, hash pe documente, durată și cache hit/miss în monitorizare.
 
 De făcut: Batch API pentru devize mari; reglarea instrucțiunilor și a pragurilor de asemănare pe date reale (necesită cheie API).
 Notă: tool runner-ul din SDK folosește automat message threads (beta `message-threads-2026-08-12`).

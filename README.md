@@ -42,6 +42,15 @@ Pentru a deveni admin de platformă, creează-ți un cont din site, apoi ruleaz�
 npm run admin:create -- emailul@tau.ro
 ```
 
+## Teste
+
+```bash
+npm test          # motorul de calcul, formula cantității, verificatorul, importul F3, Excel (dacă e instalat LibreOffice)
+npm run test:db   # cu baza de date (DB_* setate): izolarea firmelor, refolosirea potrivirilor fără apeluri la asistent
+```
+
+`npm test` rulează și în GitHub Actions, înainte de build; dacă un test pică, nu se publică nimic.
+
 ## Publicare pe cPanel
 
 Fluxul: **push pe `main` → GitHub Actions face build-ul → îl urcă prin FTP ca o singură arhivă în `.deploy/` → cron-ul din cPanel (la fiecare minut) o despachetează și repornește aplicația → la pornire, aplicația își aplică singură migrările SQL noi.** Durează 1–3 minute; progresul se vede în tabul *Actions* de pe GitHub. Dacă build-ul eșuează, site-ul rămâne pe versiunea veche.

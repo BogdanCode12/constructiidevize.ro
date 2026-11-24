@@ -40,6 +40,8 @@ jobs:
 
       - run: npm ci
       - run: npm run typecheck
+      # Teste automate ale motorului de calcul, verificatorului, formulelor și importului F3 (fără bază de date).
+      - run: npm test
       - run: npm run build
 
       - name: Pregătește arhiva
