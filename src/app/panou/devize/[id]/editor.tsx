@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from "react"
 import { saveEstimateAction, deleteEstimateAction, estimatorJobAction, saveRecipeAction, startEstimatorAction } from "../actions";
 import { cellCls, ImportDialog, newKey, NumInput, RecipePicker, ResourcePicker } from "./parts";
 import { QuantityBlock } from "./quantity-block";
+import { ItemPanel } from "./item-panel";
+import { PriceUpdateDialog } from "./price-update";
 import { Simulator } from "./simulator";
 import { Gantt } from "./gantt";
 import { checkEstimate, type Issue } from "@/lib/estimate/checks";
@@ -39,6 +41,8 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
   const [showImport, setShowImport] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [aiJob, setAiJob] = useState<number | null>(null);
+  const [panel, setPanel] = useState<string | null>(null);
+  const [showPrices, setShowPrices] = useState(false);
 
   const update = useCallback((fn: (d: EstimateDoc) => EstimateDoc) => {
     setDoc((d) => fn(d));
@@ -182,6 +186,8 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
             {saving ? "Se salvează…" : dirty ? "Modificări nesalvate" : savedAt ? `Salvat la ${savedAt.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}` : "Salvat"}
           </span>
           <button onClick={() => setShowImport(true)} className="rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200">Import F3</button>
+          <button onClick={() => setShowPrices(true)} className="rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold hover:border-brand-200"
+            title="Compară prețurile din deviz cu catalogul și alege ce actualizezi">Actualizează prețurile</button>
           {missing.length > 0 && (
             <button onClick={startAi} disabled={!!aiJob}
               className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-800 hover:border-brand-500 disabled:opacity-60">
@@ -237,6 +243,11 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
           }}
         />
       )}
+      {panel && <ItemPanel doc={doc} itemKey={panel} issues={issues} update={update} onClose={() => setPanel(null)} />}
+      {showPrices && (
+        <PriceUpdateDialog doc={doc} onClose={() => setShowPrices(false)}
+          onApply={(fn, msg) => { update(fn); setShowPrices(false); setNotice(msg); }} />
+      )}
       {tab === "verificari" && <IssuesPanel issues={issues} onGo={goTo} />}
       {tab === "simulator" && <Simulator doc={doc} />}
       {tab === "grafic" && <Gantt doc={doc} onDoc={update} onChapter={setChapter} />}
@@ -288,6 +299,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
                             item={it}
                             open={expanded.has(it.key)}
                             rounding={doc.rounding}
+                            onPanel={() => setPanel(it.key)}
                             flash={flash === it.key}
                             onToggle={() => toggle(it.key)}
                             onItem={(fn) => setItem(ci, ii, fn)}
@@ -456,8 +468,9 @@ function PctRow({ label, pct, value, onPct, hint }: { label: string; pct: number
 }
 
 function ItemRows({
-  nr, item, open, flash, onToggle, onItem, onRes, onMove, onDuplicate, onDelete, onSaveRecipe, isAdmin, rounding,
+  nr, item, open, flash, onToggle, onItem, onRes, onMove, onDuplicate, onDelete, onSaveRecipe, isAdmin, rounding, onPanel,
 }: {
+  onPanel: () => void;
   nr: string; item: EstItem; open: boolean; flash: boolean; rounding: RoundingMode;
   onToggle: () => void;
   onItem: (fn: (it: EstItem) => EstItem) => void;
@@ -495,6 +508,8 @@ function ItemRows({
         <td className="px-2 py-2.5 text-right tabular-nums">{fmtMoney(itemUnitPrice(item, rounding))}</td>
         <td className="px-2 py-2.5 text-right font-semibold tabular-nums">{fmtMoney(itemTotal(item, rounding))}</td>
         <td className="px-2 py-2.5 text-right whitespace-nowrap text-muted">
+          <button title="Detalii articol: rețetă, surse prețuri, oferte, calculul cantității" onClick={onPanel}
+            className="mr-1 rounded border border-line px-1.5 text-xs font-semibold text-brand-700 hover:border-brand-200">Detalii</button>
           <button title="Mută sus" onClick={() => onMove(-1)} className="px-1 hover:text-ink">↑</button>
           <button title="Mută jos" onClick={() => onMove(1)} className="px-1 hover:text-ink">↓</button>
           <button title="Duplică articolul" onClick={onDuplicate} className="px-1 hover:text-ink">⧉</button>
