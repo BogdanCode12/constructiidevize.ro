@@ -1,4 +1,5 @@
 import "server-only";
+import { effectivePrices } from "../resources/repo";
 import { randomUUID } from "node:crypto";
 import { execute, query, queryOne, transaction } from "../db";
 import { normKey, normUnit, similarity } from "../estimate/normalize";
@@ -41,32 +42,30 @@ export async function searchRecipes(companyId: number, q: string, unit?: string,
   }));
 }
 
-type RRow = { recipe_id: number; resource_id: number | null; type: ResType; code: string | null; name: string; unit: string; norm: string; price: string;
-  cur_price: string | null; cur_name: string | null; cur_code: string | null; cur_unit: string | null };
+type RRow = { recipe_id: number; resource_id: number | null; type: ResType; code: string | null; name: string; unit: string; norm: string; price: string };
 
-/** Resursele rețetelor, cu prețul curent din catalog (dacă resursa e vizibilă firmei). */
+/** Resursele rețetelor, cu prețul aplicabil firmei (propriu sau de referință), dacă resursa e vizibilă. */
 async function recipeResources(companyId: number, recipeIds: number[]): Promise<Map<number, EstResource[]>> {
   const map = new Map<number, EstResource[]>();
   if (!recipeIds.length) return map;
   const rows = await query<RRow>(
-    `SELECT rr.recipe_id, rr.resource_id, rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.price,
-            r.price AS cur_price, r.name AS cur_name, r.code AS cur_code, r.unit AS cur_unit
-       FROM recipe_resources rr
-       LEFT JOIN resources r ON r.id = rr.resource_id AND (r.company_id IS NULL OR r.company_id = ?)
-      WHERE rr.recipe_id IN (?) ORDER BY rr.recipe_id, rr.position`,
-    [companyId, recipeIds],
+    `SELECT rr.recipe_id, rr.resource_id, rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.price
+       FROM recipe_resources rr WHERE rr.recipe_id IN (?) ORDER BY rr.recipe_id, rr.position`,
+    [recipeIds],
   );
+  const cur = await effectivePrices(companyId, rows.map((x) => x.resource_id).filter((x): x is number => !!x));
   for (const x of rows) {
     const list = map.get(x.recipe_id) ?? [];
+    const c = x.resource_id ? cur.get(x.resource_id) : undefined;
     list.push({
       key: randomUUID(),
-      resourceId: x.cur_price !== null ? x.resource_id : null,
+      resourceId: c ? c.id : null,
       type: x.type,
-      code: x.cur_code ?? x.code ?? "",
-      name: x.cur_name ?? x.name,
-      unit: x.cur_unit ?? x.unit,
+      code: c?.code ?? x.code ?? "",
+      name: c?.name ?? x.name,
+      unit: c?.unit ?? x.unit,
       norm: Number(x.norm),
-      price: Number(x.cur_price ?? x.price),
+      price: c ? (c.price ?? 0) : Number(x.price),
     });
     map.set(x.recipe_id, list);
   }
@@ -170,16 +169,12 @@ export async function matchLines(companyId: number, lines: ImportLine[]): Promis
 
 /** Actualizează prețurile resurselor după catalogul curent (resursele dispărute rămân cu prețul salvat). */
 export async function refreshPrices(companyId: number, res: EstResource[]): Promise<EstResource[]> {
-  const ids = res.map((r) => r.resourceId).filter((x): x is number => !!x);
-  const cur = ids.length
-    ? await query<{ id: number; price: string; name: string; unit: string; code: string | null }>(
-        "SELECT id, price, name, unit, code FROM resources WHERE id IN (?) AND (company_id IS NULL OR company_id = ?)",
-        [ids, companyId],
-      )
-    : [];
-  const m = new Map(cur.map((c) => [c.id, c]));
+  const cur = await effectivePrices(companyId, res.map((r) => r.resourceId).filter((x): x is number => !!x));
   return res.map((r) => {
-    const c = r.resourceId ? m.get(r.resourceId) : undefined;
-    return { ...r, key: randomUUID(), resourceId: c ? r.resourceId : null, price: c ? Number(c.price) : r.price, name: c?.name ?? r.name, unit: c?.unit ?? r.unit, code: c?.code ?? r.code };
+    const c = r.resourceId ? cur.get(r.resourceId) : undefined;
+    return {
+      ...r, key: randomUUID(), resourceId: c ? r.resourceId : null,
+      price: c ? (c.price ?? 0) : r.price, name: c?.name ?? r.name, unit: c?.unit ?? r.unit, code: c?.code ?? r.code,
+    };
   });
 }

@@ -3,16 +3,16 @@ import { Card, PageHeader } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { listRecipes } from "@/lib/recipes/list";
 import { deleteCompanyRecipeAction } from "@/lib/resources/actions";
-import { ResourceManager } from "@/components/resource-manager";
+import { CatalogList } from "@/components/catalog/pages";
+import { companyCtx } from "@/components/catalog/contexts";
 import { requireUser } from "@/lib/auth/session";
-import { listResources } from "@/lib/resources/repo";
-import { RES_TYPES, type ResType } from "@/lib/estimate/types";
 
 export const metadata = { title: "Resurse" };
 
-export default async function ResourcesPage({ searchParams }: { searchParams: Promise<{ tip?: string; q?: string; tab?: string }> }) {
+export default async function ResourcesPage({ searchParams }: { searchParams: Promise<{ tip?: string; q?: string; tab?: string; categorie?: string; status?: string }> }) {
   const user = await requireUser();
-  const { tip, q, tab } = await searchParams;
+  const sp = await searchParams;
+  const { q, tab } = sp;
   const tabs = (
     <nav className="mb-6 flex gap-1 border-b border-line">
       {[["resurse", "Resurse"], ["retete", "Rețete de articole"]].map(([id, label]) => (
@@ -55,16 +55,12 @@ export default async function ResourcesPage({ searchParams }: { searchParams: Pr
       </>
     );
   }
-  const type = RES_TYPES.includes(tip as ResType) ? (tip as ResType) : undefined;
-  const resources = await listResources({ companyId: user.company?.id ?? null, includeGlobal: true, type, q: q?.trim() || undefined });
+  const ctx = companyCtx(user.company?.id ?? null);
   return (
     <>
-      <PageHeader
-        title="Resurse"
-        subtitle="Materialele, manopera, utilajele și transportul tău, cu prețurile tale. Resursele marcate „catalog” vin de la platformă."
-      />
+      <PageHeader title={ctx.title} subtitle={ctx.subtitle} />
       {tabs}
-      <ResourceManager scope="company" resources={resources} basePath="/panou/resurse" type={type} q={q} />
+      <CatalogList ctx={ctx} sp={sp} header={false} />
     </>
   );
 }

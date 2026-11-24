@@ -1,18 +1,8 @@
-import { PageHeader } from "@/components/ui";
-import { ResourceManager } from "@/components/resource-manager";
-import { listResources } from "@/lib/resources/repo";
-import { RES_TYPES, type ResType } from "@/lib/estimate/types";
+import { CatalogList } from "@/components/catalog/pages";
+import { ADMIN_MATERIALE } from "@/components/catalog/contexts";
 
-export const metadata = { title: "Catalog resurse · Admin" };
+export const metadata = { title: `${ADMIN_MATERIALE.title} · Admin` };
 
-export default async function AdminResourcesPage({ searchParams }: { searchParams: Promise<{ tip?: string; q?: string }> }) {
-  const { tip, q } = await searchParams;
-  const type = RES_TYPES.includes(tip as ResType) ? (tip as ResType) : undefined;
-  const resources = await listResources({ companyId: null, includeGlobal: true, type, q: q?.trim() || undefined });
-  return (
-    <>
-      <PageHeader title="Catalog global de resurse" subtitle="Resursele de aici sunt vizibile tuturor clienților, în pagina Resurse și în editorul de deviz." />
-      <ResourceManager scope="global" resources={resources} basePath="/admin/resurse" type={type} q={q} />
-    </>
-  );
+export default async function Page({ searchParams }: { searchParams: Promise<{ tip?: string; categorie?: string; status?: string; q?: string }> }) {
+  return <CatalogList ctx={ADMIN_MATERIALE} sp={await searchParams} />;
 }

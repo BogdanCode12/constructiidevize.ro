@@ -96,7 +96,7 @@ function tools(companyId: number) {
           companyId, includeGlobal: true, q: text, limit: 8,
           type: tip === "orice" ? undefined : (tip as ResType),
         });
-        return list.length ? list.map((r) => `${r.id}|${r.type}|${r.name}|${r.unit}|${r.price}`).join("\n") : "nimic găsit";
+        return list.length ? list.map((r) => `${r.id}|${r.type}|${r.name}|${r.unit}|${r.price === null ? "fără preț" : r.price}`).join("\n") : "nimic găsit";
       },
     }),
   ];

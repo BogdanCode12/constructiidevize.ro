@@ -119,7 +119,7 @@ export function ResourcePicker({ onPick, onManual }: { onPick: (r: CatalogResour
                 <span className="w-20 shrink-0 text-xs text-muted">{RES_TYPE_LABEL[r.type]}</span>
                 <span className="flex-1">{r.name}</span>
                 <span className="text-muted">{r.unit}</span>
-                <span className="w-24 text-right tabular-nums">{fmtMoney(r.price)}</span>
+                <span className="w-24 text-right tabular-nums">{r.price === null ? <span className="text-xs text-muted">fără preț</span> : fmtMoney(r.price)}</span>
               </button>
             ))
           )}

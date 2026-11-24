@@ -21,15 +21,87 @@ export const RES_TYPE_PLURAL: Record<ResType, string> = {
   echipament: "Echipamente",
 };
 
+export type ResStatus = "neverificat" | "verificat" | "inactiv";
+export type TariffKind = "cost_salarial" | "echipa" | "comercial";
+export type PriceSource = "manual" | "import" | "oferta_furnizor" | "negociat";
+
+export const RES_STATUS_LABEL: Record<ResStatus, string> = { neverificat: "Neverificat", verificat: "Verificat", inactiv: "Inactiv" };
+export const TARIFF_KIND_LABEL: Record<TariffKind, string> = {
+  cost_salarial: "Cost salarial (fără CAM)",
+  echipa: "Tarif de echipă",
+  comercial: "Tarif comercial (include contribuțiile)",
+};
+export const PRICE_SOURCE_LABEL: Record<PriceSource, string> = {
+  manual: "Introdus manual",
+  import: "Import",
+  oferta_furnizor: "Ofertă furnizor",
+  negociat: "Preț negociat",
+};
+
+/** Grupurile din admin: „Materiale & Prețuri” și „Manoperă & Utilaje”. */
+export const RES_GROUPS = {
+  materiale: { label: "Materiale & Prețuri", types: ["material", "echipament"] as ResType[] },
+  manopera: { label: "Manoperă & Utilaje", types: ["manopera", "utilaj", "transport"] as ResType[] },
+};
+export type ResGroup = keyof typeof RES_GROUPS;
+
+/** Prețul folosit pentru o resursă (în lei, fără TVA) și de unde vine. */
+export type ResPrice = {
+  offerId: number | null;
+  value: number;
+  /** „propriu” = prețul negociat al firmei; „referinta” = oferta aleasă în catalog. */
+  kind: "propriu" | "referinta";
+  supplier: string | null;
+  source: PriceSource | null;
+  status: ResStatus | null;
+  obtainedAt: string | null;
+  validUntil: string | null;
+  expired: boolean;
+  transportIncluded: boolean | null;
+};
+
 export type CatalogResource = {
   id: number;
   global: boolean;
   type: ResType;
+  category: string | null;
   code: string | null;
   name: string;
   unit: string;
-  price: number;
+  specs: string | null;
+  producer: string | null;
+  productCode: string | null;
+  status: ResStatus;
+  tariffKind: TariffKind | null;
+  region: string | null;
+  mobilizationCost: number | null;
+  conditions: string | null;
   notes: string | null;
+  /** Prețul aplicabil (propriu al firmei, altfel cel de referință). null = fără preț. */
+  price: number | null;
+  priceInfo: ResPrice | null;
+};
+
+export type PriceOffer = {
+  id: number;
+  resourceId: number;
+  own: boolean;
+  supplier: string | null;
+  price: number;
+  currency: string;
+  exchangeRate: number;
+  priceRon: number;
+  source: PriceSource;
+  documentUrl: string | null;
+  obtainedAt: string;
+  validUntil: string | null;
+  expired: boolean;
+  transportIncluded: boolean | null;
+  minQty: number | null;
+  status: ResStatus;
+  notes: string | null;
+  current: boolean;
+  createdAt: string;
 };
 
 /** Resursă folosită într-un articol: consum (normă) pe unitatea articolului × preț unitar. */

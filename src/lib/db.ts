@@ -25,7 +25,7 @@ export function pool(): Pool {
 }
 
 type Params = unknown[];
-type Conn = Pool | PoolConnection;
+export type Conn = Pool | PoolConnection;
 
 export async function query<T>(sql: string, params: Params = [], conn: Conn = pool()): Promise<T[]> {
   const [rows] = await conn.query(sql, params as never);

@@ -516,7 +516,7 @@ function ItemRows({
               </table>
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-3 py-2.5">
                 <ResourcePicker
-                  onPick={(c) => addRes({ resourceId: c.id, type: c.type, code: c.code ?? "", name: c.name, unit: c.unit, norm: 1, price: c.price })}
+                  onPick={(c) => addRes({ resourceId: c.id, type: c.type, code: c.code ?? "", name: c.name, unit: c.unit, norm: 1, price: c.price ?? 0 })}
                   onManual={(t) => addRes({ resourceId: null, type: t, code: "", name: "", unit: t === "material" || t === "echipament" ? "buc" : "ora", norm: 1, price: 0 })}
                 />
                 <div className="flex flex-wrap gap-3 text-muted">

@@ -1,6 +1,8 @@
 /** Normalizare pentru potrivirea articolelor: fără diacritice, litere mici, fără punctuație inutilă. */
 export function normText(s: string): string {
   return s
+    .replace(/³/g, "3")
+    .replace(/²/g, "2")
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
