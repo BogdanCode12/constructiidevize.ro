@@ -8,7 +8,7 @@ import { Logo } from "../logo";
 export const NAV = [
   { href: "/", label: "Acasă" },
   { href: "/servicii", label: "Servicii" },
-  { href: "/preturi", label: "Prețuri" },
+  { href: "/abonamente", label: "Abonamente" },
   { href: "/contact", label: "Contact" },
 ];
 

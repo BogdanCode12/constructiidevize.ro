@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   // mysql2 rămâne în node_modules (nu în bundle), ca să-l poată folosi și scripts/migrate.mjs pe server.
   serverExternalPackages: ["mysql2", "unpdf"],
+  // Pagina „Prețuri” a devenit „Abonamente”; linkurile vechi duc la pagina nouă.
+  async redirects() {
+    return [{ source: "/preturi", destination: "/abonamente", permanent: true }];
+  },
   async headers() {
     return [
       {

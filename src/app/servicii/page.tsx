@@ -111,7 +111,7 @@ export default function ServicesPage() {
           <h2 className="font-display text-3xl font-semibold text-white">Încearcă toate serviciile, gratuit.</h2>
           <div className="flex gap-3">
             <Link href="/inregistrare" className="rounded-lg bg-brand-700 px-6 py-3.5 font-semibold text-white hover:bg-brand-800">Creează cont</Link>
-            <Link href="/preturi" className="rounded-lg border border-white/30 px-6 py-3.5 font-semibold text-white hover:bg-white/10">Prețuri</Link>
+            <Link href="/abonamente" className="rounded-lg border border-white/30 px-6 py-3.5 font-semibold text-white hover:bg-white/10">Abonamente</Link>
           </div>
         </div>
       </section>

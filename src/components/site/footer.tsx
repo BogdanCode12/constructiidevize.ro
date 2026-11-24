@@ -12,7 +12,7 @@ export function SiteFooter() {
             Platformă pentru firme de construcții din România: devize, dosare de licitație și urmărirea execuției, într-un singur loc.
           </p>
         </div>
-        <FooterCol title="Platformă" links={[["/servicii", "Servicii"], ["/preturi", "Prețuri"], ["/inregistrare", "Creează cont"], ["/autentificare", "Autentificare"]]} />
+        <FooterCol title="Platformă" links={[["/servicii", "Servicii"], ["/abonamente", "Abonamente"], ["/inregistrare", "Creează cont"], ["/autentificare", "Autentificare"]]} />
         <FooterCol title="Servicii" links={[["/servicii#devize", "Devize F1–F5, C5–C9"], ["/servicii#ai", "Asistent tehnic"], ["/servicii#documente", "Dosar de licitație"], ["/servicii#santier", "Șantier"]]} />
         <FooterCol title="Companie" links={[["/contact", "Contact"], ["/termeni", "Termeni și condiții"], ["/confidentialitate", "Confidențialitate"]]} />
       </div>

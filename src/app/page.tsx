@@ -200,11 +200,11 @@ export default async function HomePage() {
       {/* PREȚURI + FAQ */}
       <section className="mx-auto grid max-w-7xl gap-14 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_1.3fr] lg:py-28">
         <div>
-          <SectionTitle eyebrow="Prețuri" title="Simplu, lunar sau anual" />
+          <SectionTitle eyebrow="Abonamente" title="Simplu, lunar sau anual" />
           <p className="mt-6 text-lg text-muted">
             {trial_days} zile gratuit, fără card.{from !== null && <> Abonamentele pornesc de la <b className="text-ink">{from} lei/lună</b> + TVA.</>}
           </p>
-          <Link href="/preturi" className="mt-8 inline-block rounded-lg bg-ink px-6 py-3.5 font-semibold text-white hover:bg-black">Vezi planurile</Link>
+          <Link href="/abonamente" className="mt-8 inline-block rounded-lg bg-ink px-6 py-3.5 font-semibold text-white hover:bg-black">Vezi planurile</Link>
         </div>
         {faq && <Faq markdown={faq.body} />}
       </section>

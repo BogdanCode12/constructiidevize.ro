@@ -17,7 +17,7 @@ găzduire cPanel (Setup Node.js App, build standalone, publicare automată la pu
 - **Fără cuvântul „AI” în textele văzute de clienți** (site și cont): se spune „asistent tehnic”, „asistentul” sau
   „automat”. Panoul de admin și codul pot folosi termenii tehnici.
 - Meniul site-ului e plutitor (bară rotunjită, desprinsă de margini), cu paginile centrate.
-- Site public: Acasă, Servicii, Prețuri, Contact + Autentificare / Contul meu. Textele principale (titlul de pe
+- Site public: Acasă, Servicii, Abonamente (`/abonamente`; `/preturi` redirecționează), Contact + Autentificare / Contul meu. Textele principale (titlul de pe
   prima pagină, întrebările frecvente, datele de contact, paginile legale) se editează din admin → Pagini.
 - Tot ce ține de conținutul platformei trebuie să poată fi modificat din panoul de admin (planuri, prețuri,
   catalog de resurse, șabloane de documente, instrucțiunile AI, setări, limite).
