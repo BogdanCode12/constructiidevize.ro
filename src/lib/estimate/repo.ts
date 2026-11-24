@@ -3,7 +3,7 @@ import { evalFormula } from "./formula";
 import { randomUUID } from "node:crypto";
 import { execute, query, queryOne, transaction } from "../db";
 import {
-  RES_TYPES, type EstimateDoc, type EstResource, type OverheadBase, type ProfitBase, type ResType, type RoundingMode, type TariffKind,
+  RES_TYPES, type EstimateDoc, type EstResource, type F3Ref, type OverheadBase, type ProfitBase, type ResType, type RoundingMode, type TariffKind,
 } from "./types";
 
 const TARIFFS: TariffKind[] = ["cost_salarial", "echipa", "comercial"];
@@ -31,9 +31,9 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
   );
   const items = await query<{
     id: number; chapter_id: number; code: string | null; name: string; unit: string; quantity: string; review_note: string | null;
-    qty_formula: string | null; qty_note: string | null; qty_estimated: number;
+    qty_formula: string | null; qty_note: string | null; qty_estimated: number; f3_ref: string | F3Ref | null;
   }>(
-    `SELECT i.id, i.chapter_id, i.code, i.name, i.unit, i.quantity, i.review_note, i.qty_formula, i.qty_note, i.qty_estimated
+    `SELECT i.id, i.chapter_id, i.code, i.name, i.unit, i.quantity, i.review_note, i.qty_formula, i.qty_note, i.qty_estimated, i.f3_ref
        FROM estimate_items i JOIN estimate_chapters c ON c.id = i.chapter_id
       WHERE c.estimate_id = ? ORDER BY i.position, i.id`,
     [id],
@@ -88,6 +88,7 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
           key: k(), code: i.code ?? "", name: i.name, unit: i.unit,
           quantity: Number(i.quantity), reviewNote: i.review_note, resources: resByItem.get(i.id) ?? [],
           qtyFormula: i.qty_formula, qtyNote: i.qty_note, qtyEstimated: i.qty_estimated === 1,
+          f3: i.f3_ref ? (typeof i.f3_ref === "string" ? (JSON.parse(i.f3_ref) as F3Ref) : i.f3_ref) : null,
         })),
     })),
   };
@@ -98,6 +99,10 @@ const num = (v: unknown, min = -1e12, max = 1e12) => {
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : 0;
 };
 const txt = (v: unknown, len: number) => String(v ?? "").trim().slice(0, len);
+const f3Json = (f: F3Ref | null | undefined) =>
+  f && typeof f === "object"
+    ? JSON.stringify({ code: txt(f.code, 40), name: txt(f.name, 500), unit: txt(f.unit, 20), quantity: num(f.quantity, 0) })
+    : null;
 
 /** Salvează devizul complet (înlocuiește capitolele/articolele) într-o tranzacție. */
 export async function saveEstimate(doc: EstimateDoc, companyId: number): Promise<void> {
@@ -141,10 +146,10 @@ export async function saveEstimate(doc: EstimateDoc, companyId: number): Promise
         const fr = formula ? evalFormula(formula) : null;
         const qty = fr?.ok ? fr.value : num(it.quantity, 0);
         const i = await execute(
-          `INSERT INTO estimate_items (chapter_id, position, code, name, unit, quantity, qty_formula, qty_note, qty_estimated, review_note)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO estimate_items (chapter_id, position, code, name, unit, quantity, qty_formula, qty_note, qty_estimated, f3_ref, review_note)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [c.insertId, ii, txt(it.code, 40) || null, txt(it.name, 500) || "Articol", txt(it.unit, 20) || "buc", qty,
-            formula || null, txt(it.qtyNote, 1000) || null, it.qtyEstimated ? 1 : 0, txt(it.reviewNote, 255) || null],
+            formula || null, txt(it.qtyNote, 1000) || null, it.qtyEstimated ? 1 : 0, f3Json(it.f3), txt(it.reviewNote, 255) || null],
           conn,
         );
         const rows = it.resources

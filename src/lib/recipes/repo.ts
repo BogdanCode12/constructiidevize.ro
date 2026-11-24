@@ -145,6 +145,12 @@ export type MatchStatus = "exact" | "propus" | "cache" | "negasit";
  * Întoarce articolele cu resurse și o notă de verificare unde potrivirea nu e sigură.
  */
 export async function matchLines(companyId: number, lines: ImportLine[]): Promise<{ item: EstItem; status: MatchStatus }[]> {
+  const res = await matchLinesRaw(companyId, lines);
+  // Datele originale din F3 rămân atașate articolului, pentru verificarea abaterilor.
+  return res.map((r, i) => ({ ...r, item: { ...r.item, f3: { code: lines[i].code, name: lines[i].name, unit: lines[i].unit, quantity: lines[i].quantity } } }));
+}
+
+async function matchLinesRaw(companyId: number, lines: ImportLine[]): Promise<{ item: EstItem; status: MatchStatus }[]> {
   const out: { item: EstItem; status: MatchStatus }[] = [];
   for (const line of lines) {
     const base = { key: randomUUID(), code: line.code, name: line.name, unit: line.unit, quantity: line.quantity, resources: [] as EstResource[], reviewNote: null as string | null };

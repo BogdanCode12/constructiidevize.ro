@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
-import { saveEstimateAction, deleteEstimateAction, estimatorJobAction, saveRecipeAction, startEstimatorAction } from "../actions";
+import { saveEstimateAction, deleteEstimateAction, estimatorJobAction, priceSourcesAction, saveRecipeAction, startEstimatorAction } from "../actions";
 import { cellCls, ImportDialog, newKey, NumInput, RecipePicker, ResourcePicker } from "./parts";
 import { QuantityBlock } from "./quantity-block";
 import { ItemPanel } from "./item-panel";
 import { PriceUpdateDialog } from "./price-update";
 import { Simulator } from "./simulator";
 import { Gantt } from "./gantt";
-import { checkEstimate, type Issue } from "@/lib/estimate/checks";
+import { checkEstimate, type CheckContext, type Issue } from "@/lib/estimate/checks";
 import { evalFormula } from "@/lib/estimate/formula";
 import { chapterBreakdown, effNorm, fmtMoney, fmtQty, itemTotal, itemUnitBreakdown, itemUnitPrice, recap, sum } from "@/lib/estimate/calc";
 import {
@@ -29,7 +29,7 @@ const move = <T,>(arr: T[], from: number, to: number) => {
   return copy;
 };
 
-export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isAdmin: boolean }) {
+export function EstimateEditor({ initial, isAdmin, rules }: { initial: EstimateDoc; isAdmin: boolean; rules: { vatPct: number; camPct: number } }) {
   const [doc, setDoc] = useState<EstimateDoc>(initial);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -149,8 +149,20 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
     setNotice(`${ok.length} articole salvate ca rețete ale firmei.`);
   };
 
-  const issues = useMemo(() => checkEstimate(doc), [doc]);
+  // Ofertele cu care au fost preluate prețurile (valabilitate, status, transport) — pentru verificări.
+  const offerIds = useMemo(() => [...new Set(doc.chapters.flatMap((c) => c.items.flatMap((i) => i.resources.map((r) => r.offerId ?? 0))))].filter(Boolean).sort(), [doc]);
+  const offerSig = offerIds.join(",");
+  const [offers, setOffers] = useState<CheckContext["offers"]>({});
+  useEffect(() => {
+    if (!offerSig) return;
+    let alive = true;
+    const t = setTimeout(() => priceSourcesAction([], offerSig.split(",").map(Number)).then((s) => { if (alive) setOffers(s.offers); }), 400);
+    return () => { alive = false; clearTimeout(t); };
+  }, [offerSig]);
+
+  const issues = useMemo(() => checkEstimate(doc, { offers, rules }), [doc, offers, rules]);
   const errors = issues.filter((i) => i.level === "eroare").length;
+  const warnings = issues.filter((i) => i.level !== "info").length;
 
   const goTo = (issue: Issue) => {
     setTab("deviz");
@@ -165,7 +177,7 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
   const r = recap(doc);
   const tabs: { id: Tab; label: string; badge?: number }[] = [
     { id: "deviz", label: "Deviz" },
-    { id: "verificari", label: "Verificări", badge: issues.length },
+    { id: "verificari", label: "Verificări", badge: warnings },
     { id: "simulator", label: "Simulator preț & profit" },
     { id: "grafic", label: "Grafic execuție" },
   ];
@@ -414,30 +426,54 @@ export function EstimateEditor({ initial, isAdmin }: { initial: EstimateDoc; isA
   );
 }
 
+const LEVELS = {
+  eroare: { label: "Erori", one: "Eroare", cls: "bg-red-100 text-red-700", hint: "calcul sau informație obligatorie incorectă" },
+  atentie: { label: "Atenționări", one: "Atenție", cls: "bg-amber-100 text-amber-800", hint: "posibile probleme de verificat" },
+  info: { label: "Informații", one: "Info", cls: "bg-canvas text-muted", hint: "recomandări, fără caracter obligatoriu" },
+} as const;
+
 function IssuesPanel({ issues, onGo }: { issues: Issue[]; onGo: (i: Issue) => void }) {
+  const disclaimer = (
+    <p className="mt-3 text-xs text-muted">
+      Verificările automate găsesc erori de calcul și date lipsă sau suspecte. Ele nu confirmă că devizul e corect tehnic sau conform
+      juridic — devizul trebuie verificat și de un specialist.
+    </p>
+  );
   if (issues.length === 0)
     return (
-      <div className="rounded-xl border border-line bg-white px-5 py-12 text-center">
-        <p className="text-lg font-semibold text-brand-700">✓ Nicio problemă găsită</p>
-        <p className="mt-1 text-sm text-muted">Am verificat cantitățile, prețurile, normele, dublurile și unitățile de măsură.</p>
+      <div className="rounded-xl border-2 border-ink/10 bg-white px-5 py-12 text-center">
+        <p className="text-lg font-semibold text-brand-700">✓ Nicio problemă găsită de verificările automate</p>
+        <p className="mt-1 text-sm text-muted">Am verificat cantitățile și formulele, prețurile și sursele lor, consumurile, dublurile, unitățile de măsură, CAM și recapitulația.</p>
+        {disclaimer}
       </div>
     );
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-white">
-      <ul className="divide-y divide-line text-sm">
-        {issues.map((i, n) => (
-          <li key={n} className="flex items-start gap-3 px-5 py-3">
-            <span className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${i.level === "eroare" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-800"}`}>
-              {i.level === "eroare" ? "Eroare" : "Atenție"}
-            </span>
-            <span className="w-40 shrink-0 text-muted">{i.where}</span>
-            <span className="flex-1">{i.message}</span>
-            {(i.itemKey || i.chapterKey) && (
-              <button onClick={() => onGo(i)} className="shrink-0 font-semibold text-brand-700 hover:underline">Vezi</button>
-            )}
-          </li>
-        ))}
-      </ul>
+    <div className="space-y-4">
+      {(Object.keys(LEVELS) as (keyof typeof LEVELS)[]).map((lvl) => {
+        const list = issues.filter((i) => i.level === lvl);
+        if (!list.length) return null;
+        const L = LEVELS[lvl];
+        return (
+          <div key={lvl} className="overflow-hidden rounded-xl border-2 border-ink/10 bg-white">
+            <div className="flex items-center gap-2 border-b-2 border-ink/10 px-5 py-2.5">
+              <span className={`rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase ${L.cls}`}>{L.label} · {list.length}</span>
+              <span className="text-xs text-muted">{L.hint}</span>
+            </div>
+            <ul className="divide-y divide-line text-sm">
+              {list.map((i, n) => (
+                <li key={n} className="flex items-start gap-3 px-5 py-3">
+                  <span className="w-40 shrink-0 text-muted">{i.where}</span>
+                  <span className="flex-1">{i.message}</span>
+                  {(i.itemKey || i.chapterKey) && (
+                    <button onClick={() => onGo(i)} className="shrink-0 font-semibold text-brand-700 hover:underline">Vezi</button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+      {disclaimer}
     </div>
   );
 }

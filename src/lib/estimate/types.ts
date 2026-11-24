@@ -134,6 +134,8 @@ export type EstResource = {
   priceManual?: boolean;
 };
 
+export type F3Ref = { code: string; name: string; unit: string; quantity: number };
+
 export type EstItem = {
   key: string;
   code: string;
@@ -146,6 +148,8 @@ export type EstItem = {
   qtyNote?: string | null;
   /** Cantitate estimată (date insuficiente) — necesită verificare. */
   qtyEstimated?: boolean;
+  /** Datele originale din F3-ul autorității (la import); nu se modifică, servesc la verificare. */
+  f3?: F3Ref | null;
   /** Notă „de verificat” pusă de import / AI; dispare când utilizatorul confirmă. */
   reviewNote: string | null;
   resources: EstResource[];
