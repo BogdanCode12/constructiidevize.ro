@@ -56,3 +56,40 @@ body {
   .building-anim .b-ghost, .building-anim .b-structure, .building-anim .b-scan { display: none; }
   .building-anim .b-finish { animation: none !important; }
 }
+
+/*
+ * Panoul de admin pe fundal negru. Culorile temei se redefinesc doar în .admin-dark, deci paginile existente
+ * (carduri, tabele, formulare) devin închise fără să fie rescrise. Roșul siglei rămâne pentru butoane și accente.
+ */
+.admin-dark {
+  --color-ink: #f2f2f0;
+  --color-muted: #a3a3aa;
+  --color-line: #2b2b30;
+  --color-canvas: #1d1d21;
+  --color-brand-50: #2a1315;
+  --color-brand-100: #3b171a;
+  --color-brand-200: #6a2025;
+  background: #0f0f11;
+  color: var(--color-ink);
+  color-scheme: dark;
+}
+.admin-dark .bg-white,
+.admin-dark .bg-white\/90,
+.admin-dark .bg-white\/95 { background-color: #17171a; }
+.admin-dark .bg-ink { background-color: #f2f2f0; color: #0c0c0d; }
+.admin-dark .bg-ink.text-white { color: #0c0c0d; }
+.admin-dark .text-brand-700,
+.admin-dark .text-brand-800,
+.admin-dark .hover\:text-brand-700:hover { color: #ff6b70; }
+.admin-dark .text-red-700 { color: #ff7b7b; }
+.admin-dark .bg-red-50 { background-color: #3a1416; }
+.admin-dark .bg-amber-50 { background-color: #33270f; }
+.admin-dark .text-amber-800,
+.admin-dark .text-amber-900 { color: #f3c46b; }
+.admin-dark .bg-emerald-50 { background-color: #0f2e22; }
+.admin-dark .text-emerald-700,
+.admin-dark .text-emerald-800 { color: #6fdcaa; }
+.admin-dark .bg-sky-50 { background-color: #0f2533; }
+.admin-dark .text-sky-800 { color: #7cc7f0; }
+.admin-dark input::placeholder,
+.admin-dark textarea::placeholder { color: #6e6e76; }
