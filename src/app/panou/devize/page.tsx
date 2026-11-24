@@ -24,7 +24,7 @@ export default async function EstimatesPage({ searchParams }: { searchParams: Pr
     overhead_pct: string; profit_pct: string; items: number;
   }>(
     `SELECT e.id, e.name, p.name AS project_name, e.updated_at, e.overhead_pct, e.profit_pct,
-            (SELECT SUM(i.quantity * r.norm * r.price) FROM estimate_item_resources r
+            (SELECT SUM(i.quantity * r.norm * (1 + r.waste_pct / 100) * r.price) FROM estimate_item_resources r
                JOIN estimate_items i ON i.id = r.item_id JOIN estimate_chapters c ON c.id = i.chapter_id
               WHERE c.estimate_id = e.id) AS direct,
             (SELECT COUNT(*) FROM estimate_items i JOIN estimate_chapters c ON c.id = i.chapter_id WHERE c.estimate_id = e.id) AS items

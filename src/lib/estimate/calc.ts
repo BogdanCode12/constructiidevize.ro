@@ -1,13 +1,16 @@
-import { CM_TYPES, RES_TYPES, type EstChapter, type EstimateDoc, type EstItem, type ResType } from "./types";
+import { CM_TYPES, RES_TYPES, type EstChapter, type EstimateDoc, type EstItem, type EstResource, type ResType } from "./types";
 
 export type Breakdown = Record<ResType, number>;
 
 export const zero = (): Breakdown => ({ material: 0, manopera: 0, utilaj: 0, transport: 0, echipament: 0 });
 
+/** Consumul efectiv pe U.M. de articol: consum × (1 + pierderi tehnologice / 100). */
+export const effNorm = (r: Pick<EstResource, "norm" | "waste">) => r.norm * (1 + (r.waste || 0) / 100);
+
 /** Prețul unitar al articolului, pe categorii (lei / U.M. articol). */
 export function itemUnitBreakdown(item: EstItem): Breakdown {
   const b = zero();
-  for (const r of item.resources) b[r.type] += r.norm * r.price;
+  for (const r of item.resources) b[r.type] += effNorm(r) * r.price;
   return b;
 }
 
@@ -37,7 +40,7 @@ const isHourUnit = (u: string) => /^(or[ae]?|h|ore-om|om-or[ae])$/i.test(u.trim(
 export function chapterLaborHours(ch: EstChapter): number {
   let h = 0;
   for (const it of ch.items)
-    for (const r of it.resources) if (r.type === "manopera" && isHourUnit(r.unit)) h += r.norm * it.quantity;
+    for (const r of it.resources) if (r.type === "manopera" && isHourUnit(r.unit)) h += effNorm(r) * it.quantity;
   return h;
 }
 
@@ -45,7 +48,7 @@ export function chapterLaborHours(ch: EstChapter): number {
 export function chapterMachineHours(ch: EstChapter): number {
   let h = 0;
   for (const it of ch.items)
-    for (const r of it.resources) if ((r.type === "utilaj" || r.type === "transport") && isHourUnit(r.unit)) h += r.norm * it.quantity;
+    for (const r of it.resources) if ((r.type === "utilaj" || r.type === "transport") && isHourUnit(r.unit)) h += effNorm(r) * it.quantity;
   return h;
 }
 
@@ -107,7 +110,7 @@ export function aggregateResources(doc: Pick<EstimateDoc, "chapters">, type: Res
         if (r.type !== type) continue;
         const k = `${r.code}|${r.name}|${r.unit}|${r.price}`;
         const e = map.get(k) ?? { code: r.code, name: r.name, unit: r.unit, price: r.price, qty: 0 };
-        e.qty += r.norm * it.quantity;
+        e.qty += effNorm(r) * it.quantity;
         map.set(k, e);
       }
   return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, "ro"));

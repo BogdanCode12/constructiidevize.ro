@@ -1,11 +1,11 @@
 import "server-only";
 import ExcelJS from "exceljs";
-import { aggregateResources, itemUnitBreakdown, recap, sum, chapterBreakdown, sumCM } from "./calc";
+import { aggregateResources, effNorm, itemUnitBreakdown, recap, sum, chapterBreakdown, sumCM } from "./calc";
 import { RES_TYPE_LABEL, RES_TYPES, type EstimateDoc, type ResType } from "./types";
 
 /*
  * Export Excel cu formule verificabile:
- *   Analize (normă × preț) → F3 (cantitate × preț unitar) → F2 / Recapitulație (sume, procente editabile).
+ *   Analize (consum × (1 + pierderi) × preț) → F3 (cantitate × preț unitar) → F2 / Recapitulație (sume, procente editabile).
  * Fiecare formulă are și rezultatul precalculat, ca fișierul să arate corect și fără recalculare.
  */
 
@@ -58,8 +58,8 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
   const rc = wb.addWorksheet("Recapitulatie");
 
   // ---------- Analize de preț ----------
-  titleBlock(an, "Analize de preț pe articole (consum × preț unitar)", lines, 7);
-  an.columns = [{ width: 14 }, { width: 12 }, { width: 50 }, { width: 8 }, { width: 12 }, { width: 13 }, { width: 14 }];
+  titleBlock(an, "Analize de preț pe articole (consum × (1 + pierderi) × preț unitar)", lines, 8);
+  an.columns = [{ width: 14 }, { width: 12 }, { width: 50 }, { width: 8 }, { width: 12 }, { width: 10 }, { width: 13 }, { width: 14 }];
   const unitRefs = new Map<string, Record<ResType, string>>();
 
   doc.chapters.forEach((ch, ci) =>
@@ -67,13 +67,13 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
       const nr = `${ci + 1}.${ii + 1}`;
       const t = an.addRow([`Art. ${nr}`, it.code, `${it.name} (${it.unit})`]);
       t.font = { bold: true };
-      headerRow(an, ["Tip", "Cod", "Resursă", "U.M.", "Normă", "Preț unitar", "Valoare / U.M."]);
+      headerRow(an, ["Tip", "Cod", "Resursă", "U.M.", "Consum", "Pierderi %", "Preț unitar", "Valoare / U.M."]);
       const first = an.rowCount + 1;
       for (const res of it.resources) {
-        const row = an.addRow([RES_TYPE_LABEL[res.type], res.code, res.name, res.unit, res.norm, res.price]);
-        row.getCell(7).value = f(`E${row.number}*F${row.number}`, res.norm * res.price);
+        const row = an.addRow([RES_TYPE_LABEL[res.type], res.code, res.name, res.unit, res.norm, res.waste || 0, res.price]);
+        row.getCell(8).value = f(`E${row.number}*(1+F${row.number}/100)*G${row.number}`, effNorm(res) * res.price);
         fmt(row, [5], QTY);
-        fmt(row, [6, 7], MONEY);
+        fmt(row, [7, 8], MONEY);
       }
       const last = Math.max(first, an.rowCount);
       const ub = itemUnitBreakdown(it);
@@ -81,15 +81,15 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
       const totalRows: number[] = [];
       for (const type of RES_TYPES) {
         const row = an.addRow(["", "", `Total ${RES_TYPE_LABEL[type].toLowerCase()}`]);
-        row.getCell(7).value = f(`SUMIF(A${first}:A${last},"${RES_TYPE_LABEL[type]}",G${first}:G${last})`, ub[type]);
-        fmt(row, [7], MONEY);
-        refs[type] = ref("Analize", 7, row.number);
+        row.getCell(8).value = f(`SUMIF(A${first}:A${last},"${RES_TYPE_LABEL[type]}",H${first}:H${last})`, ub[type]);
+        fmt(row, [8], MONEY);
+        refs[type] = ref("Analize", 8, row.number);
         totalRows.push(row.number);
       }
       const tot = an.addRow(["", "", "Preț unitar articol"]);
-      tot.getCell(7).value = f(`SUM(G${totalRows[0]}:G${totalRows[totalRows.length - 1]})`, sum(ub));
+      tot.getCell(8).value = f(`SUM(H${totalRows[0]}:H${totalRows[totalRows.length - 1]})`, sum(ub));
       tot.font = { bold: true };
-      fmt(tot, [7], MONEY);
+      fmt(tot, [8], MONEY);
       an.addRow([]);
       unitRefs.set(it.key, refs);
     }),

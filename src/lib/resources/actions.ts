@@ -262,10 +262,3 @@ export async function searchCatalogAction(q: string, type?: ResType): Promise<Ca
     limit: 25,
   });
 }
-
-export async function deleteCompanyRecipeAction(data: FormData): Promise<void> {
-  const user = await requireUser();
-  if (!user.company) return;
-  await execute("DELETE FROM recipes WHERE id = ? AND company_id = ?", [Number(data.get("id")), user.company.id]);
-  revalidatePath("/panou/resurse");
-}

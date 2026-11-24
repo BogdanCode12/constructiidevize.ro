@@ -78,7 +78,7 @@ function tools(companyId: number) {
       strict: true,
       run: async ({ id }) => {
         const it = await recipeItem(companyId, id);
-        return it ? it.resources.map((r) => `${r.resourceId ?? ""}|${r.type}|${r.name}|${r.unit}|${r.norm}|${r.price}`).join("\n") || "rețetă fără resurse" : "rețeta nu există";
+        return it ? it.resources.map((r) => `${r.resourceId ?? ""}|${r.type}|${r.name}|${r.unit}|${r.norm}${r.waste ? `+${r.waste}%` : ""}|${r.price}`).join("\n") || "rețetă fără resurse" : "rețeta nu există";
       },
     }),
     betaTool({
@@ -105,7 +105,7 @@ function tools(companyId: number) {
 async function materialize(companyId: number, out: Output["articole"][number]): Promise<EstResource[]> {
   if (out.reteta_id && !out.resurse.length) return (await recipeItem(companyId, out.reteta_id))?.resources ?? [];
   const raw: EstResource[] = out.resurse.map((r) => ({
-    key: randomUUID(), resourceId: r.resursa_id, type: r.tip, code: "", name: r.denumire, unit: r.um, norm: Math.max(0, r.norma), price: 0,
+    key: randomUUID(), resourceId: r.resursa_id, type: r.tip, code: "", name: r.denumire, unit: r.um, norm: Math.max(0, r.norma), waste: 0, price: 0,
   }));
   return refreshPrices(companyId, raw);
 }

@@ -190,37 +190,6 @@ export async function updateAiTaskAction(_: FormState, data: FormData): Promise<
   return { ok: `„${name}” salvat.` };
 }
 
-export async function deleteRecipeAdminAction(data: FormData): Promise<void> {
-  const admin = await requireAdmin();
-  const id = Number(data.get("id"));
-  await execute("DELETE FROM recipes WHERE id = ?", [id]);
-  await logActivity({ userId: admin.id, action: "admin.reteta.stearsa", details: { id } });
-  revalidatePath("/admin/retete");
-}
-
-export async function promoteRecipeAction(data: FormData): Promise<void> {
-  const admin = await requireAdmin();
-  const id = Number(data.get("id"));
-  const r = await query<{ norm_key: string }>("SELECT norm_key FROM recipes WHERE id = ? AND company_id IS NOT NULL", [id]);
-  if (!r.length) return;
-  // Copiază rețeta firmei în catalogul global (înlocuiește una globală cu aceeași cheie).
-  await transaction(async (conn) => {
-    await execute("DELETE FROM recipes WHERE company_id IS NULL AND norm_key = ?", [r[0].norm_key], conn);
-    const ins = await execute(
-      "INSERT INTO recipes (company_id, code, name, unit, norm_key, source, created_by) SELECT NULL, code, name, unit, norm_key, 'manual', ? FROM recipes WHERE id = ?",
-      [admin.id, id], conn,
-    );
-    await execute(
-      `INSERT INTO recipe_resources (recipe_id, position, resource_id, type, code, name, unit, norm, price)
-       SELECT ?, rr.position, CASE WHEN res.company_id IS NULL THEN rr.resource_id ELSE NULL END, rr.type, rr.code, rr.name, rr.unit, rr.norm, rr.price
-         FROM recipe_resources rr LEFT JOIN resources res ON res.id = rr.resource_id WHERE rr.recipe_id = ?`,
-      [ins.insertId, id], conn,
-    );
-  });
-  await logActivity({ userId: admin.id, action: "admin.reteta.globala", details: { id } });
-  revalidatePath("/admin/retete");
-}
-
 export async function savePageAction(_: FormState, data: FormData): Promise<FormState> {
   const admin = await requireAdmin();
   const slug = s(data, "slug");

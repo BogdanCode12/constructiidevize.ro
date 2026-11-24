@@ -7,7 +7,7 @@ import { cellCls, ImportDialog, newKey, NumInput, RecipePicker, ResourcePicker }
 import { Simulator } from "./simulator";
 import { Gantt } from "./gantt";
 import { checkEstimate, type Issue } from "@/lib/estimate/checks";
-import { chapterBreakdown, fmtMoney, fmtQty, itemTotal, itemUnitBreakdown, itemUnitPrice, recap, sum } from "@/lib/estimate/calc";
+import { chapterBreakdown, effNorm, fmtMoney, fmtQty, itemTotal, itemUnitBreakdown, itemUnitPrice, recap, sum } from "@/lib/estimate/calc";
 import {
   RES_TYPE_LABEL, RES_TYPES, type EstChapter, type EstimateDoc, type EstItem, type EstResource, type ResType,
 } from "@/lib/estimate/types";
@@ -484,7 +484,8 @@ function ItemRows({
                     <th className="w-24 px-1 py-1.5 font-medium">Cod</th>
                     <th className="px-1 py-1.5 font-medium">Resursă</th>
                     <th className="w-16 px-1 py-1.5 font-medium">U.M.</th>
-                    <th className="w-24 px-1 py-1.5 text-right font-medium" title="Consum pe unitatea articolului">Normă / {item.unit || "U.M."}</th>
+                    <th className="w-24 px-1 py-1.5 text-right font-medium" title="Consum pe unitatea articolului">Consum / {item.unit || "U.M."}</th>
+                    <th className="w-16 px-1 py-1.5 text-right font-medium" title="Pierderi tehnologice: consum efectiv = consum × (1 + pierderi/100)">Pierd. %</th>
                     <th className="w-24 px-1 py-1.5 text-right font-medium">Preț</th>
                     <th className="w-24 px-2 py-1.5 text-right font-medium">Valoare / {item.unit || "U.M."}</th>
                     <th className="w-8" />
@@ -502,22 +503,23 @@ function ItemRows({
                       <td className="px-1 py-0.5"><input value={res.name} onChange={(e) => onRes(ri, (x) => ({ ...x, name: e.target.value }))} className={cellCls} placeholder="Denumire" /></td>
                       <td className="px-1 py-0.5"><input value={res.unit} onChange={(e) => onRes(ri, (x) => ({ ...x, unit: e.target.value }))} className={cellCls} /></td>
                       <td className="px-1 py-0.5"><NumInput value={res.norm} onChange={(n) => onRes(ri, (x) => ({ ...x, norm: n ?? 0 }))} /></td>
+                      <td className="px-1 py-0.5"><NumInput value={res.waste} onChange={(n) => onRes(ri, (x) => ({ ...x, waste: Math.min(100, Math.max(0, n ?? 0)) }))} /></td>
                       <td className="px-1 py-0.5"><NumInput value={res.price} onChange={(n) => onRes(ri, (x) => ({ ...x, price: n ?? 0 }))} /></td>
-                      <td className="px-2 py-0.5 text-right tabular-nums">{fmtMoney(res.norm * res.price)}</td>
+                      <td className="px-2 py-0.5 text-right tabular-nums">{fmtMoney(effNorm(res) * res.price)}</td>
                       <td className="px-1 text-center">
                         <button title="Elimină" onClick={() => onItem((it) => ({ ...it, resources: it.resources.filter((_, i) => i !== ri) }))} className="text-red-700">✕</button>
                       </td>
                     </tr>
                   ))}
                   {item.resources.length === 0 && (
-                    <tr><td colSpan={8} className="px-3 py-3 text-muted">Adaugă resursele articolului: materiale, manoperă, utilaje, transport, echipamente — cu consumul pe {item.unit || "unitatea de măsură"}.</td></tr>
+                    <tr><td colSpan={9} className="px-3 py-3 text-muted">Adaugă resursele articolului: materiale, manoperă, utilaje, transport, echipamente — cu consumul pe {item.unit || "unitatea de măsură"}.</td></tr>
                   )}
                 </tbody>
               </table>
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-3 py-2.5">
                 <ResourcePicker
-                  onPick={(c) => addRes({ resourceId: c.id, type: c.type, code: c.code ?? "", name: c.name, unit: c.unit, norm: 1, price: c.price ?? 0 })}
-                  onManual={(t) => addRes({ resourceId: null, type: t, code: "", name: "", unit: t === "material" || t === "echipament" ? "buc" : "ora", norm: 1, price: 0 })}
+                  onPick={(c) => addRes({ resourceId: c.id, type: c.type, code: c.code ?? "", name: c.name, unit: c.unit, norm: 1, waste: 0, price: c.price ?? 0 })}
+                  onManual={(t) => addRes({ resourceId: null, type: t, code: "", name: "", unit: t === "material" || t === "echipament" ? "buc" : "ora", norm: 1, waste: 0, price: 0 })}
                 />
                 <div className="flex flex-wrap gap-3 text-muted">
                   {RES_TYPES.filter((t) => t !== "echipament" || ub.echipament > 0).map((t) => (

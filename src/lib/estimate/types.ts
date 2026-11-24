@@ -113,6 +113,8 @@ export type EstResource = {
   name: string;
   unit: string;
   norm: number;
+  /** Pierderi tehnologice (%), separat de consum: consum efectiv = norm × (1 + waste/100). */
+  waste: number;
   price: number;
 };
 
