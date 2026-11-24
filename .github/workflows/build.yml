@@ -1,7 +1,15 @@
-name: Build & release
+name: Build & publicare
 
-# La fiecare push pe main: verificare tipuri, build Next.js (standalone) și publicare
-# în ramura `release`, de unde cron-ul de pe cPanel îl preia (scripts/cpanel-deploy.sh).
+# La fiecare push pe main: verificare tipuri, build Next.js (standalone), urcare prin FTP în folderul
+# aplicației din cPanel, repornire (tmp/restart.txt) și aplicarea migrărilor SQL noi.
+#
+# Secrets necesare (GitHub → Settings → Secrets and variables → Actions):
+#   FTP_SERVER     ex: ftp.devizconstruct.ro
+#   FTP_USERNAME   contul FTP (cu folderul aplicației ca rădăcină)
+#   FTP_PASSWORD
+#   FTP_DIR        opțional: folderul aplicației față de rădăcina contului FTP (implicit ./)
+#   SITE_URL       ex: https://devizconstruct.ro
+#   CRON_SECRET    același ca în variabilele aplicației din cPanel
 on:
   push:
     branches: [main]
@@ -9,15 +17,18 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: true
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Publicarea rulează doar pe main și doar după ce secretele FTP sunt configurate.
+      DEPLOY: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && secrets.FTP_SERVER != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -32,20 +43,42 @@ jobs:
 
       - name: Pregătește pachetul
         run: |
-          mkdir -p release/.next
+          mkdir -p release/.next release/tmp
           cp -r .next/standalone/. release/
           cp -r .next/static release/.next/static
           cp -r public release/public
           cp -r sql scripts release/
           rm -f release/.env
+          # Passenger repornește aplicația când se schimbă acest fișier.
+          echo "${GITHUB_SHA}" > release/tmp/restart.txt
 
-      - name: Publică în ramura release
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+      - name: Urcă prin FTP
+        if: env.DEPLOY == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./release/
+          server-dir: ${{ secrets.FTP_DIR || './' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .env
+            stderr.log
+
+      - name: Migrări bază de date
+        if: env.DEPLOY == 'true'
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          cd release
-          git init -q -b release
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git add -A -f
-          git commit -q -m "build ${GITHUB_SHA::7}"
-          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" release
+          # Aplicația pornește la prima cerere după repornire; încercăm de câteva ori.
+          for i in 1 2 3 4 5 6; do
+            if out=$(curl -fsS -X POST -H "Authorization: Bearer ${CRON_SECRET}" "${SITE_URL}/api/cron/migrari"); then
+              echo "$out"; exit 0
+            fi
+            sleep 10
+          done
+          echo "Migrările nu au putut fi aplicate (verifică site-ul și CRON_SECRET)."; exit 1

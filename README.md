@@ -18,11 +18,10 @@ Platformă SaaS pentru firme de construcții: devize, calcul manoperă și ore d
 sql/                    structura bazei de date (numerotată, se aplică în ordine)
 scripts/migrate.mjs     aplică fișierele SQL noi (ține evidența în schema_migrations)
 scripts/create-admin.mjs  face admin un cont existent
-scripts/cpanel-deploy.sh  rulat din cron pe cPanel: preia build-ul nou și repornește aplicația
 src/app/                pagini: site public, (auth), panou, admin, api/health
 src/lib/                bază de date, autentificare, email, planuri, module
 src/components/         componente UI
-.github/workflows/      build automat → ramura `release`
+.github/workflows/      build automat și publicare prin FTP
 ```
 
 ## Dezvoltare locală
@@ -44,34 +43,33 @@ npm run admin:create -- emailul@tau.ro
 
 ## Publicare pe cPanel
 
-Fluxul: **push pe `main` → GitHub Actions face build-ul → ramura `release` → cron-ul din cPanel îl preia → aplicația repornește singură.**
+Fluxul: **push pe `main` → GitHub Actions face build-ul → îl urcă prin FTP în folderul aplicației → aplicația repornește → se aplică migrările SQL noi.** Durează câteva minute; progresul se vede în tabul *Actions* de pe GitHub.
 
 ### O singură dată, la configurare
 
-1. **Baza de date.** În *MySQL Databases*, creează baza și utilizatorul, apoi dă-i acestuia toate drepturile pe bază. Importă fișierele din `sql/` în ordine din phpMyAdmin, sau lasă cron-ul să le aplice (pasul 4).
+1. **Baza de date.** În *MySQL Databases*, creează baza și utilizatorul, apoi dă-i acestuia toate drepturile pe bază. Tabelele se creează automat la prima publicare.
 2. **Aplicația Node.** În *Setup Node.js App → Create Application*:
-   - Node.js version: 20 sau 22
+   - Node.js version: 22
    - Application mode: Production
    - Application root: `constructiidevize`
    - Application URL: domeniul
    - Application startup file: `server.js`
-   - Environment variables: toate din `.env.example` (`APP_URL`, `DB_*`, `SMTP_*`, `MAIL_FROM`). Adaugă și `NODE_ENV=production`.
-3. **Clona ramurii `release`.** Din *Terminal* (sau SSH), după ce adaugi o *deploy key* (doar citire) în GitHub → Settings → Deploy keys:
-   ```bash
-   git clone -b release git@github.com:BogdanCode12/constructiidevize.ro.git ~/constructiidevize-release
-   ```
-4. **Migrările din cron.** Ca să ruleze automat migrările la publicare, creează `~/constructiidevize/.env` cu aceleași valori `DB_*`. Acesta e singurul loc din afara cPanel-ului unde stau parolele; fișierul nu e în git și nu e șters la publicare.
-5. **Cron.** În *Cron Jobs*, la fiecare 5 minute:
-   ```
-   /bin/bash $HOME/constructiidevize-release/scripts/cpanel-deploy.sh >> $HOME/logs/deploy.log 2>&1
-   ```
-6. **Alerte zilnice pe email.** Adaugă `CRON_SECRET` (un text lung, aleator) în variabilele aplicației, apoi un cron zilnic:
+   - Environment variables: `APP_URL`, `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `CRON_SECRET`, plus `SMTP_*` / `MAIL_FROM` pentru email și `ANTHROPIC_API_KEY` pentru asistent.
+3. **Cont FTP.** În *FTP Accounts*, creează un cont al cărui *Directory* este folderul aplicației (`constructiidevize`).
+4. **Secrets pe GitHub** (*Settings → Secrets and variables → Actions → New repository secret*):
+   - `FTP_SERVER`: serverul FTP (de ex. `ftp.domeniul.ro`)
+   - `FTP_USERNAME`, `FTP_PASSWORD`: contul de la pasul 3
+   - `FTP_DIR` (opțional): folderul aplicației față de rădăcina contului FTP, dacă nu e chiar rădăcina (de ex. `constructiidevize/`)
+   - `SITE_URL`: de ex. `https://domeniul.ro`
+   - `CRON_SECRET`: același text ca în variabilele aplicației
+5. **Alerte zilnice pe email.** În *Cron Jobs*, o dată pe zi:
    ```
    curl -s "https://domeniul.ro/api/cron/alerte?key=CRON_SECRET" > /dev/null
    ```
-7. **Fișiere încărcate.** Documentele clienților se salvează în `~/constructiidevize-uploads`, în afara aplicației, ca să nu fie șterse la publicare. Folderul se poate schimba cu `UPLOAD_DIR`. Include-l în backup.
-8. **Asistentul AI.** Adaugă `ANTHROPIC_API_KEY` (cheia din console.anthropic.com) în variabilele aplicației. Fără cheie, platforma merge normal, iar AI-ul apare ca neactivat. Pentru teste fără cost, `AI_MOCK=1` întoarce răspunsuri simulate. Modelul implicit e `claude-opus-5-5` și se schimbă cu `AI_MODEL`.
-9. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true}`.
+6. **Fișiere încărcate.** Documentele clienților se salvează în `~/constructiidevize-uploads`, în afara aplicației, ca să nu fie atinse la publicare. Folderul se poate schimba cu `UPLOAD_DIR`. Include-l în backup.
+7. **Asistentul AI.** Adaugă `ANTHROPIC_API_KEY` (cheia din console.anthropic.com) în variabilele aplicației. Fără cheie, platforma merge normal, iar asistentul apare ca neactivat. Pentru teste fără cost, `AI_MOCK=1` întoarce răspunsuri simulate. Modelul implicit e `claude-opus-5-5` și se schimbă cu `AI_MODEL`.
+8. **Verificare.** `https://domeniul/api/health` trebuie să răspundă cu `{"ok":true,"db":true}`.
+9. **Admin.** Creează-ți un cont din site, apoi în phpMyAdmin, în tabelul `users`, setează `role` = `admin` pe rândul tău.
 
 ## Ce poate face clientul
 
