@@ -5,7 +5,11 @@ import { getPlans } from "@/lib/plans";
 import { getSettings } from "@/lib/settings";
 import { getPage } from "@/lib/pages";
 
-export const metadata = { title: "Abonamente" };
+export const metadata = {
+  title: "Abonamente și prețuri",
+  description: "Abonamentele DevizConstruct.ro pentru firme de construcții: devize, dosar de licitație și urmărirea șantierului. Perioadă de probă gratuită.",
+  alternates: { canonical: "/abonamente" },
+};
 export const dynamic = "force-dynamic";
 
 export default async function PricingPage() {

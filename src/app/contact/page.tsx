@@ -4,7 +4,11 @@ import { Markdown } from "@/components/markdown";
 import { getPage } from "@/lib/pages";
 import { contactAction } from "./actions";
 
-export const metadata = { title: "Contact" };
+export const metadata = {
+  title: "Contact",
+  description: "Scrie-ne despre devize, licitații sau abonamente DevizConstruct.ro. Îți răspundem cât mai repede.",
+  alternates: { canonical: "/contact" },
+};
 export const dynamic = "force-dynamic";
 
 const input = "w-full rounded-lg border border-line bg-white px-4 py-3 outline-none transition focus:border-ink";

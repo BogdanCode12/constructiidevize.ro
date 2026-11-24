@@ -6,7 +6,11 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getSettings } from "@/lib/settings";
 import { registerAction } from "../actions";
 
-export const metadata = { title: "Creează cont" };
+export const metadata = {
+  title: "Creează cont gratuit",
+  description: "Creează gratuit un cont DevizConstruct.ro și fă primul deviz de construcții în câteva minute.",
+  alternates: { canonical: "/inregistrare" },
+};
 
 export default async function RegisterPage() {
   if (await getCurrentUser()) redirect("/panou");

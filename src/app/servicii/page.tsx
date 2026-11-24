@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { SiteShell } from "@/components/site/shell";
 
-export const metadata = { title: "Servicii", description: "Devize F1–F5 și C5–C9, import F3, asistent tehnic pentru licitații, dosar și declarații, management de șantier." };
+export const metadata = {
+  title: "Servicii: devize, licitații și șantier",
+  description: "Devize F1–F5 și C5–C9 cu export Excel, import F3 automat, asistent tehnic pentru caiete de sarcini, dosar de licitație, declarații și situații de lucrări.",
+  alternates: { canonical: "/servicii" },
+};
 
 const SECTIONS = [
   {

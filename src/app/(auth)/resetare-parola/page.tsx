@@ -3,7 +3,7 @@ import { ActionForm } from "@/components/action-form";
 import { Field } from "@/components/ui";
 import { resetPasswordAction } from "../actions";
 
-export const metadata = { title: "Parolă nouă" };
+export const metadata = { title: "Parolă nouă", robots: { index: false, follow: true } };
 
 export default async function ResetPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const { token } = await searchParams;

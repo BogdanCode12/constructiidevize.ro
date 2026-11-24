@@ -5,7 +5,7 @@ import { Field } from "@/components/ui";
 import { getCurrentUser } from "@/lib/auth/session";
 import { loginAction } from "../actions";
 
-export const metadata = { title: "Autentificare" };
+export const metadata = { title: "Autentificare", robots: { index: false, follow: true } };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; resetat?: string }> }) {
   if (await getCurrentUser()) redirect("/panou");

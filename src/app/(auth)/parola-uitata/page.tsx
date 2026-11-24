@@ -3,7 +3,7 @@ import { ActionForm } from "@/components/action-form";
 import { Field } from "@/components/ui";
 import { forgotPasswordAction } from "../actions";
 
-export const metadata = { title: "Parolă uitată" };
+export const metadata = { title: "Parolă uitată", robots: { index: false, follow: true } };
 
 export default function ForgotPage() {
   return (

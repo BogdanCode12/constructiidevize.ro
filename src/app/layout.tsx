@@ -7,6 +7,8 @@ import { siteUrl } from "@/lib/site-url";
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
+  // Verificarea în Google Search Console prin etichetă meta (opțional; altfel prin DNS).
+  ...(process.env.GOOGLE_SITE_VERIFICATION ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } } : {}),
   metadataBase: new URL(siteUrl()),
   openGraph: { siteName: "DevizConstruct.ro", locale: "ro_RO", type: "website" },
   title: { default: "DevizConstruct.ro — devize și dosare de licitație pentru construcții", template: "%s · DevizConstruct.ro" },

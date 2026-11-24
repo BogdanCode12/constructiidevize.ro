@@ -1,11 +1,19 @@
 import Link from "next/link";
 import { SiteShell } from "@/components/site/shell";
-import { Faq } from "@/components/site/faq";
+import { Faq, parseFaq } from "@/components/site/faq";
+import { siteUrl } from "@/lib/site-url";
 import { getSettings } from "@/lib/settings";
 import { getPlans } from "@/lib/plans";
 import { getPage } from "@/lib/pages";
 
 export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: { absolute: "DevizConstruct.ro — devize de construcții F1–F5, C5–C9 și dosare de licitație" },
+  description:
+    "Platformă online pentru firme de construcții: devize F1–F5 și C5–C9 cu export Excel, import F3 automat, asistent tehnic pentru caiete de sarcini, dosar de licitație și situații de lucrări.",
+  alternates: { canonical: "/" },
+};
 
 const STEPS = [
   { n: "01", title: "Încarci documentația", text: "Caietul de sarcini, fișa de date și lista de cantități (F3), din PDF, Word sau Excel." },
@@ -27,8 +35,32 @@ export default async function HomePage() {
   const [{ trial_days }, plans, hero, faq] = await Promise.all([getSettings(), getPlans(), getPage("acasa"), getPage("intrebari-frecvente")]);
   const from = plans.length ? Math.min(...plans.map((p) => p.monthly)) : null;
 
+  const base = siteUrl();
+  const faqItems = faq ? parseFaq(faq.body) : [];
+  const jsonLd = [
+    {
+      "@context": "https://schema.org", "@type": "Organization", "@id": `${base}/#org`, name: "DevizConstruct.ro", url: `${base}/`,
+      logo: `${base}/brand/devizconstruct-logo.png`,
+    },
+    {
+      "@context": "https://schema.org", "@type": "WebSite", "@id": `${base}/#site`, name: "DevizConstruct.ro", url: `${base}/`,
+      inLanguage: "ro-RO", publisher: { "@id": `${base}/#org` },
+    },
+    {
+      "@context": "https://schema.org", "@type": "SoftwareApplication", name: "DevizConstruct.ro", url: `${base}/`,
+      applicationCategory: "BusinessApplication", operatingSystem: "Web", inLanguage: "ro-RO",
+      description: "Devize de construcții F1–F5 și C5–C9, import F3, dosar de licitație și situații de lucrări.",
+      publisher: { "@id": `${base}/#org` },
+    },
+    ...(faqItems.length ? [{
+      "@context": "https://schema.org", "@type": "FAQPage",
+      mainEntity: faqItems.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    }] : []),
+  ];
+
   return (
     <SiteShell>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       {/* HERO — fundal: clădirea din schiță în clădire finisată (public/brand/hero-building.webp) */}
       <section className="relative isolate overflow-hidden bg-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}

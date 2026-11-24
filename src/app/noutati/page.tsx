@@ -17,7 +17,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     title: page > 1 ? `${title} (pagina ${page})` : title,
     description: "Articole despre devize de construcții, licitații publice, legislație, prețuri și organizarea lucrărilor, scrise pentru firme de construcții din România.",
     alternates: { canonical: `/noutati${qs ? `?${qs}` : ""}`, types: { "application/rss+xml": "/noutati/rss.xml" } },
-    openGraph: { type: "website", title, url: "/noutati" },
+    openGraph: { type: "website", title, url: "/noutati", siteName: "DevizConstruct.ro", locale: "ro_RO", images: ["/opengraph-image.jpg"] },
   };
 }
 

@@ -10,7 +10,11 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["mysql2", "unpdf"],
   // Pagina „Prețuri” a devenit „Abonamente”; linkurile vechi duc la pagina nouă.
   async redirects() {
-    return [{ source: "/preturi", destination: "/abonamente", permanent: true }];
+    return [
+      { source: "/preturi", destination: "/abonamente", permanent: true },
+      // O singură adresă pentru Google: fără „www” (altfel apar pagini duplicate). https se forțează din cPanel → Domains.
+      { source: "/:path*", has: [{ type: "host", value: "www.devizconstruct.ro" }], destination: "https://devizconstruct.ro/:path*", permanent: true },
+    ];
   },
   async headers() {
     return [

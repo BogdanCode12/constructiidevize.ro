@@ -1,6 +1,6 @@
 /** Întrebări frecvente din Markdown („## Întrebare” + răspuns), editabile din admin → Pagini. */
-export function Faq({ markdown }: { markdown: string }) {
-  const items = markdown
+export function parseFaq(markdown: string): { q: string; a: string }[] {
+  return markdown
     .split(/\n(?=## )/)
     .map((b) => b.trim())
     .filter((b) => b.startsWith("## "))
@@ -8,6 +8,10 @@ export function Faq({ markdown }: { markdown: string }) {
       const [q, ...rest] = b.split("\n");
       return { q: q.replace(/^##\s+/, ""), a: rest.join("\n").trim() };
     });
+}
+
+export function Faq({ markdown }: { markdown: string }) {
+  const items = parseFaq(markdown);
   return (
     <div className="divide-y divide-line border-y border-line">
       {items.map((it, i) => (

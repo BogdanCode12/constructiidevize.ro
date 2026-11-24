@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { findInvitation } from "@/lib/invitations";
 import { acceptInvitationAction, registerFromInvitationAction } from "./actions";
 
-export const metadata = { title: "Invitație" };
+export const metadata = { title: "Invitație", robots: { index: false, follow: true } };
 
 export default async function InvitationPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const { token = "" } = await searchParams;

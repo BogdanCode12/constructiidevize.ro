@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
   if (!p) return { title: "Articol negăsit" };
   const desc = description(p);
   const url = `/noutati/${p.slug}`;
-  const images = p.coverUrl ? [{ url: p.coverUrl, alt: p.coverAlt ?? p.title }] : undefined;
+  const images = p.coverUrl ? [{ url: p.coverUrl, alt: p.coverAlt ?? p.title }] : ["/opengraph-image.jpg"];
   return {
     title: p.metaTitle || p.title,
     description: desc,

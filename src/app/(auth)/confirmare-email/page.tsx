@@ -2,7 +2,7 @@ import { ButtonLink } from "@/components/ui";
 import { execute, queryOne } from "@/lib/db";
 import { hashToken } from "@/lib/auth/tokens";
 
-export const metadata = { title: "Confirmare email" };
+export const metadata = { title: "Confirmare email", robots: { index: false, follow: true } };
 
 export default async function VerifyEmailPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const { token } = await searchParams;
