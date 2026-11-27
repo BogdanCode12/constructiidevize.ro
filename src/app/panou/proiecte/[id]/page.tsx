@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CountySelect } from "@/components/county-select";
 import { notFound } from "next/navigation";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
@@ -22,8 +23,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const id = Number((await params).id);
   const p = await queryOne<{
     id: number; name: string; client_name: string | null; authority: string | null; notice_number: string | null;
-    location: string | null; status: keyof typeof STATUS_LABEL; notes: string | null;
-  }>("SELECT id, name, client_name, authority, notice_number, location, status, notes FROM projects WHERE id = ? AND company_id = ?", [id, companyId]);
+    location: string | null; county: string | null; status: keyof typeof STATUS_LABEL; notes: string | null;
+  }>("SELECT id, name, client_name, authority, notice_number, location, county, status, notes FROM projects WHERE id = ? AND company_id = ?", [id, companyId]);
   if (!p) notFound();
 
   const deadlines = await query<{ id: number; type: keyof typeof DEADLINE_TYPES; title: string; due_at: Date; done: number }>(
@@ -123,7 +124,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
             <Field label="Autoritate contractantă" name="authority" required={false} defaultValue={p.authority ?? ""} />
             <Field label="Nr. anunț / procedură SEAP" name="notice_number" required={false} defaultValue={p.notice_number ?? ""} />
             <Field label="Beneficiar" name="client_name" required={false} defaultValue={p.client_name ?? ""} />
-            <Field label="Locație" name="location" required={false} defaultValue={p.location ?? ""} />
+            <Field label="Localitate" name="location" required={false} defaultValue={p.location ?? ""} />
+            <CountySelect defaultValue={p.county} hint="Devizele noi ale proiectului folosesc prețurile din acest județ." />
             <label className="block">
               <span className="mb-1.5 block text-sm font-medium">Status</span>
               <select name="status" defaultValue={p.status} className={input}>

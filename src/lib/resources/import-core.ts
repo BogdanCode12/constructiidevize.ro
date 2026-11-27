@@ -1,4 +1,5 @@
 import "server-only";
+import { parseCounty } from "../counties";
 import ExcelJS from "exceljs";
 import { query } from "../db";
 import { normKey, normText, similarity } from "../estimate/normalize";
@@ -22,6 +23,7 @@ export const IMPORT_FIELDS = [
   { key: "producer", label: "Producător", required: false, hints: ["producator", "producător", "marca", "brand"] },
   { key: "specs", label: "Specificații", required: false, hints: ["specificatii", "specificații", "caracteristici", "detalii"] },
   { key: "valid_until", label: "Valabil până la", required: false, hints: ["valabil", "valabilitate", "valid"] },
+  { key: "county", label: "Județ (zona prețului)", required: false, hints: ["judet", "județ", "zona", "zonă", "county", "regiune"] },
 ] as const;
 export type ImportFieldKey = (typeof IMPORT_FIELDS)[number]["key"];
 export type ImportRow = Partial<Record<ImportFieldKey, string>>;
@@ -87,6 +89,8 @@ export type PreviewRow = {
   index: number;
   code: string | null; name: string; unit: string; price: number | null; supplier: string | null; category: string | null;
   producer: string | null; specs: string | null; validUntil: string | null;
+  /** Județul prețului (cod auto) din coloana „Județ”; null = cel ales pentru tot fișierul. */
+  county: string | null;
   status: "nou" | "existent" | "dublura_fisier" | "invalid";
   reason?: string;
   existing?: { id: number; name: string; price: number | null; verified: boolean };
@@ -130,11 +134,13 @@ export async function previewRows(companyId: number | null, type: ResType, input
       producer: (raw.producer ?? "").trim().slice(0, 120) || null,
       specs: (raw.specs ?? "").trim().slice(0, 500) || null,
       validUntil: toDate(validRaw),
+      county: parseCounty(raw.county),
     };
     if (!name) return { ...base, status: "invalid", reason: "Lipsește denumirea." };
     if (!unit) return { ...base, status: "invalid", reason: "Lipsește unitatea de măsură." };
     if (priceRaw && (price === null || price <= 0)) return { ...base, status: "invalid", reason: `Preț nevalid: „${priceRaw}”.` };
     if (validRaw && !base.validUntil) return { ...base, status: "invalid", reason: `Dată de valabilitate nevalidă: „${validRaw}”.` };
+    if ((raw.county ?? "").trim() && !base.county) return { ...base, status: "invalid", reason: `Județ nerecunoscut: „${(raw.county ?? "").trim()}”.` };
 
     const key = normKey(name, unit);
     const fileKey = code ? `c:${normText(code)}` : `k:${key}`;

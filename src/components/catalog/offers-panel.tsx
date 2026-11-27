@@ -1,4 +1,5 @@
 import { Card } from "../ui";
+import { zoneLabel } from "@/lib/counties";
 import { setCurrentOfferAction, setOfferStatusAction } from "@/lib/resources/actions";
 import { PRICE_SOURCE_LABEL, type CatalogResource, type PriceOffer } from "@/lib/estimate/types";
 import { StatusBadge } from "./resource-list";
@@ -49,7 +50,7 @@ export function OffersPanel({
           <tr>
             <th className="px-3 py-2 font-medium">Data</th>
             <th className="px-3 py-2 text-right font-medium">Preț fără TVA</th>
-            <th className="px-3 py-2 font-medium">Furnizor / sursă</th>
+            <th className="px-3 py-2 font-medium">Zonă · furnizor / sursă</th>
             <th className="px-3 py-2 font-medium">Condiții</th>
             <th className="px-3 py-2 font-medium">Status</th>
             <th className="px-3 py-2" />
@@ -67,6 +68,7 @@ export function OffersPanel({
                 {o.currency !== "RON" && <div className="text-xs text-muted">{money.format(o.price)} {o.currency} × {o.exchangeRate.toFixed(4)}</div>}
               </td>
               <td className="px-3 py-2">
+                <span className={`mr-1.5 rounded px-1.5 py-0.5 text-[11px] font-semibold ${o.county ? "bg-sky-50 text-sky-800" : "bg-canvas text-muted"}`}>{zoneLabel(o.county)}</span>
                 {o.supplier ?? "—"}
                 <div className="text-xs text-muted">
                   {PRICE_SOURCE_LABEL[o.source]}

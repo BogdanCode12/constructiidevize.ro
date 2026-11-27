@@ -22,7 +22,7 @@ export const USABLE = `status <> 'depasit' AND superseded_by IS NULL
 export const DRAFT_NOTE = "Rețetă nevalidată (draft) — verifică consumurile înainte de ofertare";
 
 /** Caută rețete (ale firmei + globale): FULLTEXT ca generator de candidați, apoi scor de asemănare. */
-export async function searchRecipes(companyId: number, q: string, unit?: string, limit = 10): Promise<RecipeHit[]> {
+export async function searchRecipes(companyId: number, q: string, unit?: string, limit = 10, county?: string | null): Promise<RecipeHit[]> {
   const text = q.trim();
   if (!text) return [];
   let rows = await query<RecipeRow & { rel: number }>(
@@ -48,7 +48,7 @@ export async function searchRecipes(companyId: number, q: string, unit?: string,
   });
   scored.sort((a, b) => b.score - a.score);
   const top = scored.slice(0, limit);
-  const prices = await unitPrices(companyId, top.map((t) => t.r.id));
+  const prices = await unitPrices(companyId, top.map((t) => t.r.id), county);
   return top.map(({ r, score }) => ({
     id: r.id, global: r.company_id === null, code: r.code, name: r.name, unit: r.unit, uses: r.uses,
     unitPrice: prices.get(r.id) ?? 0, score: Math.min(1, score), status: r.status,
@@ -58,7 +58,7 @@ export async function searchRecipes(companyId: number, q: string, unit?: string,
 type RRow = { recipe_id: number; resource_id: number | null; type: ResType; code: string | null; name: string; unit: string; norm: string; waste_pct: string; price: string; tariff_kind: TariffKind | null };
 
 /** Resursele rețetelor, cu prețul aplicabil firmei (propriu sau de referință), dacă resursa e vizibilă. */
-async function recipeResources(companyId: number, recipeIds: number[]): Promise<Map<number, EstResource[]>> {
+async function recipeResources(companyId: number, recipeIds: number[], county?: string | null): Promise<Map<number, EstResource[]>> {
   const map = new Map<number, EstResource[]>();
   if (!recipeIds.length) return map;
   const rows = await query<RRow>(
@@ -66,7 +66,7 @@ async function recipeResources(companyId: number, recipeIds: number[]): Promise<
        FROM recipe_resources rr WHERE rr.recipe_id IN (?) ORDER BY rr.recipe_id, rr.position`,
     [recipeIds],
   );
-  const cur = await effectivePrices(companyId, rows.map((x) => x.resource_id).filter((x): x is number => !!x));
+  const cur = await effectivePrices(companyId, rows.map((x) => x.resource_id).filter((x): x is number => !!x), county);
   for (const x of rows) {
     const list = map.get(x.recipe_id) ?? [];
     const c = x.resource_id ? cur.get(x.resource_id) : undefined;
@@ -88,18 +88,18 @@ async function recipeResources(companyId: number, recipeIds: number[]): Promise<
   return map;
 }
 
-async function unitPrices(companyId: number, ids: number[]): Promise<Map<number, number>> {
-  const res = await recipeResources(companyId, ids);
+async function unitPrices(companyId: number, ids: number[], county?: string | null): Promise<Map<number, number>> {
+  const res = await recipeResources(companyId, ids, county);
   const out = new Map<number, number>();
   for (const [id, list] of res) out.set(id, list.reduce((s, r) => s + effNorm(r) * r.price, 0));
   return out;
 }
 
 /** Articol gata de pus în deviz, construit dintr-o rețetă (prețuri curente). */
-export async function recipeItem(companyId: number, recipeId: number, quantity = 0): Promise<EstItem | null> {
+export async function recipeItem(companyId: number, recipeId: number, quantity = 0, county?: string | null): Promise<EstItem | null> {
   const r = await queryOne<RecipeRow>("SELECT id, company_id, code, name, unit, uses, status FROM recipes WHERE id = ? AND (company_id IS NULL OR company_id = ?)", [recipeId, companyId]);
   if (!r) return null;
-  const res = (await recipeResources(companyId, [r.id])).get(r.id) ?? [];
+  const res = (await recipeResources(companyId, [r.id], county)).get(r.id) ?? [];
   await execute("UPDATE recipes SET uses = uses + 1 WHERE id = ?", [r.id]);
   return { key: randomUUID(), code: r.code ?? "", name: r.name, unit: r.unit, quantity, reviewNote: r.status === "verificat" ? null : DRAFT_NOTE, resources: res };
 }
@@ -144,13 +144,13 @@ export type MatchStatus = "exact" | "propus" | "cache" | "negasit";
  * Potrivire fără AI: cod → denumire exactă → potriviri AI salvate → căutare cu scor.
  * Întoarce articolele cu resurse și o notă de verificare unde potrivirea nu e sigură.
  */
-export async function matchLines(companyId: number, lines: ImportLine[]): Promise<{ item: EstItem; status: MatchStatus }[]> {
-  const res = await matchLinesRaw(companyId, lines);
+export async function matchLines(companyId: number, lines: ImportLine[], county?: string | null): Promise<{ item: EstItem; status: MatchStatus }[]> {
+  const res = await matchLinesRaw(companyId, lines, county);
   // Datele originale din F3 rămân atașate articolului, pentru verificarea abaterilor.
   return res.map((r, i) => ({ ...r, item: { ...r.item, f3: { code: lines[i].code, name: lines[i].name, unit: lines[i].unit, quantity: lines[i].quantity } } }));
 }
 
-async function matchLinesRaw(companyId: number, lines: ImportLine[]): Promise<{ item: EstItem; status: MatchStatus }[]> {
+async function matchLinesRaw(companyId: number, lines: ImportLine[], county?: string | null): Promise<{ item: EstItem; status: MatchStatus }[]> {
   const out: { item: EstItem; status: MatchStatus }[] = [];
   for (const line of lines) {
     const base = { key: randomUUID(), code: line.code, name: line.name, unit: line.unit, quantity: line.quantity, resources: [] as EstResource[], reviewNote: null as string | null };
@@ -164,7 +164,7 @@ async function matchLinesRaw(companyId: number, lines: ImportLine[]): Promise<{ 
       [companyId, line.code, line.code, line.unit, key],
     );
     if (exact) {
-      const it = await recipeItem(companyId, exact.id, line.quantity);
+      const it = await recipeItem(companyId, exact.id, line.quantity, county);
       if (it) { out.push({ item: { ...it, code: line.code || it.code, name: line.name, quantity: line.quantity }, status: it.reviewNote ? "propus" : "exact" }); continue; }
     }
 
@@ -176,14 +176,14 @@ async function matchLinesRaw(companyId: number, lines: ImportLine[]): Promise<{ 
     if (cached) {
       const res = (typeof cached.proposal === "string" ? JSON.parse(cached.proposal) : cached.proposal) as EstResource[];
       await execute("UPDATE ai_match_cache SET hits = hits + 1 WHERE id = ?", [cached.id]);
-      out.push({ item: { ...base, resources: await refreshPrices(companyId, res), reviewNote: "Propus anterior de asistent — verifică normele și prețurile" }, status: "cache" });
+      out.push({ item: { ...base, resources: await refreshPrices(companyId, res, county), reviewNote: "Propus anterior de asistent — verifică normele și prețurile" }, status: "cache" });
       continue;
     }
 
     // 4. căutare cu scor
-    const [best] = await searchRecipes(companyId, line.name, line.unit, 1);
+    const [best] = await searchRecipes(companyId, line.name, line.unit, 1, county);
     if (best && best.score >= 0.5 && normUnit(best.unit) === normUnit(line.unit)) {
-      const it = await recipeItem(companyId, best.id, line.quantity);
+      const it = await recipeItem(companyId, best.id, line.quantity, county);
       if (it) {
         const sure = best.score >= 0.9 && best.status === "verificat";
         out.push({
@@ -199,8 +199,8 @@ async function matchLinesRaw(companyId: number, lines: ImportLine[]): Promise<{ 
 }
 
 /** Actualizează prețurile resurselor după catalogul curent (resursele dispărute rămân cu prețul salvat). */
-export async function refreshPrices(companyId: number, res: EstResource[]): Promise<EstResource[]> {
-  const cur = await effectivePrices(companyId, res.map((r) => r.resourceId).filter((x): x is number => !!x));
+export async function refreshPrices(companyId: number, res: EstResource[], county?: string | null): Promise<EstResource[]> {
+  const cur = await effectivePrices(companyId, res.map((r) => r.resourceId).filter((x): x is number => !!x), county);
   return res.map((r) => {
     const c = r.resourceId ? cur.get(r.resourceId) : undefined;
     return {

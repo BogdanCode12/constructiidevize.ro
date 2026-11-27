@@ -1,5 +1,6 @@
 "use server";
 
+import { isCounty } from "@/lib/counties";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { execute, queryOne } from "@/lib/db";
@@ -27,8 +28,9 @@ export async function updateProjectAction(_: FormState, data: FormData): Promise
   if (!name) return { error: "Denumirea este obligatorie." };
   if (!STATUSES.includes(status)) return { error: "Status invalid." };
   await execute(
-    "UPDATE projects SET name = ?, client_name = ?, authority = ?, notice_number = ?, location = ?, status = ?, notes = ? WHERE id = ?",
-    [name, s(data, "client_name"), s(data, "authority"), s(data, "notice_number", 60), s(data, "location"), status, s(data, "notes", 5000), id],
+    "UPDATE projects SET name = ?, client_name = ?, authority = ?, notice_number = ?, location = ?, county = ?, status = ?, notes = ? WHERE id = ?",
+    [name, s(data, "client_name"), s(data, "authority"), s(data, "notice_number", 60), s(data, "location"),
+      isCounty(String(data.get("county") ?? "")) ? String(data.get("county")) : null, status, s(data, "notes", 5000), id],
   );
   await logActivity({ companyId: user.company!.id, userId: user.id, action: "proiect.modificat", details: { id } });
   revalidatePath(`/panou/proiecte/${id}`);

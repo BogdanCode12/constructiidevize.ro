@@ -1,5 +1,7 @@
 "use client";
 
+import { priceOriginLabel, zoneLabel } from "@/lib/counties";
+import { useZone } from "./zone";
 import { useEffect, useMemo, useState } from "react";
 import { priceSourcesAction, resourceOffersAction, type OfferBrief } from "../actions";
 import { searchCatalogAction } from "@/lib/resources/actions";
@@ -54,7 +56,7 @@ function PriceSource({ r, src }: { r: EstResource; src: Sources | null }) {
     <div className="flex flex-wrap items-center gap-1 text-[11px]">
       {off ? (
         <>
-          <span className="text-muted">{off.own ? "prețul firmei" : "catalog"} · {off.supplier ?? PRICE_SOURCE_LABEL[off.source as keyof typeof PRICE_SOURCE_LABEL] ?? off.source} · {dateFmt(off.obtainedAt)}</span>
+          <span className="text-muted">{off.own ? "prețul firmei" : "catalog"} · {zoneLabel(off.county)} · {off.supplier ?? PRICE_SOURCE_LABEL[off.source as keyof typeof PRICE_SOURCE_LABEL] ?? off.source} · {dateFmt(off.obtainedAt)}</span>
           {off.expired && <Badge tone="bad">expirat {dateFmt(off.validUntil)}</Badge>}
           {off.status === "neverificat" && <Badge tone="warn">neverificat</Badge>}
           {off.status === "inactiv" && <Badge tone="muted">ofertă dezactivată</Badge>}
@@ -66,7 +68,7 @@ function PriceSource({ r, src }: { r: EstResource; src: Sources | null }) {
         <span className="text-muted">din catalog (fără ofertă înregistrată)</span>
       )}
       {cur && cur.price === null && <Badge tone="warn">fără preț în catalog</Badge>}
-      {diff !== null && <Badge tone="warn">în catalog acum: {fmtMoney(diff)} lei</Badge>}
+      {diff !== null && <Badge tone="warn">pentru zona devizului acum: {fmtMoney(diff)} lei ({priceOriginLabel(cur?.priceInfo)})</Badge>}
     </div>
   );
 }
@@ -98,6 +100,7 @@ function OfferCompare({ doc, res, onUse }: { doc: EstimateDoc; res: EstResource;
               <td className="py-1.5 pr-2">
                 <div className="font-medium">{o.supplier ?? "—"} {o.own && <span className="text-brand-800">(prețul firmei)</span>}</div>
                 <div className="flex flex-wrap gap-1 pt-0.5">
+                  <Badge tone={o.county && o.county === doc.priceCounty ? "ok" : "muted"}>{zoneLabel(o.county)}</Badge>
                   <span className="text-muted">{dateFmt(o.obtainedAt)}</span>
                   {o.expired && <Badge tone="bad">expirat</Badge>}
                   {o.status === "neverificat" && <Badge tone="warn">neverificat</Badge>}
@@ -129,10 +132,11 @@ function OfferCompare({ doc, res, onUse }: { doc: EstimateDoc; res: EstResource;
 
 /** Înlocuirea unei resurse cu alta din catalog (niciodată automat). */
 function ReplacePicker({ res, onPick }: { res: EstResource; onPick: (c: CatalogResource) => void }) {
+  const zone = useZone();
   const [q, setQ] = useState("");
   const [list, setList] = useState<CatalogResource[]>([]);
   useEffect(() => {
-    const t = setTimeout(async () => setList(await searchCatalogAction(q, res.type)), 250);
+    const t = setTimeout(async () => setList(await searchCatalogAction(q, res.type, zone)), 250);
     return () => clearTimeout(t);
   }, [q, res.type]);
   return (
@@ -181,10 +185,10 @@ export function ItemPanel({
   useEffect(() => {
     let alive = true;
     setSrc(null);
-    priceSourcesAction(resIds, offIds).then((s) => { if (alive) setSrc(s); });
+    priceSourcesAction(resIds, offIds, doc.priceCounty).then((s) => { if (alive) setSrc(s); });
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sig]);
+  }, [sig, doc.priceCounty]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };

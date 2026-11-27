@@ -1,5 +1,6 @@
 "use server";
 
+import { isCounty } from "../counties";
 import { revalidatePath } from "next/cache";
 import { execute, queryOne, transaction } from "../db";
 import { requireAdmin, requireUser } from "../auth/session";
@@ -42,7 +43,7 @@ export async function previewImportAction(scope: string, type: string, rows: Imp
   return previewRows(companyId, type, rows);
 }
 
-export type ApplyOptions = { obtainedAt: string; verified: boolean; supplier: string };
+export type ApplyOptions = { obtainedAt: string; verified: boolean; supplier: string; county?: string };
 
 /**
  * Aplică importul pentru rândurile bifate. Resursele noi se creează; la cele existente prețul se adaugă în istoric
@@ -56,9 +57,10 @@ export async function applyImportAction(scope: string, type: string, rows: Impor
   const obtainedAt = /^\d{4}-\d{2}-\d{2}$/.test(opts.obtainedAt) && opts.obtainedAt <= today() ? opts.obtainedAt : today();
   const defSupplier = opts.supplier.trim().slice(0, 160) || null;
   const status = opts.verified ? "verificat" : "neverificat";
+  const defCounty = isCounty(opts.county) ? opts.county : null;
 
   const preview = await previewRows(companyId, type, rows);
-  let created = 0, priced = 0, keptVerified = 0, skipped = 0;
+  let created = 0, priced = 0, keptVerified = 0, skipped = 0, zoned = 0;
   const touched = new Set<number>();
 
   await transaction(async (conn) => {
@@ -82,12 +84,16 @@ export async function applyImportAction(scope: string, type: string, rows: Impor
         created++;
       }
       if (r.price !== null) {
+        const county = r.county ?? defCounty;
         const ins = await execute(
-          `INSERT INTO resource_prices (resource_id, company_id, supplier, price, currency, exchange_rate, price_ron, source, obtained_at, valid_until, status, created_by)
-           VALUES (?, ?, ?, ?, 'RON', 1, ?, 'import', ?, ?, ?, ?)`,
-          [id, companyId, r.supplier ?? defSupplier, r.price, r.price, obtainedAt, r.validUntil, status, userId], conn,
+          `INSERT INTO resource_prices (resource_id, company_id, county, supplier, price, currency, exchange_rate, price_ron, source, obtained_at, valid_until, status, created_by)
+           VALUES (?, ?, ?, ?, ?, 'RON', 1, ?, 'import', ?, ?, ?, ?)`,
+          [id, companyId, county, r.supplier ?? defSupplier, r.price, r.price, obtainedAt, r.validUntil, status, userId], conn,
         );
         priced++;
+        touched.add(id);
+        // Un preț pe județ intră în oferte (se folosește în devizele din zonă); prețul de referință rămâne cel național.
+        if (county) { zoned++; continue; }
         const cur = await queryOne<{ verified: number | null }>(
           "SELECT (p.status = 'verificat') AS verified FROM resources r LEFT JOIN resource_prices p ON p.id = r.current_price_id WHERE r.id = ?",
           [id], conn,
@@ -103,6 +109,7 @@ export async function applyImportAction(scope: string, type: string, rows: Impor
   await logActivity({ companyId, userId, action: "resurse.importate", details: { type, created, priced, keptVerified, skipped } });
   for (const p of ["/panou/resurse", "/admin/resurse", "/admin/manopera"]) revalidatePath(p);
   const parts = [`${created} resurse noi`, `${priced} prețuri adăugate în istoric`];
+  if (zoned) parts.push(`${zoned} prețuri pe județ (folosite în devizele din zona respectivă)`);
   if (keptVerified) parts.push(`${keptVerified} prețuri verificate păstrate ca referință (prețul nou a intrat doar în istoric)`);
   if (skipped) parts.push(`${skipped} rânduri sărite`);
   return { ok: `Import finalizat: ${parts.join(", ")}.` };

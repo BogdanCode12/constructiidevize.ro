@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { exchangeRateAction } from "@/lib/resources/actions";
 import { PRICE_SOURCE_LABEL, type PriceSource } from "@/lib/estimate/types";
+import { COUNTIES } from "@/lib/counties";
 
 const inputCls = "w-full rounded-lg border-2 border-ink/10 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500";
 const todayRo = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Bucharest" }).format(new Date());
@@ -53,7 +54,13 @@ export function OfferFields({ scope, optional = false, ownPrice = false }: { sco
           </L>
         ) : <div />}
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <L label="Zona prețului" hint="Unde e valabil prețul. Devizele din acel județ îl folosesc primul.">
+          <select name="county" defaultValue="" className={inputCls}>
+            <option value="">Toată țara</option>
+            {COUNTIES.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+          </select>
+        </L>
         <L label="Furnizor"><input name="supplier" placeholder="ex. Depozitul X" className={inputCls} /></L>
         <L label="Sursa prețului">
           <select name="source" defaultValue={sources[0]} className={inputCls}>

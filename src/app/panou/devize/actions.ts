@@ -1,5 +1,6 @@
 "use server";
 
+import { isCounty, parseCounty } from "@/lib/counties";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { execute, query, queryOne } from "@/lib/db";
@@ -18,6 +19,9 @@ import { runEstimatorJob, type EstimatorInput, type EstimatorProposal } from "@/
 import type { CatalogResource, EstItem, PriceOffer } from "@/lib/estimate/types";
 import { effectivePrices, isExpired, listOffers } from "@/lib/resources/repo";
 
+/** Zona de prețuri primită de la client: doar un cod de județ valid. */
+const zone = (c: string | null | undefined) => (isCounty(c) ? c : null);
+
 async function companyOf() {
   const user = await requireUser();
   if (!user.company) throw new Error("Contul nu are o firmă.");
@@ -28,15 +32,19 @@ export async function createEstimateAction(_: FormState, data: FormData): Promis
   const { user, companyId } = await companyOf();
   const projectId = Number(data.get("project_id"));
   const name = String(data.get("name") ?? "").trim().slice(0, 190) || "Deviz";
-  const project = await queryOne<{ id: number }>("SELECT id FROM projects WHERE id = ? AND company_id = ?", [projectId, companyId]);
+  const project = await queryOne<{ id: number; county: string | null; location: string | null; company_county: string | null }>(
+    `SELECT p.id, p.county, p.location, c.county AS company_county FROM projects p JOIN companies c ON c.id = p.company_id
+      WHERE p.id = ? AND p.company_id = ?`, [projectId, companyId]);
   if (!project) return { error: "Alege un proiect." };
+  // Zona de prețuri: județul lucrării (proiect), altfel cel din locație, altfel județul firmei. Se poate schimba din deviz.
+  const priceCounty = zone(project.county) ?? parseCounty(project.location) ?? parseCounty(project.company_county);
 
   // Regulile valabile azi se copiază în deviz; nu se mai schimbă dacă se modifică ulterior în admin.
   const d = await estimateDefaults();
   const res = await execute(
-    `INSERT INTO estimates (company_id, project_id, name, overhead_pct, profit_pct, vat_pct, cam_pct, overhead_base, profit_base, rounding_mode, rules_date, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [companyId, projectId, name, d.overheadPct, d.profitPct, d.vatPct, d.camPct, d.overheadBase, d.profitBase, d.rounding, d.rulesDate, user.id],
+    `INSERT INTO estimates (company_id, project_id, name, overhead_pct, profit_pct, vat_pct, cam_pct, overhead_base, profit_base, rounding_mode, rules_date, price_county, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [companyId, projectId, name, d.overheadPct, d.profitPct, d.vatPct, d.camPct, d.overheadBase, d.profitBase, d.rounding, d.rulesDate, priceCounty, user.id],
   );
   await execute("INSERT INTO estimate_chapters (estimate_id, position, name) VALUES (?, 0, 'Capitolul 1')", [res.insertId]);
   await logActivity({ companyId, userId: user.id, action: "deviz.creat", details: { id: res.insertId, name } });
@@ -68,14 +76,14 @@ export async function deleteEstimateAction(data: FormData): Promise<void> {
 // ---------- Rețete, import F3, completare AI ----------
 
 
-export async function searchRecipesAction(q: string, unit?: string): Promise<RecipeHit[]> {
+export async function searchRecipesAction(q: string, unit?: string, county?: string | null): Promise<RecipeHit[]> {
   const { companyId } = await companyOf();
-  return searchRecipes(companyId, q.slice(0, 200), unit?.slice(0, 20), 12);
+  return searchRecipes(companyId, q.slice(0, 200), unit?.slice(0, 20), 12, zone(county));
 }
 
-export async function recipeItemAction(id: number): Promise<EstItem | null> {
+export async function recipeItemAction(id: number, county?: string | null): Promise<EstItem | null> {
   const { companyId } = await companyOf();
-  return recipeItem(companyId, Number(id));
+  return recipeItem(companyId, Number(id), 0, zone(county));
 }
 
 export async function saveRecipeAction(item: EstItem, global: boolean): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -114,7 +122,7 @@ export async function importF3Action(data: FormData): Promise<ImportResult> {
   const stats: Record<MatchStatus, number> = { exact: 0, propus: 0, cache: 0, negasit: 0 };
   const out = [];
   for (const ch of chapters) {
-    const matched = await matchLines(companyId, ch.lines);
+    const matched = await matchLines(companyId, ch.lines, zone(String(data.get("county") ?? "")));
     matched.forEach((m) => stats[m.status]++);
     out.push({ name: ch.name, items: matched.map((m) => m.item) });
   }
@@ -125,7 +133,7 @@ export async function importF3Action(data: FormData): Promise<ImportResult> {
 export async function startEstimatorAction(estimateId: number, items: EstimatorInput[]): Promise<{ ok: true; jobId: number } | { ok: false; error: string }> {
   const { user, companyId } = await companyOf();
   if (!aiConfigured()) return { ok: false, error: "Asistentul tehnic nu este configurat încă pe platformă." };
-  const est = await queryOne<{ project_id: number }>("SELECT project_id FROM estimates WHERE id = ? AND company_id = ?", [estimateId, companyId]);
+  const est = await queryOne<{ project_id: number; price_county: string | null }>("SELECT project_id, price_county FROM estimates WHERE id = ? AND company_id = ?", [estimateId, companyId]);
   if (!est) return { ok: false, error: "Devizul nu există." };
   const clean = items
     .filter((i) => i.name?.trim())
@@ -137,7 +145,7 @@ export async function startEstimatorAction(estimateId: number, items: EstimatorI
 
   const res = await execute(
     "INSERT INTO ai_jobs (company_id, project_id, task_slug, task_name, instructions, created_by) VALUES (?, ?, 'deviz_ai', ?, ?, ?)",
-    [companyId, est.project_id, `Completare deviz (${clean.length} articole)`, JSON.stringify(clean), user.id],
+    [companyId, est.project_id, `Completare deviz (${clean.length} articole)`, JSON.stringify({ county: est.price_county, items: clean }), user.id],
   );
   after(() => runEstimatorJob(res.insertId));
   return { ok: true, jobId: res.insertId };
@@ -156,7 +164,7 @@ export async function estimatorJobAction(jobId: number): Promise<{ status: strin
 
 
 export type OfferBrief = {
-  id: number; resourceId: number; supplier: string | null; priceRon: number; obtainedAt: string; validUntil: string | null; expired: boolean;
+  id: number; resourceId: number; county: string | null; supplier: string | null; priceRon: number; obtainedAt: string; validUntil: string | null; expired: boolean;
   status: "neverificat" | "verificat" | "inactiv"; transportIncluded: boolean | null; source: string; own: boolean;
 };
 
@@ -165,20 +173,20 @@ export type OfferBrief = {
  * și detaliile ofertelor cu care au fost preluate prețurile (valabilitate, status, furnizor).
  * Doar resursele și ofertele vizibile firmei.
  */
-export async function priceSourcesAction(resourceIds: number[], offerIds: number[]): Promise<{
+export async function priceSourcesAction(resourceIds: number[], offerIds: number[], county?: string | null): Promise<{
   resources: Record<number, CatalogResource>; offers: Record<number, OfferBrief>;
 }> {
   const { companyId } = await companyOf();
   const rids = [...new Set(resourceIds.filter((n) => Number.isInteger(n) && n > 0))].slice(0, 2000);
   const oids = [...new Set(offerIds.filter((n) => Number.isInteger(n) && n > 0))].slice(0, 2000);
-  const res = await effectivePrices(companyId, rids);
+  const res = await effectivePrices(companyId, rids, zone(county));
   const offers: Record<number, OfferBrief> = {};
   if (oids.length) {
     const rows = await query<{
-      id: number; resource_id: number; company_id: number | null; supplier: string | null; price_ron: string; obtained_at: Date; valid_until: Date | null;
+      id: number; resource_id: number; company_id: number | null; county: string | null; supplier: string | null; price_ron: string; obtained_at: Date; valid_until: Date | null;
       status: OfferBrief["status"]; transport_included: number | null; source: string;
     }>(
-      `SELECT p.id, p.resource_id, p.company_id, p.supplier, p.price_ron, p.obtained_at, p.valid_until, p.status, p.transport_included, p.source
+      `SELECT p.id, p.resource_id, p.company_id, p.county, p.supplier, p.price_ron, p.obtained_at, p.valid_until, p.status, p.transport_included, p.source
          FROM resource_prices p JOIN resources r ON r.id = p.resource_id
         WHERE p.id IN (?) AND (p.company_id IS NULL OR p.company_id = ?) AND (r.company_id IS NULL OR r.company_id = ?)`,
       [oids, companyId, companyId],
@@ -187,7 +195,7 @@ export async function priceSourcesAction(resourceIds: number[], offerIds: number
     for (const o of rows) {
       const valid = ymd(o.valid_until);
       offers[o.id] = {
-        id: o.id, resourceId: o.resource_id, supplier: o.supplier, priceRon: Number(o.price_ron), obtainedAt: ymd(o.obtained_at)!, validUntil: valid,
+        id: o.id, resourceId: o.resource_id, county: o.county, supplier: o.supplier, priceRon: Number(o.price_ron), obtainedAt: ymd(o.obtained_at)!, validUntil: valid,
         expired: isExpired(valid), status: o.status, transportIncluded: o.transport_included === null ? null : o.transport_included === 1,
         source: o.source, own: o.company_id === companyId,
       };

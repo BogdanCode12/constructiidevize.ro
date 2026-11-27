@@ -1,5 +1,7 @@
 "use client";
 
+import { ZoneContext } from "./zone";
+import { COUNTIES, zoneLabel } from "@/lib/counties";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { saveEstimateAction, deleteEstimateAction, estimatorJobAction, priceSourcesAction, saveRecipeAction, startEstimatorAction } from "../actions";
@@ -183,6 +185,7 @@ export function EstimateEditor({ initial, isAdmin, rules }: { initial: EstimateD
   ];
 
   return (
+    <ZoneContext.Provider value={doc.priceCounty}>
     <div className="-mt-2">
       <div className="sticky top-0 z-20 -mx-4 mb-6 border-b-2 border-ink/10 bg-white/95 px-4 pt-3 backdrop-blur sm:-mx-8 sm:px-8">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -194,6 +197,17 @@ export function EstimateEditor({ initial, isAdmin, rules }: { initial: EstimateD
               className="block w-full rounded-md border border-transparent bg-transparent text-xl font-bold outline-none hover:border-line focus:border-brand-500 focus:bg-white sm:text-2xl"
             />
           </div>
+          <label className="flex items-center gap-1.5 text-xs text-muted sm:text-sm" title="Prețurile se iau întâi din județul ales (prețurile tale, apoi catalogul), apoi din regiune, apoi naționale.">
+            Prețuri:
+            <select value={doc.priceCounty ?? ""} onChange={(e) => {
+              const v = e.target.value || null;
+              update((d) => ({ ...d, priceCounty: v }));
+              setNotice(`Zona prețurilor: ${zoneLabel(v)}. Apasă „Actualizează prețurile” ca să vezi și să preiei prețurile din această zonă.`);
+            }} className="rounded-md border border-line bg-white px-1.5 py-1 text-xs font-semibold text-ink sm:text-sm">
+              <option value="">Toată țara</option>
+              {COUNTIES.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+            </select>
+          </label>
           <span className="basis-full text-xs text-muted sm:basis-auto sm:text-sm">
             {saving ? "Se salvează…" : dirty ? "Modificări nesalvate" : savedAt ? `Salvat la ${savedAt.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}` : "Salvat"}
           </span>
@@ -423,6 +437,7 @@ export function EstimateEditor({ initial, isAdmin, rules }: { initial: EstimateD
         </>
       )}
     </div>
+    </ZoneContext.Provider>
   );
 }
 

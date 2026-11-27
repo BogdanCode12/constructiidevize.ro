@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { COUNTIES, priceOriginLabel } from "@/lib/counties";
 import { Card } from "../ui";
 import { RES_STATUS_LABEL, RES_TYPE_LABEL, RES_TYPE_PLURAL, type CatalogResource, type ResStatus, type ResType } from "@/lib/estimate/types";
 
@@ -16,7 +17,7 @@ export function StatusBadge({ status }: { status: ResStatus | "expirat" }) {
   return <span className={`whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] font-semibold ${cls}`}>{status === "expirat" ? "Preț expirat" : RES_STATUS_LABEL[status]}</span>;
 }
 
-export type ListFilters = { type?: ResType; category?: string; status?: string; q?: string };
+export type ListFilters = { type?: ResType; category?: string; status?: string; q?: string; zone?: string };
 
 /** Lista catalogului (admin sau firmă): filtre, tabel, legături spre fișa resursei. */
 export function ResourceList({
@@ -32,6 +33,7 @@ export function ResourceList({
     if (f.category) p.set("categorie", f.category);
     if (f.status) p.set("status", f.status);
     if (f.q) p.set("q", f.q);
+    if (f.zone) p.set("zona", f.zone);
     const s = p.toString();
     return s ? `${basePath}?${s}` : basePath;
   };
@@ -64,6 +66,10 @@ export function ResourceList({
           <option value="expirat">Preț expirat</option>
           <option value="inactiv">Inactive</option>
         </select>
+        <select name="zona" defaultValue={filters.zone ?? ""} title="Arată prețul aplicabil într-un județ" className="rounded-lg border-2 border-ink/10 bg-white px-3 py-2 text-sm">
+          <option value="">Prețuri: toată țara</option>
+          {COUNTIES.map((c) => <option key={c.code} value={c.code}>Prețuri: {c.name}</option>)}
+        </select>
         <button className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-ink/85">Filtrează</button>
       </form>
 
@@ -94,7 +100,8 @@ export function ResourceList({
                         {r.code && <span>· {r.code}</span>}
                         {r.category && <span>· {r.category}</span>}
                         {scope === "company" && r.global && <span className="rounded bg-canvas px-1.5 font-semibold uppercase">catalog</span>}
-                        {p?.kind === "propriu" && <span className="rounded bg-brand-50 px-1.5 font-semibold text-brand-800">prețul tău</span>}
+                        {p?.kind === "propriu" && <span className="rounded bg-brand-50 px-1.5 font-semibold text-brand-800">{priceOriginLabel(p)}</span>}
+                        {p && p.kind !== "propriu" && p.county && <span className="rounded bg-sky-50 px-1.5 font-semibold text-sky-800">{priceOriginLabel(p)}</span>}
                       </div>
                     </td>
                     <td className="px-4 py-2.5">{r.unit}</td>

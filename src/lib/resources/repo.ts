@@ -1,6 +1,7 @@
 import "server-only";
 import { execute, query, queryOne, type Conn } from "../db";
 import type { CatalogResource, PriceOffer, PriceSource, ResPrice, ResStatus, ResType, TariffKind } from "../estimate/types";
+import { isCounty, regionCounties } from "../counties";
 
 /*
  * Catalogul de resurse.
@@ -8,6 +9,9 @@ import type { CatalogResource, PriceOffer, PriceSource, ResPrice, ResStatus, Res
  *  - resource_prices = ofertele, cu istoric (nu se suprascriu).
  *  - O firmă vede catalogul global + resursele ei; pe resursele globale poate avea prețuri proprii (negociate),
  *    care au prioritate față de prețul de referință. Prețurile proprii ale unei firme nu sunt vizibile altora.
+ *  - Zone de preț: o ofertă poate fi pentru un județ (resource_prices.county) sau pentru toată țara (NULL).
+ *    Cu o zonă (județul devizului), ordinea este: propriu județ → propriu regiune → propriu național
+ *    → catalog județ → catalog regiune → preț de referință (național).
  */
 
 type Row = {
@@ -15,9 +19,11 @@ type Row = {
   specs: string | null; producer: string | null; product_code: string | null; status: ResStatus; tariff_kind: TariffKind | null;
   region: string | null; mobilization_cost: string | null; conditions: string | null; notes: string | null; price: string | null;
   cur_id: number | null; cur_supplier: string | null; cur_source: PriceSource | null; cur_status: ResStatus | null;
-  cur_obtained: Date | null; cur_valid: Date | null; cur_transport: number | null;
+  cur_obtained: Date | null; cur_valid: Date | null; cur_transport: number | null; cur_county: string | null;
   own_id: number | null; own_price: string | null; own_supplier: string | null; own_source: PriceSource | null; own_status: ResStatus | null;
-  own_obtained: Date | null; own_valid: Date | null; own_transport: number | null;
+  own_obtained: Date | null; own_valid: Date | null; own_transport: number | null; own_county: string | null;
+  zg_id: number | null; zg_price: string | null; zg_supplier: string | null; zg_source: PriceSource | null; zg_status: ResStatus | null;
+  zg_obtained: Date | null; zg_valid: Date | null; zg_transport: number | null; zg_county: string | null;
 };
 
 /** Datele DATE vin din pool cu timezone „Z” (miezul nopții UTC), deci partea de dată din ISO e cea corectă. */
@@ -26,21 +32,23 @@ const ymd = (d: Date | string | null) => (!d ? null : typeof d === "string" ? d.
 export const today = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Bucharest" }).format(new Date());
 export const isExpired = (validUntil: string | null) => !!validUntil && validUntil < today();
 
+function offerInfo(kind: ResPrice["kind"], id: number | null, price: string | null, supplier: string | null, source: PriceSource | null,
+  status: ResStatus | null, obtained: Date | null, validUntil: Date | null, transport: number | null, county: string | null): ResPrice {
+  const valid = ymd(validUntil);
+  return {
+    offerId: id, value: Number(price), kind, county, supplier, source, status, obtainedAt: ymd(obtained), validUntil: valid,
+    expired: isExpired(valid), transportIncluded: transport === null ? null : transport === 1,
+  };
+}
+
 function map(r: Row): CatalogResource {
   let info: ResPrice | null = null;
-  if (r.own_id && r.own_price !== null) {
-    const valid = ymd(r.own_valid);
-    info = {
-      offerId: r.own_id, value: Number(r.own_price), kind: "propriu", supplier: r.own_supplier, source: r.own_source, status: r.own_status,
-      obtainedAt: ymd(r.own_obtained), validUntil: valid, expired: isExpired(valid), transportIncluded: r.own_transport === null ? null : r.own_transport === 1,
-    };
-  } else if (r.price !== null) {
-    const valid = ymd(r.cur_valid);
-    info = {
-      offerId: r.cur_id, value: Number(r.price), kind: "referinta", supplier: r.cur_supplier, source: r.cur_source, status: r.cur_status,
-      obtainedAt: ymd(r.cur_obtained), validUntil: valid, expired: isExpired(valid), transportIncluded: r.cur_transport === null ? null : r.cur_transport === 1,
-    };
-  }
+  // Prețul propriu al firmei: pe resursele din catalog, oricare; pe resursele firmei, doar unul pe județ/regiune
+  // (prețul național al resursei proprii este chiar oferta de referință aleasă).
+  const ownApplies = r.own_id && r.own_price !== null && (r.company_id === null || r.own_county !== null);
+  if (ownApplies) info = offerInfo("propriu", r.own_id, r.own_price, r.own_supplier, r.own_source, r.own_status, r.own_obtained, r.own_valid, r.own_transport, r.own_county);
+  else if (r.zg_id && r.zg_price !== null) info = offerInfo("zona", r.zg_id, r.zg_price, r.zg_supplier, r.zg_source, r.zg_status, r.zg_obtained, r.zg_valid, r.zg_transport, r.zg_county);
+  else if (r.price !== null) info = offerInfo("referinta", r.cur_id, r.price, r.cur_supplier, r.cur_source, r.cur_status, r.cur_obtained, r.cur_valid, r.cur_transport, r.cur_county);
   return {
     id: r.id, global: r.company_id === null, type: r.type, category: r.category, code: r.code, name: r.name, unit: r.unit,
     specs: r.specs, producer: r.producer, productCode: r.product_code, status: r.status, tariffKind: r.tariff_kind, region: r.region,
@@ -49,20 +57,39 @@ function map(r: Row): CatalogResource {
   };
 }
 
-/** SELECT comun: resursa + oferta de referință + cel mai recent preț propriu activ al firmei (?). */
-const SELECT = `
+/**
+ * SELECT comun: resursa + oferta de referință + prețul propriu al firmei + (cu zonă) oferta din catalog pentru zonă.
+ * Întoarce și parametrii pentru semnele „?” din SELECT (se pun primii).
+ */
+function selectFor(companyId: number | null, county?: string | null): { sql: string; params: unknown[] } {
+  const zone = isCounty(county) ? county : null;
+  const near = zone ? regionCounties(zone) : [];
+  const offerCols = (a: string) =>
+    `${a}.id AS ${a}_id, ${a}.price_ron AS ${a}_price, ${a}.supplier AS ${a}_supplier, ${a}.source AS ${a}_source, ${a}.status AS ${a}_status,
+     ${a}.obtained_at AS ${a}_obtained, ${a}.valid_until AS ${a}_valid, ${a}.transport_included AS ${a}_transport, ${a}.county AS ${a}_county`;
+  // Prețul propriu: cu zonă — județul, apoi regiunea, apoi național; fără zonă — de preferință cel național.
+  const ownWhere = zone ? "AND (p.county IS NULL OR p.county IN (?))" : "";
+  const ownOrder = zone ? "(p.county = ?) DESC, (p.county IS NOT NULL) DESC," : "(p.county IS NULL) DESC,";
+  const sql = `
   SELECT r.id, r.company_id, r.type, r.category, r.code, r.name, r.unit, r.specs, r.producer, r.product_code, r.status,
          r.tariff_kind, r.region, r.mobilization_cost, r.conditions, r.notes, r.price,
          cur.id AS cur_id, cur.supplier AS cur_supplier, cur.source AS cur_source, cur.status AS cur_status,
-         cur.obtained_at AS cur_obtained, cur.valid_until AS cur_valid, cur.transport_included AS cur_transport,
-         own.id AS own_id, own.price_ron AS own_price, own.supplier AS own_supplier, own.source AS own_source, own.status AS own_status,
-         own.obtained_at AS own_obtained, own.valid_until AS own_valid, own.transport_included AS own_transport
+         cur.obtained_at AS cur_obtained, cur.valid_until AS cur_valid, cur.transport_included AS cur_transport, cur.county AS cur_county,
+         ${offerCols("own")}, ${offerCols("zg")}
     FROM resources r
     LEFT JOIN resource_prices cur ON cur.id = r.current_price_id
-    LEFT JOIN resource_prices own ON r.company_id IS NULL AND own.id = (
+    LEFT JOIN resource_prices own ON own.id = (
       SELECT p.id FROM resource_prices p
-       WHERE p.resource_id = r.id AND p.company_id = ? AND p.status <> 'inactiv'
-       ORDER BY p.obtained_at DESC, p.id DESC LIMIT 1)`;
+       WHERE p.resource_id = r.id AND p.company_id = ? AND p.status <> 'inactiv' ${ownWhere}
+       ORDER BY ${ownOrder} p.obtained_at DESC, p.id DESC LIMIT 1)
+    LEFT JOIN resource_prices zg ON ${zone ? `r.company_id IS NULL AND zg.id = (
+      SELECT p.id FROM resource_prices p
+       WHERE p.resource_id = r.id AND p.company_id IS NULL AND p.status <> 'inactiv' AND p.county IN (?)
+       ORDER BY (p.county = ?) DESC, (p.status = 'verificat') DESC, p.obtained_at DESC, p.id DESC LIMIT 1)` : "FALSE"}`;
+  const params: unknown[] = [companyId ?? 0];
+  if (zone) params.push(near, zone, near, zone);
+  return { sql, params };
+}
 
 export type ListOpts = {
   /** Firma care privește (pentru resursele ei și prețurile proprii). null = adminul, doar catalogul global. */
@@ -77,6 +104,8 @@ export type ListOpts = {
   status?: ResStatus | "expirat" | "fara_pret";
   /** Resursele inactive apar doar în administrare. */
   includeInactive?: boolean;
+  /** Zona de prețuri (cod de județ): prețul afișat e cel aplicabil în zonă. */
+  county?: string | null;
   q?: string;
   limit?: number;
 };
@@ -84,7 +113,8 @@ export type ListOpts = {
 /** Resursele vizibile: catalogul global + (opțional) resursele firmei, cu prețul aplicabil. */
 export async function listResources(opts: ListOpts): Promise<CatalogResource[]> {
   const where: string[] = [];
-  const params: unknown[] = [opts.companyId ?? 0];
+  const sel = selectFor(opts.companyId, opts.county);
+  const params: unknown[] = [...sel.params];
   const scope: string[] = [];
   if (opts.includeGlobal && !opts.onlyOwn) scope.push("r.company_id IS NULL");
   if (opts.companyId) {
@@ -116,7 +146,7 @@ export async function listResources(opts: ListOpts): Promise<CatalogResource[]> 
   }
   params.push(opts.limit ?? 500);
   const rows = await query<Row>(
-    `${SELECT} WHERE ${where.join(" AND ")} ORDER BY (r.company_id IS NULL), r.type, r.category, r.name LIMIT ?`,
+    `${sel.sql} WHERE ${where.join(" AND ")} ORDER BY (r.company_id IS NULL), r.type, r.category, r.name LIMIT ?`,
     params,
   );
   return rows.map(map);
@@ -124,19 +154,21 @@ export async function listResources(opts: ListOpts): Promise<CatalogResource[]> 
 
 /** O resursă vizibilă pentru firmă (sau, cu companyId null, doar din catalogul global). */
 export async function getResource(id: number, companyId: number | null): Promise<CatalogResource | null> {
+  const sel = selectFor(companyId);
   const row = await queryOne<Row>(
-    `${SELECT} WHERE r.id = ? AND (r.company_id IS NULL OR r.company_id = ?)`,
-    [companyId ?? 0, id, companyId ?? 0],
+    `${sel.sql} WHERE r.id = ? AND (r.company_id IS NULL OR r.company_id = ?)`,
+    [...sel.params, id, companyId ?? 0],
   );
   return row ? map(row) : null;
 }
 
-/** Prețurile aplicabile pentru mai multe resurse (pentru rețete, editor, actualizarea devizului). */
-export async function effectivePrices(companyId: number, ids: number[]): Promise<Map<number, CatalogResource>> {
+/** Prețurile aplicabile pentru mai multe resurse (pentru rețete, editor, actualizarea devizului), opțional într-o zonă. */
+export async function effectivePrices(companyId: number, ids: number[], county?: string | null): Promise<Map<number, CatalogResource>> {
   if (!ids.length) return new Map();
+  const sel = selectFor(companyId, county);
   const rows = await query<Row>(
-    `${SELECT} WHERE r.id IN (?) AND (r.company_id IS NULL OR r.company_id = ?)`,
-    [companyId, [...new Set(ids)], companyId],
+    `${sel.sql} WHERE r.id IN (?) AND (r.company_id IS NULL OR r.company_id = ?)`,
+    [...sel.params, [...new Set(ids)], companyId],
   );
   return new Map(rows.map((r) => [r.id, map(r)]));
 }
@@ -152,7 +184,7 @@ export async function listCategories(companyId: number | null, types?: ResType[]
 }
 
 type OfferRow = {
-  id: number; resource_id: number; company_id: number | null; supplier: string | null; price: string; currency: string; exchange_rate: string;
+  id: number; resource_id: number; company_id: number | null; county: string | null; supplier: string | null; price: string; currency: string; exchange_rate: string;
   price_ron: string; source: PriceSource; document_url: string | null; obtained_at: Date; valid_until: Date | null; transport_included: number | null;
   min_qty: string | null; status: ResStatus; notes: string | null; created_at: Date; current_price_id: number | null;
 };
@@ -171,7 +203,7 @@ export async function listOffers(resourceId: number, companyId: number | null): 
   return rows.map((p) => {
     const valid = ymd(p.valid_until);
     return {
-      id: p.id, resourceId: p.resource_id, own: p.company_id !== null && p.company_id === companyId,
+      id: p.id, resourceId: p.resource_id, own: p.company_id !== null && p.company_id === companyId, county: p.county,
       supplier: p.supplier, price: Number(p.price), currency: p.currency, exchangeRate: Number(p.exchange_rate), priceRon: Number(p.price_ron),
       source: p.source, documentUrl: p.document_url, obtainedAt: ymd(p.obtained_at)!, validUntil: valid, expired: isExpired(valid),
       transportIncluded: p.transport_included === null ? null : p.transport_included === 1,
@@ -201,7 +233,7 @@ export async function syncReferencePrice(resourceId: number, conn?: Conn): Promi
   if (!currentId) {
     const best = await queryOne<{ id: number }>(
       `SELECT id FROM resource_prices WHERE resource_id = ? AND company_id <=> ? AND status <> 'inactiv'
-        ORDER BY (status = 'verificat') DESC, obtained_at DESC, id DESC LIMIT 1`,
+        ORDER BY (county IS NULL) DESC, (status = 'verificat') DESC, obtained_at DESC, id DESC LIMIT 1`,
       [resourceId, r.company_id], conn,
     );
     currentId = best?.id ?? null;

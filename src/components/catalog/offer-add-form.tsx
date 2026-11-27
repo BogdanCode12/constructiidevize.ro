@@ -29,7 +29,7 @@ export function OfferAddForm({ scope, resourceId, owner }: { scope: "global" | "
         {owner && (
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="make_current" defaultChecked className="size-4 accent-brand-700" />
-            Folosește-l ca preț de referință
+            Folosește-l ca preț de referință (doar pentru prețurile pe toată țara)
           </label>
         )}
       </ActionForm>

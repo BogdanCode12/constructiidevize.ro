@@ -1,5 +1,6 @@
 "use server";
 
+import { countyName, isCounty } from "../counties";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { execute, queryOne, transaction } from "../db";
@@ -59,6 +60,7 @@ async function visibleResource(id: number, companyId: number | null) {
 }
 
 type OfferInput = {
+  county: string | null;
   supplier: string | null; price: number; currency: string; exchangeRate: number; source: PriceSource; documentUrl: string | null;
   obtainedAt: string; validUntil: string | null; transportIncluded: boolean | null; minQty: number | null; status: ResStatus; notes: string | null;
 };
@@ -83,7 +85,9 @@ function readOffer(data: FormData, prefix = ""): OfferInput | { error: string } 
   const docUrl = String(g("document_url") ?? "").trim().slice(0, 500) || null;
   if (docUrl && !/^https?:\/\//i.test(docUrl)) return { error: "Linkul justificativ trebuie să înceapă cu https://" };
   const minQty = parseNum(g("min_qty"));
+  const county = String(g("county") ?? "").trim();
   return {
+    county: isCounty(county) ? county : null,
     supplier: String(g("supplier") ?? "").trim().slice(0, 160) || null,
     price, currency, exchangeRate, source: SOURCES.includes(src) ? src : "manual", documentUrl: docUrl,
     obtainedAt, validUntil, transportIncluded: ti === "da" ? true : ti === "nu" ? false : null,
@@ -95,10 +99,10 @@ function readOffer(data: FormData, prefix = ""): OfferInput | { error: string } 
 
 async function insertOffer(resourceId: number, companyId: number | null, userId: number, o: OfferInput, conn?: Parameters<typeof execute>[2]) {
   const res = await execute(
-    `INSERT INTO resource_prices (resource_id, company_id, supplier, price, currency, exchange_rate, price_ron, source, document_url,
+    `INSERT INTO resource_prices (resource_id, company_id, county, supplier, price, currency, exchange_rate, price_ron, source, document_url,
        obtained_at, valid_until, transport_included, min_qty, status, notes, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [resourceId, companyId, o.supplier, o.price, o.currency, o.exchangeRate, Math.round(o.price * o.exchangeRate * 10000) / 10000, o.source,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [resourceId, companyId, o.county, o.supplier, o.price, o.currency, o.exchangeRate, Math.round(o.price * o.exchangeRate * 10000) / 10000, o.source,
       o.documentUrl, o.obtainedAt, o.validUntil, o.transportIncluded === null ? null : o.transportIncluded ? 1 : 0, o.minQty, o.status, o.notes, userId],
     conn,
   );
@@ -204,13 +208,15 @@ export async function addOfferAction(_: FormState, data: FormData): Promise<Form
     const oid = await insertOffer(resourceId, companyId, userId, offer, conn);
     if (owner) {
       const cur = await queryOne<{ current_price_id: number | null }>("SELECT current_price_id FROM resources WHERE id = ?", [resourceId], conn);
-      if (data.get("make_current") || !cur?.current_price_id) await execute("UPDATE resources SET current_price_id = ? WHERE id = ?", [oid, resourceId], conn);
+      // Prețul de referință e cel național: o ofertă pe județ devine referință doar dacă resursa nu are niciun preț.
+      if ((data.get("make_current") && !offer.county) || !cur?.current_price_id) await execute("UPDATE resources SET current_price_id = ? WHERE id = ?", [oid, resourceId], conn);
       await syncReferencePrice(resourceId, conn);
     }
   });
   await logActivity({ companyId, userId, action: "resursa.pret_adaugat", details: { id: resourceId, price: offer.price, currency: offer.currency } });
   refresh(resourceId);
-  return { ok: owner ? "Prețul a fost adăugat în istoric." : "Prețul tău a fost salvat. Îl vezi doar tu și se folosește în devizele firmei." };
+  const where = offer.county ? ` pentru ${countyName(offer.county)} (se folosește în devizele din județ și, dacă nu există altul, din regiune)` : "";
+  return { ok: owner ? `Prețul a fost adăugat în istoric${where}.` : `Prețul tău a fost salvat${where}. Îl vezi doar tu și se folosește în devizele firmei.` };
 }
 
 /** Alege oferta folosită ca preț de referință (doar proprietarul resursei). */
@@ -252,10 +258,11 @@ export async function exchangeRateAction(currency: string): Promise<{ rate: numb
 }
 
 /** Căutare în catalog (global + firma) pentru editorul de deviz. Fără resursele inactive. */
-export async function searchCatalogAction(q: string, type?: ResType): Promise<CatalogResource[]> {
+export async function searchCatalogAction(q: string, type?: ResType, county?: string | null): Promise<CatalogResource[]> {
   const user = await requireUser();
   return listResources({
     companyId: user.company?.id ?? null,
+    county: isCounty(county) ? county : null,
     includeGlobal: true,
     q: q.trim().slice(0, 100) || undefined,
     type: type && isType(type) ? type : undefined,

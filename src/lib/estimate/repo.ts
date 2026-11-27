@@ -1,4 +1,5 @@
 import "server-only";
+import { isCounty } from "../counties";
 import { evalFormula } from "./formula";
 import { randomUUID } from "node:crypto";
 import { execute, query, queryOne, transaction } from "../db";
@@ -15,10 +16,11 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
     id: number; name: string; project_id: number; project_name: string;
     overhead_pct: string; profit_pct: string; vat_pct: string; start_date: Date | string | null; hours_per_day: string;
     cam_pct: string; overhead_base: OverheadBase; profit_base: ProfitBase; rounding_mode: RoundingMode; rules_date: string | null;
+    price_county: string | null;
   }>(
     `SELECT e.id, e.name, e.project_id, p.name AS project_name, e.overhead_pct, e.profit_pct, e.vat_pct,
             DATE_FORMAT(e.start_date, '%Y-%m-%d') AS start_date, e.hours_per_day,
-            e.cam_pct, e.overhead_base, e.profit_base, e.rounding_mode, DATE_FORMAT(e.rules_date, '%Y-%m-%d') AS rules_date
+            e.cam_pct, e.overhead_base, e.profit_base, e.rounding_mode, DATE_FORMAT(e.rules_date, '%Y-%m-%d') AS rules_date, e.price_county
        FROM estimates e JOIN projects p ON p.id = e.project_id
       WHERE e.id = ? AND e.company_id = ?`,
     [id, companyId],
@@ -75,6 +77,7 @@ export async function loadEstimate(id: number, companyId: number): Promise<Estim
     profitBase: est.profit_base,
     rounding: est.rounding_mode,
     rulesDate: est.rules_date,
+    priceCounty: est.price_county,
     startDate: est.start_date ? String(est.start_date) : null,
     hoursPerDay: Number(est.hours_per_day),
     chapters: chapters.map((c) => ({
@@ -120,12 +123,13 @@ export async function saveEstimate(doc: EstimateDoc, companyId: number): Promise
 
     await execute(
       `UPDATE estimates SET name = ?, overhead_pct = ?, profit_pct = ?, vat_pct = ?, cam_pct = ?, overhead_base = ?, profit_base = ?, rounding_mode = ?,
-         start_date = ?, hours_per_day = ? WHERE id = ?`,
+         start_date = ?, hours_per_day = ?, price_county = ? WHERE id = ?`,
       [
         txt(doc.name, 190) || "Deviz", num(doc.overheadPct, 0, 1000), num(doc.profitPct, 0, 1000), num(doc.vatPct, 0, 100), num(doc.camPct, 0, 100),
         doc.overheadBase === "manopera" ? "manopera" : "direct", doc.profitBase === "direct" ? "direct" : "direct_indirecte",
         doc.rounding === "pret_unitar" ? "pret_unitar" : "final",
-        doc.startDate && /^\d{4}-\d{2}-\d{2}$/.test(doc.startDate) ? doc.startDate : null, num(doc.hoursPerDay, 1, 24) || 8, doc.id,
+        doc.startDate && /^\d{4}-\d{2}-\d{2}$/.test(doc.startDate) ? doc.startDate : null, num(doc.hoursPerDay, 1, 24) || 8,
+        isCounty(doc.priceCounty) ? doc.priceCounty : null, doc.id,
       ],
       conn,
     );

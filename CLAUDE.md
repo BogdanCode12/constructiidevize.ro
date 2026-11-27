@@ -72,6 +72,11 @@ Motor profesional (Etapa 1 din promptul proprietarului) — făcut:
   sursa prețului în deviz (028), datele originale din F3 (029);
 - editor: panou lateral pe articol, compararea ofertelor, „Actualizează prețurile”; verificator cu 3 niveluri (`checks.ts`);
 - teste: `npm test` (și în CI) și `npm run test:db`, în `tests/`.
+- prețuri pe zone (034): oferta are județ (`resource_prices.county`, cod auto) sau e națională; devizul are `price_county`
+  (din județul proiectului / locație / firmă, schimbabil în editor). Ordinea: propriu județ → propriu regiune → propriu național
+  → catalog județ → catalog regiune → referință națională (`selectFor` în `src/lib/resources/repo.ts`, județe în `src/lib/counties.ts`).
+- e-mail (033): `src/lib/email.ts` cu jurnal `email_log`; confirmarea contului e obligatorie când există SMTP_HOST; alertele zilnice
+  rulează din aplicație (`src/lib/alerts.ts`, pornite în `instrumentation.ts`).
 Următor (Etapa 2 din prompt): Modul B cu estimări marcate de asistent, hash pe documente, durată și cache hit/miss în monitorizare.
 
 De făcut: Batch API pentru devize mari; reglarea instrucțiunilor și a pragurilor de asemănare pe date reale (necesită cheie API).

@@ -54,7 +54,7 @@ const OUTPUT_SCHEMA = {
 type Output = { articole: { ref: string; reteta_id: number | null; resurse: { resursa_id: number | null; tip: ResType; denumire: string; um: string; norma: number }[]; nota: string }[] };
 
 /** Uneltele prin care AI-ul caută în baza platformei. Rezultate scurte, ca text, ca să consume puțini tokeni. */
-function tools(companyId: number) {
+function tools(companyId: number, county: string | null) {
   return [
     betaTool({
       name: "cauta_retete",
@@ -67,7 +67,7 @@ function tools(companyId: number) {
       },
       strict: true,
       run: async ({ text, um }) => {
-        const hits = await searchRecipes(companyId, text, um || undefined, 6);
+        const hits = await searchRecipes(companyId, text, um || undefined, 6, county);
         return hits.length ? hits.map((h) => `${h.id}|${h.code ?? ""}|${h.name}|${h.unit}|${h.unitPrice.toFixed(2)}`).join("\n") : "nimic găsit";
       },
     }),
@@ -77,7 +77,7 @@ function tools(companyId: number) {
       inputSchema: { type: "object", additionalProperties: false, required: ["id"], properties: { id: { type: "integer" } } },
       strict: true,
       run: async ({ id }) => {
-        const it = await recipeItem(companyId, id);
+        const it = await recipeItem(companyId, id, 0, county);
         return it ? it.resources.map((r) => `${r.resourceId ?? ""}|${r.type}|${r.name}|${r.unit}|${r.norm}${r.waste ? `+${r.waste}%` : ""}|${r.price}`).join("\n") || "rețetă fără resurse" : "rețeta nu există";
       },
     }),
@@ -93,7 +93,7 @@ function tools(companyId: number) {
       strict: true,
       run: async ({ text, tip }) => {
         const list = await listResources({
-          companyId, includeGlobal: true, q: text, limit: 8,
+          companyId, includeGlobal: true, q: text, limit: 8, county,
           type: tip === "orice" ? undefined : (tip as ResType),
         });
         return list.length ? list.map((r) => `${r.id}|${r.type}|${r.name}|${r.unit}|${r.price === null ? "fără preț" : r.price}`).join("\n") : "nimic găsit";
@@ -102,12 +102,12 @@ function tools(companyId: number) {
   ];
 }
 
-async function materialize(companyId: number, out: Output["articole"][number]): Promise<EstResource[]> {
-  if (out.reteta_id && !out.resurse.length) return (await recipeItem(companyId, out.reteta_id))?.resources ?? [];
+async function materialize(companyId: number, out: Output["articole"][number], county: string | null): Promise<EstResource[]> {
+  if (out.reteta_id && !out.resurse.length) return (await recipeItem(companyId, out.reteta_id, 0, county))?.resources ?? [];
   const raw: EstResource[] = out.resurse.map((r) => ({
     key: randomUUID(), resourceId: r.resursa_id, type: r.tip, code: "", name: r.denumire, unit: r.um, norm: Math.max(0, r.norma), waste: 0, price: 0,
   }));
-  return refreshPrices(companyId, raw);
+  return refreshPrices(companyId, raw, county);
 }
 
 /** Salvează potrivirea: globală (refolosibilă de orice firmă) dacă folosește doar resurse globale, altfel a firmei. */
@@ -124,7 +124,7 @@ async function cacheProposal(companyId: number, item: EstimatorInput, res: EstRe
 
 let client: Anthropic | null = null;
 
-async function runBatch(companyId: number, items: EstimatorInput[], prompt: string, effort: Effort) {
+async function runBatch(companyId: number, items: EstimatorInput[], prompt: string, effort: Effort, county: string | null) {
   client ??= new Anthropic({ maxRetries: 3, timeout: 10 * 60 * 1000 });
   const list = items.map((i) => `${i.ref}|${i.code}|${i.name}|${i.unit}`).join("\n");
   const runner = client.beta.messages.toolRunner({
@@ -134,7 +134,7 @@ async function runBatch(companyId: number, items: EstimatorInput[], prompt: stri
     thinking: { type: "adaptive" },
     output_config: { effort, format: { type: "json_schema", schema: OUTPUT_SCHEMA as unknown as Record<string, unknown> } },
     system: [{ type: "text", text: `${SYSTEM_PROMPT}\n\n${prompt}`, cache_control: { type: "ephemeral" } }],
-    tools: tools(companyId),
+    tools: tools(companyId, county),
     messages: [{ role: "user", content: `Articole (ref|cod|denumire|U.M.):\n${list}` }],
   });
   let inputTokens = 0;
@@ -182,7 +182,10 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
   if (!job) return;
   await execute("UPDATE ai_jobs SET status = 'running' WHERE id = ?", [jobId]);
   try {
-    const items = JSON.parse(job.instructions) as EstimatorInput[];
+    // Lucrarea păstrează articolele și zona de prețuri a devizului (format vechi: doar lista de articole).
+    const parsed = JSON.parse(job.instructions) as EstimatorInput[] | { county: string | null; items: EstimatorInput[] };
+    const items = Array.isArray(parsed) ? parsed : parsed.items;
+    const county = Array.isArray(parsed) ? null : parsed.county;
     const task = await queryOne<{ prompt: string; effort: Effort }>("SELECT prompt, effort FROM ai_tasks WHERE slug = 'deviz_ai'");
     const proposals: EstimatorProposal[] = [];
     let tin = 0;
@@ -194,7 +197,7 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
       if (process.env.AI_MOCK === "1") out = await mockBatch(job.company_id, batch);
       else {
         if (!process.env.ANTHROPIC_API_KEY) throw new AiError("Asistentul tehnic nu este configurat.");
-        const r = await runBatch(job.company_id, batch, task?.prompt ?? "", task?.effort ?? "low");
+        const r = await runBatch(job.company_id, batch, task?.prompt ?? "", task?.effort ?? "low", county);
         out = r.parsed;
         tin += r.inputTokens;
         tout += r.outputTokens;
@@ -203,7 +206,7 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
       for (const a of out.articole) {
         const src = batch.find((b) => b.ref === a.ref);
         if (!src) continue;
-        const resources = await materialize(job.company_id, a);
+        const resources = await materialize(job.company_id, a, county);
         proposals.push({ ref: a.ref, resources, note: `Propus de asistent — verifică. ${a.nota}`.slice(0, 255) });
         await cacheProposal(job.company_id, src, resources);
       }

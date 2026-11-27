@@ -1,5 +1,6 @@
 "use server";
 
+import { isCounty, parseCounty } from "@/lib/counties";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { execute } from "@/lib/db";
@@ -19,10 +20,12 @@ export async function createProjectAction(_: FormState, data: FormData): Promise
   if (name.length < 2) return { error: "Completează numele proiectului." };
   const client = String(data.get("client") ?? "").trim() || null;
   const location = String(data.get("location") ?? "").trim() || null;
+  const countyRaw = String(data.get("county") ?? "");
+  const county = isCounty(countyRaw) ? countyRaw : parseCounty(location);
 
   const res = await execute(
-    "INSERT INTO projects (company_id, name, client_name, location, created_by) VALUES (?, ?, ?, ?, ?)",
-    [user.company.id, name.slice(0, 190), client?.slice(0, 190) ?? null, location?.slice(0, 190) ?? null, user.id],
+    "INSERT INTO projects (company_id, name, client_name, location, county, created_by) VALUES (?, ?, ?, ?, ?, ?)",
+    [user.company.id, name.slice(0, 190), client?.slice(0, 190) ?? null, location?.slice(0, 190) ?? null, county, user.id],
   );
   await logActivity({ companyId: user.company.id, userId: user.id, action: "proiect.creat", details: { id: res.insertId, name }, ip: await clientIp() });
   revalidatePath("/panou");

@@ -1,5 +1,6 @@
 "use client";
 
+import { priceOriginLabel } from "@/lib/counties";
 import { useEffect, useMemo, useState } from "react";
 import { priceSourcesAction } from "../actions";
 import { effNorm, fmtMoney } from "@/lib/estimate/calc";
@@ -39,7 +40,7 @@ export function PriceUpdateDialog({ doc, onApply, onClose }: {
   }, [doc]);
 
   useEffect(() => {
-    priceSourcesAction([...new Set(groups.map((g) => g.resourceId))], []).then((s) => setCur(s.resources));
+    priceSourcesAction([...new Set(groups.map((g) => g.resourceId))], [], doc.priceCounty).then((s) => setCur(s.resources));
   }, [groups]);
 
   const rows: Row[] = useMemo(() => groups.map((g) => {
@@ -111,7 +112,7 @@ export function PriceUpdateDialog({ doc, onApply, onClose }: {
                         <div className="font-medium">{r.name}</div>
                         <div className="flex flex-wrap gap-x-2 text-xs text-muted">
                           <span>{RES_TYPE_LABEL[r.type]} · {r.items} {r.items === 1 ? "articol" : "articole"}</span>
-                          {p && <span>{p.kind === "propriu" ? "prețul firmei" : "referință"}{p.supplier ? ` · ${p.supplier}` : ""}</span>}
+                          {p && <span>{priceOriginLabel(p)}{p.supplier ? ` · ${p.supplier}` : ""}</span>}
                           {p?.expired && <span className="font-semibold text-red-700">preț expirat în catalog</span>}
                           {p?.status === "neverificat" && <span className="text-amber-800">neverificat</span>}
                           {r.manual && <span className="font-semibold text-amber-800">în deviz e preț introdus manual</span>}

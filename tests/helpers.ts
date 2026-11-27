@@ -9,7 +9,7 @@ export const item = (o: Partial<EstItem> & Pick<EstItem, "name">): EstItem => ({
 });
 export const doc = (items: EstItem[], o: Partial<EstimateDoc> = {}): EstimateDoc => ({
   id: 1, name: "Test", projectId: 1, projectName: "P", overheadPct: 10, profitPct: 5, vatPct: 21, camPct: 2.25,
-  overheadBase: "direct", profitBase: "direct_indirecte", rounding: "final", rulesDate: null, startDate: null, hoursPerDay: 8,
+  overheadBase: "direct", profitBase: "direct_indirecte", rounding: "final", rulesDate: null, priceCounty: null, startDate: null, hoursPerDay: 8,
   chapters: [{ key: "c1", name: "Capitol", teamSize: 2, startDay: null, items }],
   ...o,
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { useZone } from "./zone";
 import { useEffect, useRef, useState } from "react";
 import { searchCatalogAction } from "@/lib/resources/actions";
 import { fmtMoney } from "@/lib/estimate/calc";
@@ -58,6 +59,7 @@ export function NumInput({ value, onChange, className = "", placeholder = "0", a
 }
 
 export function ResourcePicker({ onPick, onManual }: { onPick: (r: CatalogResource) => void; onManual: (t: ResType) => void }) {
+  const zone = useZone();
   const [q, setQ] = useState("");
   const [type, setType] = useState<ResType | "">("");
   const [results, setResults] = useState<CatalogResource[]>([]);
@@ -74,7 +76,7 @@ export function ResourcePicker({ onPick, onManual }: { onPick: (r: CatalogResour
     setLoading(true);
     const t = setTimeout(async () => {
       try {
-        setResults(await searchCatalogAction(q, type || undefined));
+        setResults(await searchCatalogAction(q, type || undefined, zone));
       } finally {
         setLoading(false);
       }
@@ -133,6 +135,7 @@ export function ResourcePicker({ onPick, onManual }: { onPick: (r: CatalogResour
 
 
 export function RecipePicker({ onPick }: { onPick: (item: EstItem) => void }) {
+  const zone = useZone();
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<RecipeHit[]>([]);
   const [open, setOpen] = useState(false);
@@ -141,7 +144,7 @@ export function RecipePicker({ onPick }: { onPick: (item: EstItem) => void }) {
 
   useEffect(() => {
     if (!open || q.trim().length < 2) return setHits([]);
-    const t = setTimeout(async () => setHits(await searchRecipesAction(q)), 250);
+    const t = setTimeout(async () => setHits(await searchRecipesAction(q, undefined, zone)), 250);
     return () => clearTimeout(t);
   }, [q, open]);
 
@@ -162,7 +165,7 @@ export function RecipePicker({ onPick }: { onPick: (item: EstItem) => void }) {
               onMouseDown={(e) => e.preventDefault()}
               onClick={async () => {
                 setBusy(true);
-                const it = await recipeItemAction(h.id);
+                const it = await recipeItemAction(h.id, zone);
                 setBusy(false);
                 if (it) { onPick(it); setQ(""); setOpen(false); }
               }}
@@ -182,6 +185,7 @@ export function RecipePicker({ onPick }: { onPick: (item: EstItem) => void }) {
 // ---------- Import listă de cantități (F3) ----------
 
 export function ImportDialog({ onClose, onImport }: { onClose: () => void; onImport: (r: Extract<ImportResult, { ok: true }>) => void }) {
+  const zone = useZone();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   return (
@@ -193,7 +197,9 @@ export function ImportDialog({ onClose, onImport }: { onClose: () => void; onImp
           setBusy(true);
           setError(null);
           try {
-            const res = await importF3Action(new FormData(e.currentTarget));
+            const fd = new FormData(e.currentTarget);
+            if (zone) fd.set("county", zone);
+            const res = await importF3Action(fd);
             if (res.ok) onImport(res);
             else setError(res.error);
           } finally {

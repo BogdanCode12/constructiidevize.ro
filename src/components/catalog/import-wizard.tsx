@@ -1,5 +1,6 @@
 "use client";
 
+import { COUNTIES } from "@/lib/counties";
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { applyImportAction, parseImportAction, previewImportAction } from "@/lib/resources/import-actions";
@@ -28,7 +29,7 @@ export function ImportWizard({ scope, types, basePath, fields }: { scope: "globa
   const [mapping, setMapping] = useState<Partial<Record<ImportFieldKey, number>>>({});
   const [preview, setPreview] = useState<PreviewRow[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [opts, setOpts] = useState({ obtainedAt: todayRo(), verified: false, supplier: "" });
+  const [opts, setOpts] = useState({ obtainedAt: todayRo(), verified: false, supplier: "", county: "" });
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -136,7 +137,14 @@ export function ImportWizard({ scope, types, basePath, fields }: { scope: "globa
               </label>
             ))}
           </div>
-          <div className="grid gap-3 border-t-2 border-ink/10 pt-4 sm:grid-cols-3">
+          <div className="grid gap-3 border-t-2 border-ink/10 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">Zona prețurilor (dacă nu e coloană)</span>
+              <select value={opts.county} onChange={(e) => setOpts({ ...opts, county: e.target.value })} className={inputCls}>
+                <option value="">Toată țara</option>
+                {COUNTIES.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+              </select>
+            </label>
             <label className="block">
               <span className="mb-1 block text-sm font-medium">Data prețurilor</span>
               <input type="date" value={opts.obtainedAt} max={todayRo()} onChange={(e) => setOpts({ ...opts, obtainedAt: e.target.value })} className={inputCls} />

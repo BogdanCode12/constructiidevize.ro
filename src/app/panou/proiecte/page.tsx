@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CountySelect } from "@/components/county-select";
 import { ActionForm } from "@/components/action-form";
 import { Card, Field, PageHeader } from "@/components/ui";
 import { query } from "@/lib/db";
@@ -60,7 +61,8 @@ export default async function ProjectsPage() {
           <ActionForm action={createProjectAction} submitLabel="Creează proiect" resetOnSuccess>
             <Field label="Denumire" name="name" placeholder="ex: Reabilitare școala nr. 3" />
             <Field label="Beneficiar" name="client" required={false} placeholder="ex: Primăria Cluj-Napoca" />
-            <Field label="Locație" name="location" required={false} placeholder="ex: Cluj-Napoca, jud. Cluj" />
+            <Field label="Localitate" name="location" required={false} placeholder="ex: Cluj-Napoca" />
+            <CountySelect hint="Devizele proiectului folosesc prețurile din acest județ." />
           </ActionForm>
         </Card>
       </div>

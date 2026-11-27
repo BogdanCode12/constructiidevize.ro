@@ -59,8 +59,10 @@ export type ResGroup = keyof typeof RES_GROUPS;
 export type ResPrice = {
   offerId: number | null;
   value: number;
-  /** „propriu” = prețul negociat al firmei; „referinta” = oferta aleasă în catalog. */
-  kind: "propriu" | "referinta";
+  /** „propriu” = prețul firmei; „zona” = oferta din catalog pentru județul/regiunea devizului; „referinta” = oferta aleasă în catalog (națională). */
+  kind: "propriu" | "zona" | "referinta";
+  /** Județul ofertei (cod auto); null = valabilă în toată țara. */
+  county: string | null;
   supplier: string | null;
   source: PriceSource | null;
   status: ResStatus | null;
@@ -96,6 +98,8 @@ export type PriceOffer = {
   id: number;
   resourceId: number;
   own: boolean;
+  /** Județul ofertei (cod auto); null = toată țara. */
+  county: string | null;
   supplier: string | null;
   price: number;
   currency: string;
@@ -183,6 +187,8 @@ export type EstimateDoc = {
   rounding: RoundingMode;
   /** Data regulilor (TVA, CAM, procente) cu care a fost creat devizul. */
   rulesDate: string | null;
+  /** Zona de prețuri (cod de județ al lucrării); null = prețuri naționale. */
+  priceCounty: string | null;
   startDate: string | null;
   hoursPerDay: number;
   chapters: EstChapter[];

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isCounty } from "@/lib/counties";
 import { notFound } from "next/navigation";
 import { Card, PageHeader } from "../ui";
 import { ConfirmSubmit } from "../confirm-submit";
@@ -24,7 +25,7 @@ export type CatalogCtx = {
   subtitle: string;
 };
 
-type SP = { tip?: string; categorie?: string; status?: string; q?: string };
+type SP = { tip?: string; categorie?: string; status?: string; q?: string; zona?: string };
 
 const btnPrimary = "rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-800";
 const btnGhost = "rounded-lg border-2 border-ink/15 bg-white px-4 py-2 text-sm font-semibold hover:border-ink/40";
@@ -36,6 +37,7 @@ export async function CatalogList({ ctx, sp, header = true, children }: { ctx: C
     listResources({
       companyId: ctx.companyId, includeGlobal: true, types: type ? [type] : ctx.types, category: sp.categorie || undefined,
       status, q: sp.q?.trim() || undefined, includeInactive: ctx.scope === "global" || status === "inactiv",
+      county: isCounty(sp.zona) ? sp.zona : null,
     }),
     listCategories(ctx.companyId, type ? [type] : ctx.types),
     currentVat(),
@@ -46,7 +48,7 @@ export async function CatalogList({ ctx, sp, header = true, children }: { ctx: C
       {children}
       <ResourceList
         resources={resources} basePath={ctx.basePath} types={ctx.types} categories={categories} vatPct={vatPct}
-        scope={ctx.scope} filters={{ type, category: sp.categorie, status: sp.status, q: sp.q }}
+        scope={ctx.scope} filters={{ type, category: sp.categorie, status: sp.status, q: sp.q, zone: isCounty(sp.zona) ? sp.zona : undefined }}
         actions={<>
           <Link href={`${ctx.basePath}/import`} className={btnGhost}>Import Excel</Link>
           <Link href={`${ctx.basePath}/nou${type ? `?tip=${type}` : ""}`} className={btnPrimary}>+ Resursă nouă</Link>
