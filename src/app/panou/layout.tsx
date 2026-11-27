@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { InstallAppButton } from "@/components/pwa";
 import { Logo } from "@/components/logo";
 import { Icon } from "@/components/icon";
 import { Sidebar } from "@/components/sidebar";
@@ -44,6 +45,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const footer = (
     <div className="space-y-3">
+      <InstallAppButton />
       {sub && (
         <Link href="/panou/abonament" className="block rounded-lg bg-canvas px-3 py-2.5 text-sm hover:bg-brand-50">
           <div className="flex items-center justify-between">

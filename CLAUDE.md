@@ -77,6 +77,8 @@ Motor profesional (Etapa 1 din promptul proprietarului) — făcut:
   → catalog județ → catalog regiune → referință națională (`selectFor` în `src/lib/resources/repo.ts`, județe în `src/lib/counties.ts`).
 - e-mail (033): `src/lib/email.ts` cu jurnal `email_log`; confirmarea contului e obligatorie când există SMTP_HOST; alertele zilnice
   rulează din aplicație (`src/lib/alerts.ts`, pornite în `instrumentation.ts`).
+- aplicație instalabilă (PWA): `src/app/manifest.ts`, `public/sw.js` (doar fișiere statice + pagina `public/offline.html`, nu păstrează date din cont),
+  butonul „Instalează aplicația” în meniul contului (`src/components/pwa.tsx`). La schimbări în sw.js crește `VERSION`.
 Următor (Etapa 2 din prompt): Modul B cu estimări marcate de asistent, hash pe documente, durată și cache hit/miss în monitorizare.
 
 De făcut: Batch API pentru devize mari; reglarea instrucțiunilor și a pragurilor de asemănare pe date reale (necesită cheie API).
