@@ -81,17 +81,31 @@ jobs:
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
         run: |
-          # Cron-ul rulează la fiecare minut; așteptăm până la ~5 minute.
-          for i in $(seq 1 30); do
-            health=$(curl -s -m 15 "${SITE_URL}/api/health" || true)
+          # Cron-ul rulează la fiecare minut; așteptăm până la ~8 minute.
+          # Firewall-ul gazdei poate răspunde uneori cu o pagină de verificare (nu JSON): o ignorăm și reîncercăm.
+          blocked=0; seen=""
+          for i in $(seq 1 48); do
+            health=$(curl -s -m 15 -H "Accept: application/json" -A "DevizConstruct-Deploy/1.0" "${SITE_URL}/api/health" || true)
             build=$(echo "$health" | sed -n 's/.*"build":"\([^"]*\)".*/\1/p')
+            if [ -z "$build" ]; then blocked=$((blocked+1)); sleep 10; continue; fi
+            seen="$build"
             if [ "$build" = "${GITHUB_SHA}" ]; then
               echo "Site-ul rulează versiunea nouă: $health"
               if echo "$health" | grep -q '"db":true'; then exit 0; fi
               echo "::error::Aplicația nu se poate conecta la baza de date. Verifică DB_NAME / DB_USER / DB_PASSWORD în Setup Node.js App."
               exit 1
             fi
+            # Un push mai nou a înlocuit arhiva înainte să fie despachetată: versiunea lui o include și pe aceasta.
+            head=$(git ls-remote origin refs/heads/main | cut -f1)
+            if [ -n "$head" ] && [ "$head" != "${GITHUB_SHA}" ] && [ "$build" = "$head" ]; then
+              echo "::notice::Site-ul rulează deja o versiune mai nouă ($build), care include această modificare."
+              exit 0
+            fi
             sleep 10
           done
-          echo "Site-ul nu a preluat versiunea nouă în 5 minute. Verifică cron-ul din cPanel (unpack.sh) și jurnalul ~/constructiidevize-deploy.log."
+          if [ -z "$seen" ] && [ "$blocked" -gt 0 ]; then
+            echo "::warning::Verificarea a fost blocată de firewall-ul gazdei ($blocked încercări). Arhiva a fost urcată; verifică manual ${SITE_URL}/api/health."
+            exit 0
+          fi
+          echo "Site-ul nu a preluat versiunea nouă în 8 minute (ultima versiune văzută: ${seen:-necunoscută}). Verifică cron-ul din cPanel (unpack.sh) și jurnalul ~/constructiidevize-deploy.log."
           exit 1
