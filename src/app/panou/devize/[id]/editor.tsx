@@ -1,5 +1,6 @@
 "use client";
 
+import { pendingReview } from "@/lib/estimate/review";
 import { ZoneContext } from "./zone";
 import { COUNTIES, zoneLabel } from "@/lib/counties";
 import Link from "next/link";
@@ -222,7 +223,15 @@ export function EstimateEditor({ initial, isAdmin, rules }: { initial: EstimateD
           )}
           <a
             href={dirty ? undefined : `/panou/devize/${doc.id}/export`}
-            onClick={(e) => { if (dirty) { e.preventDefault(); alert("Salvează devizul înainte de export."); } }}
+            onClick={(e) => {
+              if (dirty) { e.preventDefault(); alert("Salvează devizul înainte de export."); return; }
+              const pend = pendingReview(doc);
+              const ai = pend.filter((p) => p.assistant).length;
+              if (pend.length && !confirm(
+                `${pend.length} articole nu sunt încă verificate${ai ? ` (${ai} propuse de asistent)` : ""}.\n\n` +
+                "Exportul le va lista pe prima foaie, „DE VERIFICAT”. Recomandat: verifică-le și apasă „✓ Am verificat” înainte de depunere.\n\nExporți totuși?",
+              )) e.preventDefault();
+            }}
             className="cursor-pointer rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold hover:border-brand-200 sm:px-4 sm:py-2"
           >
             Export Excel

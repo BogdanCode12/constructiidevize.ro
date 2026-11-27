@@ -1,4 +1,5 @@
 import "server-only";
+import { pendingReview } from "./review";
 import ExcelJS from "exceljs";
 import {
   aggregateResources, chapterBreakdown, chapterCamBase, chapterRecap, effNorm, itemCamBase, itemCamUnit, itemUnitBreakdown, itemValueBreakdown,
@@ -319,6 +320,23 @@ export function addEstimateSheets(wb: ExcelJS.Workbook, doc: EstimateDoc, info: 
 export async function estimateWorkbook(doc: EstimateDoc, info: WorkbookInfo): Promise<ArrayBuffer> {
   const wb = new ExcelJS.Workbook();
   wb.creator = "DevizConstruct.ro";
+  // Articolele încă neverificate apar pe prima foaie, ca să nu ajungă în ofertă din greșeală.
+  const pending = pendingReview(doc);
+  if (pending.length) {
+    const ws = wb.addWorksheet("DE VERIFICAT", { properties: { tabColor: { argb: "FFC71319" } } });
+    titleBlock(ws, "Articole de verificat înainte de depunere", [
+      `${pending.length} articole au note de verificare${pending.some((p) => p.assistant) ? ", dintre care unele propuse de asistent" : ""}.`,
+      "Confirmă-le în platformă („✓ Am verificat”) și exportă din nou. Șterge această foaie înainte de depunere.",
+    ], 5);
+    headerRow(ws, ["Nr. art.", "Cod", "Denumire", "U.M.", "De verificat"]);
+    ws.columns = [{ width: 9 }, { width: 14 }, { width: 50 }, { width: 8 }, { width: 70 }];
+    for (const p of pending) {
+      const row = ws.addRow([p.where, p.code, p.name, p.unit, p.note]);
+      row.getCell(5).alignment = { wrapText: true, vertical: "top" };
+      row.getCell(3).alignment = { wrapText: true, vertical: "top" };
+      if (p.assistant) row.getCell(1).font = { bold: true, color: { argb: "FFC71319" } };
+    }
+  }
   addEstimateSheets(wb, doc, info);
   return (await wb.xlsx.writeBuffer()) as ArrayBuffer;
 }

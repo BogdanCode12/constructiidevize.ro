@@ -1,4 +1,5 @@
 import { effNorm, itemUnitPrice } from "./calc";
+import { isAssistantNote } from "./review";
 import { evalFormula } from "./formula";
 import { normText } from "./normalize";
 import { RES_TYPE_LABEL, type EstimateDoc, type EstItem } from "./types";
@@ -55,7 +56,9 @@ export function checkEstimate(doc: EstimateDoc, ctx: CheckContext = {}): Issue[]
 
       // --- date de bază
       if (!it.name.trim()) add("eroare", "Articol fără denumire.");
-      if (it.reviewNote) add("atentie", `De verificat: ${it.reviewNote}`);
+      // Propunerile asistentului nu intră în ofertă neverificate: eroare până la „✓ Am verificat”.
+      if (it.reviewNote && isAssistantNote(it.reviewNote)) add("eroare", `Propus de asistent, neverificat — confirmă resursele și normele („✓ Am verificat”). ${it.reviewNote}`);
+      else if (it.reviewNote) add("atentie", `De verificat: ${it.reviewNote}`);
       if (!it.unit.trim()) add("eroare", "Lipsește unitatea de măsură.");
       if (it.quantity <= 0) add("eroare", "Cantitatea este 0.");
       if (it.resources.length === 0) add("eroare", "Articolul nu are resurse, deci prețul unitar este 0.");
