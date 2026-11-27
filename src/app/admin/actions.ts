@@ -9,6 +9,7 @@ import { parseNum } from "@/lib/numbers";
 import { PAID_PLAN_IDS, type PaidPlanId } from "@/lib/plans";
 import { saveSetting, SETTING_DEFAULTS, type Settings } from "@/lib/settings";
 import type { FormState } from "@/components/action-form";
+import { AI_MODELS, isAiModel } from "@/lib/ai/models";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const s = (d: FormData, k: string) => String(d.get(k) ?? "").trim();
@@ -207,4 +208,18 @@ export async function toggleContactHandledAction(data: FormData): Promise<void> 
   await requireAdmin();
   await execute("UPDATE contact_messages SET handled = 1 - handled WHERE id = ?", [Number(data.get("id"))]);
   revalidatePath("/admin/mesaje");
+}
+
+/** Modelul asistentului (setarea `ai_model`); se aplică de la următoarea cerere, fără repornire. */
+export async function setAiModelAction(_: FormState, data: FormData): Promise<FormState> {
+  const admin = await requireAdmin();
+  const model = s(data, "model");
+  if (!isAiModel(model)) return { error: "Model necunoscut." };
+  await execute(
+    "INSERT INTO settings (`key`, `value`) VALUES ('ai_model', ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)",
+    [model],
+  );
+  await logActivity({ userId: admin.id, action: "admin.ai.model", details: { model } });
+  revalidatePath("/admin/ai");
+  return { ok: `Model schimbat: ${AI_MODELS.find((m) => m.id === model)?.label}. Se aplică de la următoarea cerere.` };
 }

@@ -1,10 +1,11 @@
 import { ActionForm } from "@/components/action-form";
 import { Card, Field, PageHeader } from "@/components/ui";
 import { query, queryOne } from "@/lib/db";
-import { AI_MODEL, aiConfigured } from "@/lib/ai/claude";
+import { aiConfigured, getAiModel } from "@/lib/ai/claude";
+import { AI_MODELS, modelPrice } from "@/lib/ai/models";
 import { listAiTasks } from "@/lib/ai/jobs";
 import { getSettings } from "@/lib/settings";
-import { updateAiTaskAction } from "../actions";
+import { setAiModelAction, updateAiTaskAction } from "../actions";
 
 export const metadata = { title: "AI · Admin" };
 
@@ -12,7 +13,7 @@ const EFFORTS = [["low", "Scăzut — rapid, ieftin"], ["medium", "Mediu"], ["hi
 const num = new Intl.NumberFormat("ro-RO");
 
 export default async function AdminAiPage() {
-  const [tasks, settings] = await Promise.all([listAiTasks(false), getSettings()]);
+  const [tasks, settings, model] = await Promise.all([listAiTasks(false), getSettings(), getAiModel()]);
   const month = await queryOne<{ jobs: number; chats: number; tin: number; tout: number; errors: number }>(
     `SELECT (SELECT COUNT(*) FROM ai_jobs WHERE created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')) AS jobs,
             (SELECT COUNT(*) FROM ai_chat_messages WHERE role = 'assistant' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')) AS chats,
@@ -22,7 +23,18 @@ export default async function AdminAiPage() {
               + (SELECT COALESCE(SUM(output_tokens),0) FROM ai_chat_messages WHERE created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')) AS tout,
             (SELECT COUNT(*) FROM ai_jobs WHERE status = 'error' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')) AS errors`,
   );
-  const cost = (Number(month?.tin ?? 0) * settings.ai_price_input_per_mtok + Number(month?.tout ?? 0) * settings.ai_price_output_per_mtok) / 1_000_000;
+  // Costul se calculează pe modelul fiecărei cereri; pentru cereri fără model cunoscut se folosesc prețurile din Setări.
+  const byModel = await query<{ model: string | null; tin: number; tout: number }>(
+    `SELECT model, SUM(tin) AS tin, SUM(tout) AS tout FROM (
+       SELECT model, COALESCE(input_tokens,0) AS tin, COALESCE(output_tokens,0) AS tout FROM ai_jobs WHERE created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')
+       UNION ALL
+       SELECT model, COALESCE(input_tokens,0), COALESCE(output_tokens,0) FROM ai_chat_messages WHERE role = 'assistant' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')
+     ) t GROUP BY model`,
+  );
+  const cost = byModel.reduce((sum, r) => {
+    const p = modelPrice(r.model) ?? { input: settings.ai_price_input_per_mtok, output: settings.ai_price_output_per_mtok };
+    return sum + (Number(r.tin) * p.input + Number(r.tout) * p.output) / 1_000_000;
+  }, 0);
   const cacheStats = await queryOne<{ recipes: number; cached: number; hits: number }>(
     "SELECT (SELECT COUNT(*) FROM recipes) AS recipes, (SELECT COUNT(*) FROM ai_match_cache) AS cached, (SELECT COALESCE(SUM(hits),0) FROM ai_match_cache) AS hits",
   );
@@ -33,7 +45,7 @@ export default async function AdminAiPage() {
 
   return (
     <>
-      <PageHeader title="Asistent AI" subtitle={`Model: ${AI_MODEL}. Limita pe firmă (${settings.ai_monthly_requests} cereri/lună) se schimbă din Setări.`} />
+      <PageHeader title="Asistent AI" subtitle={`Model: ${AI_MODELS.find((m) => m.id === model)?.label ?? model}. Limita pe firmă (${settings.ai_monthly_requests} cereri/lună) se schimbă din Setări.`} />
       <div className={`mb-6 rounded-lg px-4 py-3 text-sm ${aiConfigured() ? "bg-brand-50 text-brand-800" : "bg-amber-50"}`}>
         {aiConfigured()
           ? process.env.AI_MOCK === "1" ? "Mod de test (AI_MOCK=1): răspunsurile sunt simulate, fără cost." : "AI activ — cheia ANTHROPIC_API_KEY este configurată."
@@ -47,6 +59,27 @@ export default async function AdminAiPage() {
         <Card><div className="text-sm text-muted">Rețete în bază</div><div className="mt-1 text-2xl font-bold">{num.format(Number(cacheStats?.recipes ?? 0))}</div></Card>
         <Card><div className="text-sm text-muted">Potriviri AI salvate / refolosite</div><div className="mt-1 text-2xl font-bold">{num.format(Number(cacheStats?.cached ?? 0))} / {num.format(Number(cacheStats?.hits ?? 0))}</div></Card>
       </div>
+      <Card className="mb-8">
+        <h2 className="font-bold">Model</h2>
+        <p className="mt-1 mb-4 text-sm text-muted">Se aplică tuturor sarcinilor și chat-ului, de la următoarea cerere (fără repornire). Prețuri în $ pe 1M tokeni, intrare / ieșire.</p>
+        <ActionForm action={setAiModelAction} submitLabel="Salvează modelul" className="space-y-3">
+          {AI_MODELS.map((m) => (
+            <label key={m.id} className="flex cursor-pointer items-start gap-3 rounded-lg border-2 border-ink/10 px-4 py-3 has-[:checked]:border-brand-700">
+              <input type="radio" name="model" value={m.id} defaultChecked={m.id === model} className="mt-1 accent-brand-700" />
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <b>{m.label}</b>
+                  <span className="text-sm tabular-nums text-muted">${m.input} / ${m.output}</span>
+                </span>
+                <span className="block text-sm text-muted">{m.note}</span>
+              </span>
+            </label>
+          ))}
+        </ActionForm>
+      </Card>
+      {byModel.length > 1 && (
+        <p className="-mt-5 mb-6 text-sm text-muted">Luna aceasta pe modele: {byModel.map((r) => `${r.model ?? "necunoscut"}: ${num.format(Number(r.tin))} / ${num.format(Number(r.tout))} tokeni`).join(" · ")}.</p>
+      )}
       {top.length > 0 && <p className="mb-6 text-sm text-muted">Cei mai activi clienți luna aceasta: {top.map((t) => `${t.name} (${t.n})`).join(", ")}.</p>}
 
       <h2 className="mb-1 text-lg font-bold">Sarcini AI</h2>

@@ -2,7 +2,7 @@ import "server-only";
 import type Anthropic from "@anthropic-ai/sdk";
 import { execute, query, queryOne } from "../db";
 import { getSettings } from "../settings";
-import { AI_MODEL, AiError, callClaude, type Effort } from "./claude";
+import { AiError, callClaude, getAiModel, type Effort } from "./claude";
 import { chatBlocks, fileBlocks, type StoredFile } from "./files";
 import { platformContext } from "./context";
 
@@ -83,7 +83,7 @@ export async function runJob(jobId: number): Promise<void> {
   } catch (err) {
     console.error("[ai] job", jobId, err);
     const msg = err instanceof AiError || err instanceof Error ? err.message : "Eroare necunoscută.";
-    await execute("UPDATE ai_jobs SET status = 'error', error = ?, model = ?, finished_at = NOW() WHERE id = ?", [msg.slice(0, 500), AI_MODEL, jobId]);
+    await execute("UPDATE ai_jobs SET status = 'error', error = ?, model = ?, finished_at = NOW() WHERE id = ?", [msg.slice(0, 500), await getAiModel(), jobId]);
   }
 }
 
@@ -115,8 +115,8 @@ export async function runChat(assistantMsgId: number): Promise<void> {
       messages,
     });
     await execute(
-      "UPDATE ai_chat_messages SET status = 'done', content = ?, input_tokens = ?, output_tokens = ? WHERE id = ?",
-      [res.text, res.inputTokens, res.outputTokens, assistantMsgId],
+      "UPDATE ai_chat_messages SET status = 'done', content = ?, model = ?, input_tokens = ?, output_tokens = ? WHERE id = ?",
+      [res.text, res.model, res.inputTokens, res.outputTokens, assistantMsgId],
     );
   } catch (err) {
     console.error("[ai] chat", assistantMsgId, err);

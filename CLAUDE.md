@@ -61,7 +61,7 @@ Făcut:
   - textul extras se salvează în `project_files.extracted_text`, la încărcare;
   - potrivirile AI sunt în tabelul `ai_match_cache` (globale dacă folosesc doar resurse globale);
   - prompt caching pe system.
-- **Pct. 5:** efort configurabil, cost estimat în /admin/ai (prețuri în Setări), opțiunea `send_originals` pe sarcină.
+- **Pct. 5:** modelul se alege din /admin/ai (Opus 5.5 / Sonnet 5.5 / Haiku 5.5, setarea `ai_model`, listă în `src/lib/ai/models.ts`); efort configurabil; costul se calculează pe modelul fiecărei cereri; opțiunea `send_originals` pe sarcină.
 - **Pct. 6:** chat-ul trimite textul extras; la documente mari, doar fragmentele relevante pentru ultima întrebare.
 
 Motor profesional (Etapa 1 din promptul proprietarului) — făcut:

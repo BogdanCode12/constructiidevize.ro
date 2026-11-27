@@ -19,8 +19,8 @@ export const SETTING_DEFAULTS: Settings = {
 export const SETTING_LABELS: Record<keyof Settings, string> = {
   trial_days: "Zile perioadă de probă (conturi noi)",
   ai_monthly_requests: "Cereri AI pe lună, per firmă",
-  ai_price_input_per_mtok: "Preț AI intrare ($ / 1M tokeni) — pentru estimarea costului",
-  ai_price_output_per_mtok: "Preț AI ieșire ($ / 1M tokeni) — pentru estimarea costului",
+  ai_price_input_per_mtok: "Preț AI intrare ($ / 1M tokeni) — doar pentru modele din afara listei din Asistent AI",
+  ai_price_output_per_mtok: "Preț AI ieșire ($ / 1M tokeni) — doar pentru modele din afara listei din Asistent AI",
 };
 
 /** Setările platformei (editabile din /admin/setari). */

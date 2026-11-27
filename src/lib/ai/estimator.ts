@@ -6,7 +6,7 @@ import { normKey } from "../estimate/normalize";
 import { listResources } from "../resources/repo";
 import { recipeItem, refreshPrices, searchRecipes } from "../recipes/repo";
 import { RES_TYPES, type EstResource, type ResType } from "../estimate/types";
-import { AI_MODEL, AiError, type Effort } from "./claude";
+import { AiError, modelParams, type Effort } from "./claude";
 import { SYSTEM_PROMPT } from "./jobs";
 import { randomUUID } from "node:crypto";
 
@@ -128,11 +128,9 @@ async function runBatch(companyId: number, items: EstimatorInput[], prompt: stri
   client ??= new Anthropic({ maxRetries: 3, timeout: 10 * 60 * 1000 });
   const list = items.map((i) => `${i.ref}|${i.code}|${i.name}|${i.unit}`).join("\n");
   const runner = client.beta.messages.toolRunner({
-    model: AI_MODEL,
+    ...(await modelParams()),
     max_tokens: 16000,
     max_iterations: 25,
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
     thinking: { type: "adaptive" },
     output_config: { effort, format: { type: "json_schema", schema: OUTPUT_SCHEMA as unknown as Record<string, unknown> } },
     system: [{ type: "text", text: `${SYSTEM_PROMPT}\n\n${prompt}`, cache_control: { type: "ephemeral" } }],
@@ -157,7 +155,7 @@ async function runBatch(companyId: number, items: EstimatorInput[], prompt: stri
   } catch {
     throw new AiError("Răspunsul asistentului nu a putut fi citit. Reîncearcă.");
   }
-  return { parsed, inputTokens, outputTokens };
+  return { parsed, inputTokens, outputTokens, model: last.model };
 }
 
 /** Propuneri simulate (AI_MOCK=1): caută în bază primul cuvânt relevant, fără apel la API. */
@@ -189,6 +187,7 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
     const proposals: EstimatorProposal[] = [];
     let tin = 0;
     let tout = 0;
+    let usedModel = process.env.AI_MOCK === "1" ? "mock" : "";
     for (let i = 0; i < items.length; i += BATCH) {
       const batch = items.slice(i, i + BATCH);
       let out: Output;
@@ -199,6 +198,7 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
         out = r.parsed;
         tin += r.inputTokens;
         tout += r.outputTokens;
+        usedModel = r.model;
       }
       for (const a of out.articole) {
         const src = batch.find((b) => b.ref === a.ref);
@@ -210,7 +210,7 @@ export async function runEstimatorJob(jobId: number): Promise<void> {
     }
     await execute(
       "UPDATE ai_jobs SET status = 'done', output = ?, model = ?, input_tokens = ?, output_tokens = ?, finished_at = NOW() WHERE id = ?",
-      [JSON.stringify(proposals), process.env.AI_MOCK === "1" ? "mock" : AI_MODEL, tin, tout, jobId],
+      [JSON.stringify(proposals), usedModel || null, tin, tout, jobId],
     );
   } catch (err) {
     console.error("[ai] estimator", jobId, err);

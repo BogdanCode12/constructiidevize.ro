@@ -1,9 +1,26 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
+import { queryOne } from "../db";
+import { DEFAULT_AI_MODEL, isAiModel, supportsServerFallback } from "./models";
 
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 
-export const AI_MODEL = process.env.AI_MODEL || "claude-opus-5-5";
+/** Modelul ales din admin → Asistent AI (setarea `ai_model`); altfel AI_MODEL din mediu; altfel Opus 5.5. */
+export async function getAiModel(): Promise<string> {
+  try {
+    const r = await queryOne<{ value: string }>("SELECT `value` FROM settings WHERE `key` = 'ai_model'");
+    if (r && isAiModel(r.value)) return r.value;
+  } catch { /* baza indisponibilă: valoarea implicită */ }
+  return process.env.AI_MODEL || DEFAULT_AI_MODEL;
+}
+
+/** Parametrii de model comuni: modelul + (unde există) reluarea automată pe un model de rezervă la refuz. */
+export async function modelParams() {
+  const model = await getAiModel();
+  return supportsServerFallback(model)
+    ? { model, betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const }
+    : { model };
+}
 
 /** Asistentul e activ când există ANTHROPIC_API_KEY (sau AI_MOCK=1 pentru teste fără cost). */
 export function aiConfigured(): boolean {
@@ -34,10 +51,8 @@ export async function callClaude(opts: {
     // Streaming: răspunsurile lungi (propuneri tehnice, analize) pot dura câteva minute.
     // `fallbacks: "default"`: dacă modelul refuză o cerere, API-ul o reia automat pe un model de rezervă.
     const stream = getClient().beta.messages.stream({
-      model: AI_MODEL,
+      ...(await modelParams()),
       max_tokens: opts.maxTokens ?? 64000,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
       thinking: { type: "adaptive" },
       output_config: { effort: opts.effort },
       system: [{ type: "text", text: opts.system, cache_control: { type: "ephemeral" } }],
