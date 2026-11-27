@@ -6,7 +6,9 @@ import { requireUser } from "@/lib/auth/session";
 import { ACCOUNT_LINKS, MODULES } from "@/lib/modules";
 import { planLabel } from "@/lib/plans";
 import { logoutAction, } from "./actions";
-import { resendVerificationAction } from "../(auth)/actions";
+import { changeUnverifiedEmailAction, resendVerificationAction, resendVerificationFormAction } from "../(auth)/actions";
+import { mailConfigured } from "@/lib/email";
+import { VerifyGate } from "@/components/verify-gate";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,15 @@ function daysLeft(d: Date | null): number | null {
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
+  // Cu e-mailul configurat, contul se folosește doar după confirmarea adresei (adminul platformei e scutit).
+  if (!user.emailVerified && mailConfigured() && user.role !== "admin") {
+    return (
+      <div className="min-h-dvh bg-white px-4">
+        <div className="mx-auto max-w-6xl pt-6"><Logo href="/" /></div>
+        <VerifyGate email={user.email} resend={resendVerificationFormAction} change={changeUnverifiedEmailAction} logout={logoutAction} />
+      </div>
+    );
+  }
   const sub = user.company;
   const trialDays = sub?.plan === "trial" ? daysLeft(sub.trialEndsAt) : null;
 

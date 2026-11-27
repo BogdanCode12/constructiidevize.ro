@@ -1,10 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { execute, queryOne, transaction } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { clientIp, createSession, requireUser } from "@/lib/auth/session";
-import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/auth/emails";
+import { notifyNewAccount, sendPasswordChangedEmail, sendPasswordResetEmail, sendVerificationEmail } from "@/lib/auth/emails";
 import { hashToken } from "@/lib/auth/tokens";
 import { logActivity } from "@/lib/activity";
 import { getSettings } from "@/lib/settings";
@@ -61,6 +62,7 @@ export async function registerAction(_: FormState, data: FormData): Promise<Form
   }
 
   await sendVerificationEmail(userId, email, name).catch((e) => console.error("[register] email", e));
+  await notifyNewAccount(name, email, companyName);
   await logActivity({ companyId, userId, action: "cont.creat", ip: await clientIp() });
   await createSession(userId);
   redirect("/panou");
@@ -125,13 +127,55 @@ export async function resetPasswordAction(_: FormState, data: FormData): Promise
     await execute("DELETE FROM sessions WHERE user_id = ?", [row.user_id], conn);
   });
   const owner = await queryOne<{ email: string }>("SELECT email FROM users WHERE id = ?", [row.user_id]);
-  if (owner) await clearAttempts(`login:email:${owner.email}`); // parola nouă deblochează logarea
+  if (owner) {
+    await clearAttempts(`login:email:${owner.email}`); // parola nouă deblochează logarea
+    await sendPasswordChangedEmail(owner.email);
+  }
   await logActivity({ userId: row.user_id, action: "parola.resetata", ip: await clientIp() });
   redirect("/autentificare?resetat=1");
 }
 
 export async function resendVerificationAction(): Promise<void> {
   const user = await requireUser();
-  if (!user.emailVerified) await sendVerificationEmail(user.id, user.email, user.name);
+  if (user.emailVerified) redirect("/panou");
+  const key = `verify:user:${user.id}`;
+  if (await tooMany(key, 4, 60)) redirect("/panou?email=prea-multe");
+  await recordAttempt(key);
+  await sendVerificationEmail(user.id, user.email, user.name).catch((e) => console.error("[verify] resend", e));
   redirect("/panou?email=retrimis");
+}
+
+/** Corectarea adresei de e-mail înainte de confirmare (ex: greșeală de tastare la înregistrare). */
+export async function changeUnverifiedEmailAction(_: FormState, data: FormData): Promise<FormState> {
+  const user = await requireUser();
+  if (user.emailVerified) return { error: "Adresa este deja confirmată. O poți schimba din Contul meu." };
+  const email = str(data, "email").toLowerCase();
+  if (!EMAIL_RE.test(email)) return { error: "Adresa de e-mail nu este validă." };
+  if (email === user.email) return { error: "Aceasta este deja adresa contului." };
+  const key = `verify:user:${user.id}`;
+  if (await tooMany(key, 4, 60)) return { error: TOO_MANY };
+  await recordAttempt(key);
+  const taken = await queryOne<{ id: number }>("SELECT id FROM users WHERE email = ? AND id <> ?", [email, user.id]);
+  if (taken) return { error: "Există deja un cont cu această adresă." };
+  await execute("UPDATE users SET email = ? WHERE id = ?", [email, user.id]);
+  await logActivity({ userId: user.id, action: "email.corectat", details: { from: user.email, to: email } });
+  await sendVerificationEmail(user.id, email, user.name).catch((e) => console.error("[verify] change", e));
+  revalidatePath("/panou", "layout");
+  return { ok: `Ți-am trimis linkul de confirmare pe ${email}.` };
+}
+
+/** Retrimiterea e-mailului de confirmare din ecranul de confirmare (cu mesaj, fără redirecționare). */
+export async function resendVerificationFormAction(): Promise<FormState> {
+  const user = await requireUser();
+  if (user.emailVerified) return { ok: "Adresa este deja confirmată. Reîncarcă pagina." };
+  const key = `verify:user:${user.id}`;
+  if (await tooMany(key, 4, 60)) return { error: "Ai cerut deja mai multe e-mailuri. Verifică și dosarul Spam sau încearcă peste o oră." };
+  await recordAttempt(key);
+  try {
+    await sendVerificationEmail(user.id, user.email, user.name);
+  } catch (e) {
+    console.error("[verify] resend", e);
+    return { error: "E-mailul nu a putut fi trimis acum. Încearcă din nou peste câteva minute." };
+  }
+  return { ok: `Ți-am trimis un link nou pe ${user.email}.` };
 }

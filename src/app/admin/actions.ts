@@ -10,6 +10,7 @@ import { PAID_PLAN_IDS, type PaidPlanId } from "@/lib/plans";
 import { saveSetting, SETTING_DEFAULTS, type Settings } from "@/lib/settings";
 import type { FormState } from "@/components/action-form";
 import { AI_MODELS, isAiModel } from "@/lib/ai/models";
+import { emailLayout, mailConfigured, sendMail } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const s = (d: FormData, k: string) => String(d.get(k) ?? "").trim();
@@ -222,4 +223,21 @@ export async function setAiModelAction(_: FormState, data: FormData): Promise<Fo
   await logActivity({ userId: admin.id, action: "admin.ai.model", details: { model } });
   revalidatePath("/admin/ai");
   return { ok: `Model schimbat: ${AI_MODELS.find((m) => m.id === model)?.label}. Se aplică de la următoarea cerere.` };
+}
+
+/** E-mail de test către adresa adminului conectat, ca să verifice setările SMTP din cPanel. */
+export async function sendTestEmailAction(_: FormState, data: FormData): Promise<FormState> {
+  const admin = await requireAdmin();
+  const to = s(data, "to") || admin.email;
+  if (!EMAIL_RE.test(to)) return { error: "Adresa nu este validă." };
+  if (!mailConfigured()) return { error: "E-mailul nu este configurat: lipsește SMTP_HOST în cPanel (Setup Node.js App → variabile)." };
+  try {
+    await sendMail(to, "Test e-mail — DevizConstruct.ro",
+      emailLayout("E-mailul funcționează", "<p>Acesta este un mesaj de test trimis din panoul de administrare DevizConstruct.ro. Setările SMTP sunt corecte.</p>"),
+      { kind: "test" });
+  } catch (e) {
+    return { error: `Trimiterea a eșuat: ${e instanceof Error ? e.message : String(e)}`.slice(0, 400) };
+  }
+  revalidatePath("/admin/setari");
+  return { ok: `E-mail de test trimis către ${to}. Verifică inboxul (și Spam).` };
 }

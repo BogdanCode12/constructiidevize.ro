@@ -78,17 +78,23 @@ export async function inviteMemberAction(_: FormState, data: FormData): Promise<
     [user.company.id, email, role, hashToken(token), user.id],
   );
   const link = appUrl(`/invitatie?token=${token}`);
+  let mailed = true;
   await sendMail(
     email,
-    `Invitație în ${user.company.name}`,
-    emailLayout("Ai fost invitat", `<p>${escapeHtml(user.name)} te invită să lucrezi în contul firmei <b>${escapeHtml(user.company.name)}</b> pe DevizConstruct.ro.</p>`, {
-      label: "Acceptă invitația",
-      href: link,
-    }),
-  ).catch((e) => console.error("[invite] email", e));
+    `${user.name} te invită în ${user.company.name} — DevizConstruct.ro`,
+    emailLayout(
+      "Ai fost invitat într-o echipă",
+      `<p><b>${escapeHtml(user.name)}</b> te invită să lucrezi în contul firmei <b>${escapeHtml(user.company.name)}</b> pe DevizConstruct.ro — devize, dosare de licitație și urmărirea lucrărilor.</p><p style="color:#555">Invitația este valabilă 7 zile.</p>`,
+      { label: "Acceptă invitația", href: link },
+      "Dacă nu te aștepți la această invitație, ignoră acest e-mail.",
+    ),
+    { kind: "invitatie", replyTo: user.email },
+  ).catch((e) => { mailed = false; console.error("[invite] email", e); });
   await logActivity({ companyId: user.company.id, userId: user.id, action: "coleg.invitat", details: { email, role } });
   revalidatePath("/panou/firma");
-  return { ok: `Invitație trimisă către ${email}. Linkul (valabil 7 zile): ${link}` };
+  return { ok: mailed
+    ? `Invitație trimisă pe e-mail către ${email}. Poți trimite și direct linkul (valabil 7 zile): ${link}`
+    : `E-mailul nu a putut fi trimis. Trimite-i persoanei linkul direct (valabil 7 zile): ${link}` };
 }
 
 export async function revokeInvitationAction(data: FormData): Promise<void> {

@@ -1,8 +1,8 @@
 "use server";
 
-import { execute, query } from "@/lib/db";
+import { execute } from "@/lib/db";
 import { clientIp } from "@/lib/auth/session";
-import { emailLayout, sendMail } from "@/lib/email";
+import { appUrl, emailLayout, notifyAdmin, sendMail } from "@/lib/email";
 import { escapeHtml } from "@/lib/auth/emails";
 import { recordAttempt, TOO_MANY, tooMany } from "@/lib/ratelimit";
 import type { FormState } from "@/components/action-form";
@@ -22,9 +22,15 @@ export async function contactAction(_: FormState, data: FormData): Promise<FormS
 
   await execute("INSERT INTO contact_messages (name, email, company, phone, message, ip) VALUES (?, ?, ?, ?, ?, ?)",
     [name, email, v("company", 190) || null, v("phone", 40) || null, message, ip]);
-  // Notificare către administratorii platformei.
-  const admins = await query<{ email: string }>("SELECT email FROM users WHERE role = 'admin'");
-  const html = emailLayout("Mesaj nou de pe site", `<p><b>${escapeHtml(name)}</b> (${escapeHtml(email)})${v("company", 190) ? `, ${escapeHtml(v("company", 190))}` : ""}${v("phone", 40) ? `, tel. ${escapeHtml(v("phone", 40))}` : ""}</p><p style="white-space:pre-line">${escapeHtml(message)}</p>`);
-  for (const a of admins) await sendMail(a.email, `Contact: ${name}`, html).catch((e) => console.error("[contact]", e));
+  // Notificare către administrator (răspunsul merge direct la cel care a scris) + confirmare pentru expeditor.
+  const html = emailLayout("Mesaj nou de pe site",
+    `<p><b>${escapeHtml(name)}</b> (${escapeHtml(email)})${v("company", 190) ? `, ${escapeHtml(v("company", 190))}` : ""}${v("phone", 40) ? `, tel. ${escapeHtml(v("phone", 40))}` : ""}</p><p style="white-space:pre-line;background:#f6f6f4;border-radius:8px;padding:12px 14px">${escapeHtml(message)}</p><p style="color:#555">Răspunde direct la acest e-mail.</p>`,
+    { label: "Vezi mesajele", href: appUrl("/admin/mesaje") }, "Notificare automată pentru administratorul DevizConstruct.ro.");
+  await notifyAdmin(`Contact: ${name}`, html, { kind: "admin_contact", replyTo: email });
+  await sendMail(email, "Am primit mesajul tău — DevizConstruct.ro",
+    emailLayout(`Mulțumim, ${escapeHtml(name)}!`,
+      `<p>Am primit mesajul tău și îți răspundem în cel mult o zi lucrătoare.</p><p style="white-space:pre-line;background:#f6f6f4;border-radius:8px;padding:12px 14px;color:#444">${escapeHtml(message.slice(0, 1500))}</p>`,
+      undefined, "Ai primit acest e-mail pentru că ne-ai scris din pagina de contact DevizConstruct.ro."),
+    { kind: "contact_confirmare" }).catch((e) => console.error("[contact] confirmare", e));
   return { ok: "Mulțumim! Am primit mesajul și revenim în cel mult o zi lucrătoare." };
 }

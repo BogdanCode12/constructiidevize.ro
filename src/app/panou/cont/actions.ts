@@ -7,6 +7,7 @@ import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { deleteUpload } from "@/lib/storage";
 import { logActivity } from "@/lib/activity";
 import type { FormState } from "@/components/action-form";
+import { sendPasswordChangedEmail } from "@/lib/auth/emails";
 
 export async function updateProfileAction(_: FormState, data: FormData): Promise<FormState> {
   const user = await requireUser();
@@ -25,6 +26,7 @@ export async function changePasswordAction(_: FormState, data: FormData): Promis
   if (next.length < 8) return { error: "Parola nouă trebuie să aibă cel puțin 8 caractere." };
   await execute("UPDATE users SET password_hash = ? WHERE id = ?", [await hashPassword(next), user.id]);
   await logActivity({ userId: user.id, action: "parola.schimbata" });
+  await sendPasswordChangedEmail(user.email);
   return { ok: "Parola a fost schimbată." };
 }
 

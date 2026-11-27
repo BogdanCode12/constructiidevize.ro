@@ -34,7 +34,9 @@ npm run db:migrate          # creează tabelele
 npm run dev                 # http://localhost:3000
 ```
 
-Dacă `SMTP_HOST` e gol, emailurile (confirmare, resetare) se afișează în consolă.
+Dacă `SMTP_HOST` e gol, emailurile (confirmare, resetare) se afișează în consolă și confirmarea contului nu e obligatorie.
+Cu SMTP configurat (`SMTP_HOST`, `SMTP_PORT` 465, `SMTP_USER` = admin@devizconstruct.ro, `SMTP_PASSWORD`, opțional `MAIL_FROM`, `ADMIN_EMAIL`), conturile noi trebuie confirmate; jurnalul și butonul de test sunt în admin → Setări.
+Alertele zilnice (documente care expiră, termene) rulează din aplicație după ora 8; `/api/cron/alerte?key=CRON_SECRET` rămâne pentru rulare manuală.
 
 Pentru a deveni admin de platformă, creează-ți un cont din site, apoi rulează:
 
