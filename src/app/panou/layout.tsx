@@ -41,7 +41,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }));
   const account = [
     ...ACCOUNT_LINKS.map((a) => ({ href: `/panou/${a.slug}`, label: a.label, icon: a.icon })),
-    ...(user.role === "admin" ? [{ href: "/admin", label: "Admin platformă", icon: "shield" }] : []),
+    ...(user.role === "admin" ? [{ href: "/admin", label: "Admin platformă", icon: "admin" }] : []),
   ];
 
   const footer = (

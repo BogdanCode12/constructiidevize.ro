@@ -28,6 +28,8 @@ const IMAGES: Record<string, string> = {
   firma: "/icons/meniu/firma.png",
   abonament: "/icons/meniu/abonament.png",
   profil: "/icons/meniu/profil.png",
+  dosar: "/icons/meniu/dosar.png",
+  admin: "/icons/meniu/admin.png",
 };
 
 export function Icon({ name, className = "size-5" }: { name: string; className?: string }) {
