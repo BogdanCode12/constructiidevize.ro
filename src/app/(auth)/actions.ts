@@ -148,7 +148,7 @@ export async function resendVerificationAction(): Promise<void> {
 /** Corectarea adresei de e-mail înainte de confirmare (ex: greșeală de tastare la înregistrare). */
 export async function changeUnverifiedEmailAction(_: FormState, data: FormData): Promise<FormState> {
   const user = await requireUser();
-  if (user.emailVerified) return { error: "Adresa este deja confirmată. O poți schimba din Contul meu." };
+  if (user.emailVerified) return { error: "Adresa este deja confirmată. O poți schimba din Profilul meu." };
   const email = str(data, "email").toLowerCase();
   if (!EMAIL_RE.test(email)) return { error: "Adresa de e-mail nu este validă." };
   if (email === user.email) return { error: "Aceasta este deja adresa contului." };

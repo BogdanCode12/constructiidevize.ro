@@ -7,7 +7,7 @@ import { requireUser } from "@/lib/auth/session";
 import { createProjectAction } from "../actions";
 import { STATUS_LABEL } from "./status";
 
-export const metadata = { title: "Proiecte" };
+export const metadata = { title: "Licitații & proiecte" };
 
 const fmt = new Intl.DateTimeFormat("ro-RO", { dateStyle: "medium" });
 
@@ -23,7 +23,7 @@ export default async function ProjectsPage() {
 
   return (
     <>
-      <PageHeader title="Proiecte" subtitle="Fiecare lucrare sau licitație e un proiect: aici vor sta devizele, documentele și șantierul." />
+      <PageHeader title="Licitații & proiecte" subtitle="Fiecare lucrare sau licitație e un proiect: aici vor sta devizele, documentele și șantierul." />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] [&>*]:min-w-0">
         <Card className="overflow-x-auto p-0">
           {projects.length === 0 ? (

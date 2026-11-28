@@ -6,7 +6,7 @@ import { RecipeList } from "@/components/recipes/pages";
 import { companyRecipes } from "@/components/recipes/contexts";
 import { requireUser } from "@/lib/auth/session";
 
-export const metadata = { title: "Resurse" };
+export const metadata = { title: "Prețuri & materiale" };
 
 type SP = { tip?: string; q?: string; tab?: string; categorie?: string; status?: string; istoric?: string };
 
@@ -25,7 +25,7 @@ export default async function ResourcesPage({ searchParams }: { searchParams: Pr
   if (recipes) {
     return (
       <>
-        <PageHeader title="Resurse" subtitle="Articolele sunt lucrări descompuse pe resurse (rețete de consum). La importul F3 se potrivesc automat, instant și fără cost. Salvezi articole și din editorul de deviz, cu ★." />
+        <PageHeader title="Prețuri & materiale" subtitle="Articolele sunt lucrări descompuse pe resurse (rețete de consum). La importul F3 se potrivesc automat, instant și fără cost. Salvezi articole și din editorul de deviz, cu ★." />
         {tabs}
         <RecipeList ctx={companyRecipes(user.company?.id ?? null)} sp={sp} listPath="/panou/resurse" />
       </>

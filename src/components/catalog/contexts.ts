@@ -15,6 +15,6 @@ export const ADMIN_MANOPERA: CatalogCtx = {
 
 export const companyCtx = (companyId: number | null): CatalogCtx => ({
   scope: "company", companyId, basePath: "/panou/resurse", types: RES_TYPES,
-  title: "Resurse",
+  title: "Prețuri & materiale",
   subtitle: "Materialele, manopera, utilajele și transportul, cu prețurile tale. Cele marcate „catalog” vin de la platformă; pe ele îți poți pune prețul negociat.",
 });

@@ -80,7 +80,7 @@ function OfferCompare({ doc, res, onUse }: { doc: EstimateDoc; res: EstResource;
   const need = totalQtyInDoc(doc, res.resourceId!);
   useEffect(() => { resourceOffersAction(res.resourceId!).then(setOffers); }, [res.resourceId]);
   if (!offers) return <p className="px-3 py-2 text-xs text-muted">Se încarcă ofertele…</p>;
-  if (!offers.length) return <p className="px-3 py-2 text-xs text-muted">Nicio ofertă activă pentru această resursă. Adaugă prețuri din pagina Resurse.</p>;
+  if (!offers.length) return <p className="px-3 py-2 text-xs text-muted">Nicio ofertă activă pentru această resursă. Adaugă prețuri din pagina Prețuri & materiale.</p>;
   const rows = offers.map((o) => ({
     o, total: o.priceRon * need.qty,
     underMin: o.minQty !== null && need.qty < o.minQty,

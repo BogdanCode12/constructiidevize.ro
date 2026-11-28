@@ -108,7 +108,7 @@ export function ResourcePicker({ onPick, onManual }: { onPick: (r: CatalogResour
           {loading && results.length === 0 ? (
             <p className="px-3 py-2 text-sm text-muted">Se caută…</p>
           ) : results.length === 0 ? (
-            <p className="px-3 py-2 text-sm text-muted">Nimic găsit. Adaugă resurse în pagina Resurse sau folosește „Resursă manuală”.</p>
+            <p className="px-3 py-2 text-sm text-muted">Nimic găsit. Adaugă resurse în pagina Prețuri & materiale sau folosește „Resursă manuală”.</p>
           ) : (
             results.map((r) => (
               <button

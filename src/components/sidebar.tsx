@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "./icon";
 
-type Item = { href: string; label: string; icon: string; soon?: boolean };
+type Item = { href: string; label: string; icon: string; soon?: boolean; group?: string };
 
 export function Sidebar({ main, account, footer, header }: {
   main: Item[]; account: Item[]; footer: React.ReactNode; header: React.ReactNode;
@@ -47,8 +47,15 @@ export function Sidebar({ main, account, footer, header }: {
       >
         <div className="px-5 py-5">{header}</div>
         <nav className="flex-1 space-y-0.5 overflow-y-auto px-3">
-          {main.map(link)}
-          <p className="px-3 pt-5 pb-1.5 text-xs font-semibold uppercase tracking-wide text-muted">Cont</p>
+          {main.map((it, i) => (
+            <div key={it.href}>
+              {it.group && it.group !== main[i - 1]?.group && (
+                <p className="px-3 pt-5 pb-1.5 text-xs font-semibold uppercase tracking-wide text-muted">{it.group}</p>
+              )}
+              {link(it)}
+            </div>
+          ))}
+          <p className="px-3 pt-5 pb-1.5 text-xs font-semibold uppercase tracking-wide text-muted">Firma</p>
           {account.map(link)}
         </nav>
         <div className="border-t border-line p-4">{footer}</div>

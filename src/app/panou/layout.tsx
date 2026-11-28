@@ -36,6 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     href: m.slug ? `/panou/${m.slug}` : "/panou",
     label: m.label,
     icon: m.icon,
+    group: m.group,
     soon: !m.ready,
   }));
   const account = [

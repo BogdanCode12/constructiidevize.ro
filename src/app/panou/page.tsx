@@ -10,7 +10,7 @@ import { expiryStatus } from "@/lib/documents";
 
 const dt = new Intl.DateTimeFormat("ro-RO", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
-export const metadata = { title: "Dashboard" };
+export const metadata = { title: "Birou" };
 
 const START_OPTIONS: { icon: string; title: string; text: string; tag?: string; href?: string }[] = [
   { icon: "spark", title: "Din documente, cu asistentul", text: "Încarcă caietul de sarcini, planșe, PDF sau Excel.", tag: "Recomandat", href: "/panou/asistent" },

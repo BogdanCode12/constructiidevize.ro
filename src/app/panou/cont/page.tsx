@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth/session";
 import { query } from "@/lib/db";
 import { changePasswordAction, deleteAccountAction, updateProfileAction } from "./actions";
 
-export const metadata = { title: "Contul meu" };
+export const metadata = { title: "Profilul meu" };
 
 const dt = new Intl.DateTimeFormat("ro-RO", { dateStyle: "short", timeStyle: "short" });
 
@@ -16,7 +16,7 @@ export default async function AccountPage() {
   );
   return (
     <>
-      <PageHeader title="Contul meu" subtitle={user.email} />
+      <PageHeader title="Profilul meu" subtitle={user.email} />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 [&>*]:min-w-0">
         <Card>
           <h2 className="mb-4 font-bold">Profil</h2>

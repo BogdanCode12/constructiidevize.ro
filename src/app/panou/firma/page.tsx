@@ -9,7 +9,7 @@ import {
   changeMemberRoleAction, inviteMemberAction, removeMemberAction, revokeInvitationAction, switchCompanyAction,
 } from "./actions";
 
-export const metadata = { title: "Firmă & utilizatori" };
+export const metadata = { title: "Firmă & echipă" };
 
 const ROLE = { owner: "Proprietar", admin: "Administrator", member: "Membru" } as const;
 const fmt = new Intl.DateTimeFormat("ro-RO", { dateStyle: "short" });
@@ -17,7 +17,7 @@ const fmt = new Intl.DateTimeFormat("ro-RO", { dateStyle: "short" });
 export default async function CompanyPage({ searchParams }: { searchParams: Promise<{ eroare?: string }> }) {
   const user = await requireUser();
   const { eroare } = await searchParams;
-  if (!user.company) return <PageHeader title="Firmă & utilizatori" subtitle="Contul nu are o firmă asociată." />;
+  if (!user.company) return <PageHeader title="Firmă & echipă" subtitle="Contul nu are o firmă asociată." />;
   const company = (await getCompany(user.company.id))!;
   const canManage = user.company.memberRole !== "member";
 
@@ -36,7 +36,7 @@ export default async function CompanyPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHeader title="Firmă & utilizatori" subtitle="Datele firmei se folosesc automat în declarații, formulare și exporturi." />
+      <PageHeader title="Firmă & echipă" subtitle="Datele firmei se folosesc automat în declarații, formulare și exporturi." />
       {eroare === "drepturi" && <p className="mb-4 rounded-lg bg-amber-50 px-4 py-2.5 text-sm">Acțiunea cere rol de proprietar sau administrator al firmei.</p>}
       {memberships.length > 1 && (
         <Card className="mb-6 flex flex-wrap items-center gap-3">

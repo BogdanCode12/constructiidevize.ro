@@ -38,7 +38,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
   return (
     <>
-      <Link href="/panou/proiecte" className="text-sm text-muted hover:text-ink">← Proiecte</Link>
+      <Link href="/panou/proiecte" className="text-sm text-muted hover:text-ink">← Licitații & proiecte</Link>
       <div className="mt-1 mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">{p.name}</h1>

@@ -1,17 +1,22 @@
-/** Modulele din panou. `ready: false` = pagină „în curând” până le construim. */
+/**
+ * Meniul contului, grupat după etapele unei lucrări: Ofertare → Execuție → Firma.
+ * `ready: false` = pagină „în curând” până o construim.
+ */
+export type ModuleGroup = "" | "Ofertare" | "Execuție";
+
 export const MODULES = [
-  { slug: "", label: "Dashboard", icon: "home", ready: true },
-  { slug: "proiecte", label: "Proiecte", icon: "folder", ready: true },
-  { slug: "devize", label: "Devize", icon: "calc", ready: true, description: "Devize pe materiale, manoperă și utilaje, cu export F1–F3 și C5–C9." },
-  { slug: "manopera", label: "Manoperă & utilaje", icon: "clock", ready: true, description: "Normă × cantitate → oameni, zile și ore de regie, cu grafic de execuție." },
-  { slug: "asistent", label: "Asistent tehnic", icon: "spark", ready: true, description: "Încarcă planuri DTAC / PTh, PDF sau Excel și primești antemăsurătoarea." },
-  { slug: "documente", label: "Documente", icon: "doc", ready: true, description: "Caiet de sarcini și declarații pentru SEAP, precompletate din datele firmei." },
-  { slug: "santier", label: "Șantier", icon: "helmet", ready: true, description: "Jurnal de șantier, pontaj și situații de lucrări lunare față de deviz." },
-  { slug: "resurse", label: "Resurse", icon: "box", ready: true, description: "Bazele tale de materiale, manoperă și utilaje, cu prețuri proprii." },
-] as const;
+  { slug: "", label: "Birou", group: "", icon: "home", ready: true },
+  { slug: "proiecte", label: "Licitații & proiecte", group: "Ofertare", icon: "folder", ready: true },
+  { slug: "devize", label: "Devize", group: "Ofertare", icon: "calc", ready: true, description: "Devize pe materiale, manoperă și utilaje, cu export F1–F3 și C5–C9." },
+  { slug: "resurse", label: "Prețuri & materiale", group: "Ofertare", icon: "box", ready: true, description: "Bazele tale de materiale, manoperă și utilaje, cu prețuri proprii." },
+  { slug: "manopera", label: "Manoperă & utilaje", group: "Ofertare", icon: "clock", ready: true, description: "Normă × cantitate → oameni, zile și ore de regie, cu grafic de execuție." },
+  { slug: "asistent", label: "Asistent tehnic", group: "Ofertare", icon: "spark", ready: true, description: "Încarcă planuri DTAC / PTh, PDF sau Excel și primești antemăsurătoarea." },
+  { slug: "documente", label: "Dosarul firmei", group: "Ofertare", icon: "doc", ready: true, description: "Caiet de sarcini și declarații pentru SEAP, precompletate din datele firmei." },
+  { slug: "santier", label: "Șantier", group: "Execuție", icon: "helmet", ready: true, description: "Jurnal de șantier, pontaj și situații de lucrări lunare față de deviz." },
+] as const satisfies readonly { slug: string; label: string; group: ModuleGroup; icon: string; ready: boolean; description?: string }[];
 
 export const ACCOUNT_LINKS = [
-  { slug: "firma", label: "Firmă & utilizatori", icon: "building" },
+  { slug: "firma", label: "Firmă & echipă", icon: "building" },
   { slug: "abonament", label: "Abonament", icon: "card" },
-  { slug: "cont", label: "Contul meu", icon: "user" },
+  { slug: "cont", label: "Profilul meu", icon: "user" },
 ] as const;

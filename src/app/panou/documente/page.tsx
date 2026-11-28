@@ -9,7 +9,7 @@ import { listTemplates } from "@/lib/templates";
 import { deleteDocumentAction } from "./actions";
 import { UploadForm } from "./upload-form";
 
-export const metadata = { title: "Documente" };
+export const metadata = { title: "Dosarul firmei" };
 
 const TONE = { ok: "bg-brand-50 text-brand-800", soon: "bg-amber-100 text-amber-800", expired: "bg-red-100 text-red-700", none: "bg-canvas text-muted" };
 const size = (b: number | null) => (b ? (b > 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.ceil(b / 1024)} KB`) : "");
@@ -22,7 +22,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader title="Documente" subtitle="Dosarul permanent al firmei și declarațiile generate automat pentru licitații." />
+      <PageHeader title="Dosarul firmei" subtitle="Dosarul permanent al firmei și declarațiile generate automat pentru licitații." />
       <nav className="mb-6 flex gap-1 border-b border-line">
         {[["dosar", "Dosarul firmei"], ["declaratii", "Declarații & formulare"]].map(([id, label]) => (
           <Link key={id} href={`/panou/documente?tab=${id}`}
@@ -108,7 +108,7 @@ async function Declarations({ companyId, projectId, estimateId }: { companyId: n
     <div className="space-y-6">
       {missing.length > 0 && (
         <p className="rounded-lg bg-amber-50 px-4 py-3 text-sm">
-          Lipsesc din datele firmei: <b>{missing.join(", ")}</b>. Completează-le în <Link href="/panou/firma" className="font-semibold text-brand-700 underline">Firmă & utilizatori</Link> ca să apară în documente.
+          Lipsesc din datele firmei: <b>{missing.join(", ")}</b>. Completează-le în <Link href="/panou/firma" className="font-semibold text-brand-700 underline">Firmă & echipă</Link> ca să apară în documente.
         </p>
       )}
       <Card>
