@@ -24,7 +24,7 @@ export function Sidebar({ main, account, footer, header }: {
           active ? "bg-brand-50 font-semibold text-brand-800" : "text-ink/80 hover:bg-canvas hover:text-ink"
         }`}
       >
-        <Icon name={it.icon} className={`size-5 ${active ? "text-brand-700" : "text-muted"}`} />
+        <Icon name={it.icon} className={`size-[22px] ${active ? "text-brand-700" : "text-muted"}`} />
         <span className="flex-1">{it.label}</span>
         {it.soon && <span className="rounded bg-canvas px-1.5 py-0.5 text-[10px] font-medium uppercase text-muted">curând</span>}
       </Link>

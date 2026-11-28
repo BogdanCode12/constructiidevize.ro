@@ -16,7 +16,21 @@ const PATHS: Record<string, string> = {
   user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
 };
 
+/** Iconițe desenate (PNG transparent în public/icons/meniu/), colorate prin mască cu culoarea textului (gri / roșu activ). */
+const IMAGES: Record<string, string> = {
+  birou: "/icons/meniu/birou.png",
+  devize: "/icons/meniu/devize.png",
+  materiale: "/icons/meniu/materiale.png",
+  manopera: "/icons/meniu/manopera.png",
+  santier: "/icons/meniu/santier.png",
+};
+
 export function Icon({ name, className = "size-5" }: { name: string; className?: string }) {
+  const img = IMAGES[name];
+  if (img) {
+    const mask = `url(${img}) center / contain no-repeat`;
+    return <span aria-hidden className={`inline-block shrink-0 bg-current ${className}`} style={{ mask, WebkitMask: mask }} />;
+  }
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <path d={PATHS[name] ?? PATHS.doc} />
